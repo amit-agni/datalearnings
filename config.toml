@@ -1,21 +1,22 @@
 baseURL = "http://example.com/"
 languageCode = "en-us"
-title = "Minimal"
+title = "Data"
 theme = "minimal"
 disqusShortname = "username" # delete this to disable disqus comments
 googleAnalytics = ""
+ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
 [params]
-    author = "Calin Tataru"
-    description = "Personal blog theme powered by Hugo"
-    githubUsername = "#"
-    accent = "red"
+    author = "Amit Agni"
+    description = "Everything around Statistics, Data Science, Machine Learning, AI, etc. "
+    githubUsername = "amit-agni"
+    accent = "grey"
     showBorder = true
     backgroundColor = "white"
     font = "Raleway" # should match the name on Google Fonts!
     highlight = true
-    highlightStyle = "default"
-    highlightLanguages = ["go", "haskell", "kotlin", "scala", "swift"]
+    highlightStyle = "monokai"
+    highlightLanguages = ["r","yaml","python"]
 
 [[menu.main]]
     url = "/"
@@ -42,26 +43,26 @@ googleAnalytics = ""
 # The list of available icons can be found at http://fontawesome.io/icons.
 
 [[menu.icon]]
-    url = "mailto:me@example.com"
+    url = "mailto:amitagni2@gmail.com"
     name = "envelope-o"
     weight = 1
 
 [[menu.icon]]
-    url = "https://github.com/username/"
+    url = "https://github.com/amit-agni/"
     name = "github"
     weight = 2
 
 [[menu.icon]]
-    url = "https://twitter.com/username/"
+    url = "https://twitter.com/amitagni/"
     name = "twitter"
     weight = 3
 
 [[menu.icon]]
-    url = "https://www.linkedin.com/in/username/"
+    url = "https://www.linkedin.com/in/amitagni/"
     name = "linkedin"
     weight = 4
 
 [[menu.icon]]
-    url = "https://www.stackoverflow.com/username/"
+    url = "https://www.stackoverflow.com/users/9644081/asquare"
     name = "stack-overflow"
     weight = 5

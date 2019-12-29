@@ -1,11 +1,9 @@
 ---
-description: Lorem ipsum dolor sit amet
+description: R package with commonly used functions
 draft: false
 repo: '#'
 tags:
-- go
-- golang
-- hugo
-title: Project 1
+- R package
+title: cutlery [WIP]
 weight: 1
 ---
