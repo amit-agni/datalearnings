@@ -1,0 +1,11 @@
+#code-folding-buttons {float: right;}
+#code-folding-buttons .pull-right > .dropdown-menu {
+    right: 0;
+    left: auto;
+}
+#code-folding-buttons .btn.btn-default.btn-xs.dropdown-toggle {
+    float: right;
+}
+#code-folding-buttons.open > .dropdown-menu {
+    display: block;
+}
