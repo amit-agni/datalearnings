@@ -1,14 +1,14 @@
-baseURL = "http://example.com/"
+baseURL = "http://datalearnings.com/"
 languageCode = "en-us"
-title = "Data"
+title = "data"
 theme = "minimal"
-disqusShortname = "username" # delete this to disable disqus comments
-googleAnalytics = ""
+disqusShortname = "amitagni_disqus" # delete this to disable disqus comments
+googleAnalytics = "UA-28526370-4"
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
 [params]
     author = "Amit Agni"
-    description = "Everything around Statistics, Data Science, Machine Learning, AI, etc. "
+    description = "learnings around Data Analytics, Data Science, Data Visualisation, Statistics, Machine Learning, AI, etc. "
     githubUsername = "amit-agni"
     accent = "grey"
     showBorder = true
