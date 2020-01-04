@@ -15,7 +15,7 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
     backgroundColor = "white"
     font = "Raleway" # should match the name on Google Fonts!
     highlight = true
-    highlightStyle = "monokai"
+    highlightStyle = "github-gist"
     highlightLanguages = ["r","yaml","python"]
     # Set to true to disable code folding
     disable_codefolding = false
