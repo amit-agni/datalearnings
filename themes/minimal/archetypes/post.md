@@ -2,8 +2,8 @@
 title: "{{ replace .TranslationBaseName "-" " " | title }}"
 date: {{ dateFormat "2006-01-02" .Date }}
 tags: []
-draft: true
 robots: "noindex,nofollow"
+draft: true
 description: "write in quotes"
 output:
   blogdown::html_page:
@@ -27,3 +27,4 @@ ggplot_color_theme <- "turquoise4"
 	<!-- feature image -->
 
 </center>
+<hr>
