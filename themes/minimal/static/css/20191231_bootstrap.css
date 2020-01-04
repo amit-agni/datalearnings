@@ -1953,15 +1953,15 @@ kbd kbd {
 
 pre {
     display: block;
-    padding: 1px;
+    padding: 0px;
     margin: 0 0 10px;
-    font-size: 13px;
+    font-size: 12px;
     line-height: 1.42857143;
     color: #333;
     word-break: break-all;
     word-wrap: break-word;
     background-color: #f5f5f5;
-    border: 1px solid #ccc;
+    border: 0px solid #ccc;
     border-radius: 4px
 }
 
@@ -1972,6 +1972,8 @@ pre code {
     white-space: pre-wrap;
     background-color: transparent;
     border-radius: 0
+    font-family: "Courier New", "Courier", "Sans Mono", "Consolas", monospace;
+
 }
 
 .pre-scrollable {
