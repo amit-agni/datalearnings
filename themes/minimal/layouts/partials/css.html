@@ -13,7 +13,7 @@
 </style>
 
 <!-- main -->
-<link rel="stylesheet" href="{{ "css/main.css" | absURL }}">
+<link rel="stylesheet" href="{{ "css/main.css" | relURL }}">
 
 <!-- custom -->
 {{ range .Site.Params.css }} <link rel="stylesheet" href="{{ . | absURL }}"> {{ end }}
@@ -25,11 +25,11 @@
 {{ if .Site.Params.highlight | default false }} <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/{{ .Site.Params.highlightStyle | default "default" }}.min.css"> {{ end }}
 
 <!-- bootstrap -->
-<link rel="stylesheet" href="{{ "css/20191231_bootstrap.css" | absURL }}">
+<link rel="stylesheet" href="{{ "css/20191231_bootstrap.css" | relURL }}">
 
 <!-- font awesome -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 
 <!-- code folding -->
-<link rel="stylesheet" href="{{ "css/code_folding.css" | absURL }}">
+<link rel="stylesheet" href="{{ "css/code_folding.css" | relURL }}">
 
