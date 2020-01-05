@@ -1,0 +1,407 @@
+---
+title: Inferential Statisics Part I - Basics
+author: Amit Agni
+date: '2018-03-21'
+slug: inferential-statisics-part-i-basics
+categories:
+  - Statistics
+tags:
+  - statistics
+  - all posts
+robots: "noindex"
+description: General statistical concepts like central limit theorem, confidence intervals, Pprobability distributions, critical values, p-values, etc
+output:
+  blogdown::html_page:
+    toc: yes
+    fig_height: 5
+    fig_width: 5
+---
+
+<script src="/rmarkdown-libs/kePrint/kePrint.js"></script>
+
+<div id="TOC">
+<ul>
+<li><a href="#sampling-distribution">Sampling Distribution</a></li>
+<li><a href="#standard-error">Standard Error</a></li>
+<li><a href="#central-limit-theorem">Central Limit Theorem</a></li>
+<li><a href="#confidence-interval-ci">Confidence interval (CI)</a></li>
+<li><a href="#z-value-and-t-value">z-value and t-value</a></li>
+<li><a href="#probability-distributions">Probability distributions</a></li>
+<li><a href="#rdq-and-p-functions-in-r">r,d,q and p functions in R</a></li>
+<li><a href="#hypothesis-testing-null-hypothesis">Hypothesis Testing &amp; Null hypothesis</a></li>
+<li><a href="#two-tailed-vs-one-tailed-hypothesis">Two-tailed vs One-Tailed Hypothesis</a></li>
+<li><a href="#critical-values">Critical Values</a></li>
+<li><a href="#p-value">P-value</a></li>
+<li><a href="#summary">Summary</a></li>
+</ul>
+</div>
+
+<center>
+<img src="/post/2018-03-21-inferential-statisics-part-i-basics_files/qingbao-meng-01_igFr7hd4-unsplash.jpg" />
+<em>Photo by Qingbao Meng on Unsplash</em>
+</center>
+<hr>
+<p>It is not always possible to collect data on the entire population, so we take random samples from the population and then use those samples to make predictions or derive inferences about the population. These techniques are referred as Inferential statistics.</p>
+<ul>
+<li>It differs from Descriptive statistics which is used to describe the population data.</li>
+<li>And it differs from Probability in which we use a known population value (parameter) to make prediction about the likelihood of a particular sample value (statistic)</li>
+<li>Descriptive statistics (like measures of central tendency, measures of spread)
+<ul>
+<li>when applied to populations are called <code>parameters</code> and</li>
+<li>when they are applied to samples are called <code>statistics</code></li>
+</ul></li>
+</ul>
+<p>This post consists of some of the notes that I had taken while studying Inferential Statistics. They are not exhaustive and also not in any specific order or structure.</p>
+<div id="sampling-distribution" class="section level3">
+<h3>Sampling Distribution</h3>
+<p>If we take random samples of data from a population, and plot the means of these samples, the resulting distribution that we get is called as the Sampling Distribution</p>
+<p>Lets run through an example. We will consider Sepal.Length from the iris dataset as our population. It has mean of 5.8433333 and standard deviation of 0.8280661. And the histogram looks as below</p>
+<pre class="r"><code>iris %&gt;%
+  ggplot(aes(x=Sepal.Length)) +
+  geom_histogram(fill=&quot;cornsilk&quot;,binwidth=0.05) +
+  labs(x=&quot;Sepal Length&quot;
+       ,y=&quot;Count&quot;
+       ,title=&quot;Petals and Sepals&quot;
+       ,subtitle=&quot;Histogram of Sepal Length&quot;
+       ,caption = varPlotCaption) +
+  theme_darklightmix(color_theme = ggplot_color_theme) +
+  scale_fill_brewer(palette = &quot;Set3&quot;)</code></pre>
+<p><img src="/post/2018-03-21-inferential-statisics-part-i-basics_files/figure-html/unnamed-chunk-1-1.png" width="384" style="display: block; margin: auto;" /></p>
+<p>Now, lets take 30 samples (sample size) from this population and repeat it 1000 times. If we plot the means of each of these repeatitions, the resulting distribution that we get is called the <code>Sampling distribution</code> and it is centered around the population mean of 5.84.</p>
+<p>If the population size was large, we could have taken larger sample size and done fewer repeats and still we would have got a similar distribution.</p>
+<pre class="r"><code>set.seed(123)
+SL_sample_means &lt;- vector()
+for(i in 1 : 1000) {
+ SL_sample_means[i] &lt;- mean(sample(iris$Sepal.Length,30))
+} 
+
+
+data.frame(Sepal.Length = SL_sample_means) %&gt;%
+  ggplot(aes(x=Sepal.Length)) +
+  geom_histogram(fill=&quot;cornsilk&quot;,binwidth=0.05) +
+  labs(x=&quot;Sepal Length&quot;
+       ,y=&quot;Count&quot;
+       ,title=&quot;Petals and Sepals&quot;
+       ,subtitle=&quot;Histogram of Sepal Length&quot;
+       ,caption = varPlotCaption) +
+  theme_darklightmix(color_theme = ggplot_color_theme) +
+  scale_fill_brewer(palette = &quot;Set3&quot;)</code></pre>
+<p><img src="/post/2018-03-21-inferential-statisics-part-i-basics_files/figure-html/unnamed-chunk-2-1.png" width="384" style="display: block; margin: auto;" /></p>
+</div>
+<div id="standard-error" class="section level3">
+<h3>Standard Error</h3>
+<ul>
+<li>The variablity of the sample means decreases as sample size increases. The sample means are more tightly clustered around the true mean. This variablity of sample means is called the standard error <code>s</code>. It is like the standard deviation of a sampling distribution.</li>
+<li>In other words, the standard deviation of this sampling distribution approximately equals the SD of the population divided by the square root of the sample size which is the typical error associated with an estimate.</li>
+<li>Thus, the SD of the sample mean given n independent observations from a population with standard deviation <span class="math inline">\(\sigma\)</span> is given by the formula <span class="math inline">\(\frac{\sigma } { \sqrt{n}}\)</span>.</li>
+<li>The important things to note is that the observations should be independent and a reliable way to do that is to take a random sample consisting of less than 10% of the population.</li>
+<li>The mean and standard deviation are descriptive statistics, whereas the standard error of the mean is descriptive of the random sampling process. i.e the standard error of the sample mean is an estimate of how far the sample mean is likely to be from the population mean, whereas the standard deviation of the sample is the degree to which individuals within the sample differ from the sample mean.</li>
+</ul>
+<p><a href="https://en.wikipedia.org/wiki/Standard_error">Wikipedia</a></p>
+<blockquote>
+<p>In particular, the standard error of a sample statistic (such as sample mean) is the actual or estimated standard deviation of the error in the process by which it was generated. In other words, it is the actual or estimated standard deviation of the sampling distribution of the sample statistic. The notation for standard error can be any one of SE, SEM (for standard error of measurement or mean), or SE.</p>
+</blockquote>
+<blockquote>
+<p>If the population standard deviation is finite, the standard error of the mean of the sample will tend to zero with increasing sample size, because the estimate of the population mean will improve, while the standard deviation of the sample will tend to approximate the population standard deviation as the sample size increases.</p>
+</blockquote>
+<pre class="r"><code>sd(SL_sample_means)</code></pre>
+<pre><code>## [1] 0.1298081</code></pre>
+<pre class="r"><code>sd(iris$Sepal.Length)/sqrt(30)</code></pre>
+<pre><code>## [1] 0.1511835</code></pre>
+</div>
+<div id="central-limit-theorem" class="section level3">
+<h3>Central Limit Theorem</h3>
+<ul>
+<li><p>The Central Limit Theorem states that the distribution of the mean of samples approaches the normal distribution as the sample size n increases. Usually, if the sample size n &gt;= 30 the distribution will be well approximated by the normal distribution, even for skewed populations. Watch out for outliers in the population.</p></li>
+<li><p>If we can select a single sample of a known size from our population and calculate its mean, we can use the Central Limit Theorem to predict what that true population mean must be within a defined degree of confidence.</p></li>
+<li><p>The Central Limit Theorem confirms the intuitive notion that as the sample size increases for a random variable, the distribution of the sample means will begin to approximate a normal distribution, with the mean equal to the mean of the underlying population and the standard deviation equal to the standard deviation of the population divided by the square root of the sample size, <code>n</code></p></li>
+</ul>
+</div>
+<div id="confidence-interval-ci" class="section level3">
+<h3>Confidence interval (CI)</h3>
+<ul>
+<li>Confidence interval gives the range of values the particular population parameter will fall between.</li>
+<li>If we know standard deviation of a population then the CI for the mean is given by the formula <span class="math inline">\(\overline{X} \pm z^{*} \frac {\sigma}{\sqrt{n}}\)</span>
+<ul>
+<li><span class="math inline">\(\overline{X}\)</span> is the mean</li>
+<li><span class="math inline">\(\sigma\)</span> is the standard deviation of the population</li>
+<li><span class="math inline">\(z^{*}\)</span> is the value from the normal distribution</li>
+</ul></li>
+<li>We can see that <span class="math inline">\(\frac {\sigma}{\sqrt{n}}\)</span> is the formula for Standard error of the mean</li>
+<li>The <span class="math inline">\(z^{*}\)</span> values for some confidence intervals are given below</li>
+</ul>
+<pre class="r"><code>tibble::tribble(
+       ~Conf_Int., ~z_Value,
+             &quot;80%&quot;,     1.28,
+             &quot;90%&quot;,     1.64,
+             &quot;95%&quot;,     1.96,
+             &quot;98%&quot;,     2.33,
+             &quot;99%&quot;,     2.58
+       ) %&gt;% 
+  kable() %&gt;%
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;
+                                      , &quot;condensed&quot;, &quot;responsive&quot;)
+                ,full_width = F
+                ,position = &quot;center&quot;
+                #,font_size = 7
+                )</code></pre>
+<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Conf_Int.
+</th>
+<th style="text-align:right;">
+z_Value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+1.28
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+90%
+</td>
+<td style="text-align:right;">
+1.64
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+95%
+</td>
+<td style="text-align:right;">
+1.96
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+98%
+</td>
+<td style="text-align:right;">
+2.33
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+99%
+</td>
+<td style="text-align:right;">
+2.58
+</td>
+</tr>
+</tbody>
+</table>
+<p>Now, lets find the Confidence interval of the Sample mean. So for the sample mean of 5.839 we get 95% CI between 5.543 and 6.135. In other words, we can say with 95% confidence that the mean will fall between 5.543 and 6.135.</p>
+<pre class="r"><code>set.seed(123)
+SL_sample_means &lt;- rep(NA,1000)
+for(i in 1 : 1000) {
+ SL_sample &lt;- sample(iris$Sepal.Length,30)
+ SL_sample_means[i] &lt;- mean(SL_sample)
+}
+mean(SL_sample_means)</code></pre>
+<pre><code>## [1] 5.836377</code></pre>
+<pre class="r"><code>SE &lt;- sd(iris$Sepal.Length) / sqrt(30)
+ 
+mean(SL_sample_means) - 1.96*SE</code></pre>
+<pre><code>## [1] 5.540057</code></pre>
+<pre class="r"><code>mean(SL_sample_means) + 1.96*SE</code></pre>
+<pre><code>## [1] 6.132696</code></pre>
+</div>
+<div id="z-value-and-t-value" class="section level3">
+<h3>z-value and t-value</h3>
+<ul>
+<li><p>We have used the z value because our sample size was 30. If our sample size was less than 30 then we would have used t value from t-distribution. And the formula would have been <span class="math inline">\(\overline{X} \pm t _{n-1} \frac {\sigma}{\sqrt{n}}\)</span> where <span class="math inline">\(t _{n-1}\)</span> is the critical <code>t-value</code> from the t-distribution table</p></li>
+<li>The t-distribution is more fatter and spread out compared to Z-distribution so our CI would be more wider</li>
+<li>If we had not known the SD of the population, we could have used the SD of the sample to find the CI</li>
+<li>The margin of error is the distance between the point estimate and the lower or upper bound of a confidence interval</li>
+<li>Confidence Interval is not the probability of capturing the population parameter</li>
+<li><a href="http://www.dummies.com/education/math/statistics/how-to-calculate-a-confidence-interval-for-a-population-mean-with-unknown-standard-deviation-andor-small-sample-size/">Source 1</a></li>
+<li><p><a href="http://www.dummies.com/education/math/statistics/how-to-calculate-a-confidence-interval-for-a-population-mean-when-you-know-its-standard-deviation/">Source 2</a></p></li>
+</ul>
+</div>
+<div id="probability-distributions" class="section level3">
+<h3>Probability distributions</h3>
+<ul>
+<li>Given below are commonly found discrete and continuous probability distribution functions and their relationships with each other. <em>Image credit and for a clear and simple explanation, check <a href="http://blog.cloudera.com/blog/2015/12/common-probability-distributions-the-data-scientists-crib-sheet/">this article</a></em></li>
+<li>This is another <a href="http://www.math.wm.edu/~leemis/chart/UDR/UDR.html">interesting article</a> showing all probability distributions, their equations and their relationships.</li>
+</ul>
+<center>
+<img src="/post/2018-03-21-inferential-statisics-part-i-basics_files/distribution.png" style="width:50.0%;height:50.0%" />
+</center>
+<p>We can use the r() function to generate the random variates for these distributions. Below code generates some of these distributions and plots them using ggplot().</p>
+<pre class="r"><code>set.seed(1234)
+normal&lt;- rnorm(1000,mean=100,2)
+tdist &lt;- rt(n=1000,df = 50)
+fdist &lt;- rf(n=1000,df1 = 5, df2 = 100)
+chisq &lt;- rchisq(n=1000,df = 5)
+exp &lt;- rexp(n=1000,rate = 1)
+pois &lt;- rpois(n=1000,lambda = 5)
+unif &lt;- runif(n=1000,min = 5, max = 10)
+geom &lt;- rgeom(n=1000,prob= 0.5)
+data &lt;- cbind(normal,tdist,fdist,chisq,exp,pois,unif,geom)
+ 
+transposed_df &lt;-gather(as.data.frame(data),key=&quot;Name&quot;,value=&quot;Value&quot;)
+transposed_df %&gt;%
+  ggplot() +
+  geom_histogram(aes(x=Value,fill=Name),binwidth = 0.1) +
+  labs(x=&quot;&quot;
+       ,y=&quot;&quot;
+       ,title = &quot;Some Probability distribution functions&quot;
+       ,caption = varPlotCaption) +
+  facet_wrap(~Name, scales = &quot;free&quot;, nrow = 4) +
+  theme_darklightmix(color_theme = ggplot_color_theme
+                     ,legend_position = &quot;none&quot;) +
+  scale_fill_brewer(palette = &quot;Set3&quot;)</code></pre>
+<p><img src="/post/2018-03-21-inferential-statisics-part-i-basics_files/figure-html/unnamed-chunk-6-1.png" width="480" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#Plot the curves [ TO DO ]
+# 
+# ggplot(transposed_df) +
+#   stat_function(fun=to_be_done
+#                 ,aes(x=Value)
+#                 ,args = list(mean = mean(transposed_df$Value)
+#                              ,sd = sd(transposed_df$Value))) +
+#   facet_wrap(~Name, scales = &quot;free&quot;, nrow = 3) </code></pre>
+</div>
+<div id="rdq-and-p-functions-in-r" class="section level3">
+<h3>r,d,q and p functions in R</h3>
+<ul>
+<li><strong>r()</strong> : In the previous section, we saw the <code>r()</code> function that we can use to generate random numbers satisfying different probability distributions.</li>
+<li><strong>q()</strong> : The q function is used to find the critical values from the probability distribution function. See Example 1 below in the Critical Values section</li>
+<li><strong>p()</strong> : The p() is used to calculate the p-value from the probability distribution function. See Example 3 below in the Critical Values section</li>
+<li><strong>d()</strong> : We can use the density function d() to find the height of the probability distribution at any given value</li>
+<li>More in <a href="http://strata.uga.edu/8370/rtips/rdqp.html">this article</a></li>
+</ul>
+<pre class="r"><code>set.seed(1234)
+dnorm(102,mean = mean(normal),sd = sd(normal))</code></pre>
+<pre><code>## [1] 0.1177504</code></pre>
+<pre class="r"><code>normal&lt;- rnorm(1000,mean=100,sd=2)
+ggplot() +
+  stat_function(fun=dnorm
+                ,aes(x=normal)
+                ,args = list(mean = mean(normal)
+                             ,sd = sd(normal))) +
+  labs(x=&quot;&quot;
+       ,y=&quot;&quot;
+       ,subtitle=&quot;Normal distribution height&quot;
+       ,caption = varPlotCaption) +
+  theme_darklightmix(color_theme = ggplot_color_theme
+                     ,legend_position = &quot;none&quot;) +
+  scale_fill_brewer(palette = &quot;Set3&quot;)</code></pre>
+<p><img src="/post/2018-03-21-inferential-statisics-part-i-basics_files/figure-html/unnamed-chunk-7-1.png" width="384" style="display: block; margin: auto;" /></p>
+</div>
+<div id="hypothesis-testing-null-hypothesis" class="section level3">
+<h3>Hypothesis Testing &amp; Null hypothesis</h3>
+<ul>
+<li><p>As per wikipedia, a null hypothesis is a default statement that there is no relationship between two events or no association among groups and that they are completely independent. And the central tasks of a statistician is to reject the null hypothesis and prove that the relationship exists. The opposite of null hypothesis is alternative hypothesis.</p></li>
+<li>Normally, we would either would either Reject the Null Hypothesis or Fail to reject the hypothesis. But there are couple of other possibilities and these are the Type I and Type II Errors
+<ul>
+<li><strong>Type I - False Positive</strong> : Error occur when we Reject the Null Hypothesis when actually we should not have rejected it</li>
+<li><strong>Type II - False Negative</strong> : Error occur when we Fail to reject the Null hypothesis when we actually should have rejected it</li>
+</ul></li>
+<li><p>The Type I error is actually the level of significance or the alpha level that we set. So if we set it at 0.05 it means the decision to reject the hypothesis when we should not have rejected it would happen 5% of the time. Hence, the Type I error is depends on what we set the alpha level. For example n certain medical studies the alpha is set at 0.001 if it involves harm to patients.</p></li>
+<li><p>z-test, t-tests, chi-square test, ANOVA are examples of the types of statistical tests. Each of these tests have their own probability distribution and their own scores for testing the hypothesis.</p></li>
+</ul>
+</div>
+<div id="two-tailed-vs-one-tailed-hypothesis" class="section level3">
+<h3>Two-tailed vs One-Tailed Hypothesis</h3>
+<ul>
+<li>In the <strong>two-tailed hypothesis</strong>, we will reject the hypothesis if the sample mean falls in either tail of the distribution. The critical regions are shown below. Together the sum of their probability is 0.05.</li>
+</ul>
+<center>
+<img src="/post/2018-03-21-inferential-statisics-part-i-basics_files/Two-tailed%20hypothesis.jpeg" style="width:50.0%;height:50.0%" />
+</center>
+<ul>
+<li><strong>One-tailed hypothesis</strong> is used when we are interested in the direction of the results. For example to test whether mean of one sample is greater than a given number. We will have only one critical region as shown below.
+<ul>
+<li>When the alternative hypothesis is that the sample mean is greater, the critical region is on the right side of the distribution.</li>
+<li>When the alternative hypothesis is that the sample is smaller, the critical region is on the left side of the distribution.</li>
+</ul></li>
+</ul>
+<center>
+<img src="/post/2018-03-21-inferential-statisics-part-i-basics_files/One-tailed%20hypothesis.jpeg" style="width:50.0%;height:50.0%" />
+</center>
+</div>
+<div id="critical-values" class="section level3">
+<h3>Critical Values</h3>
+<ul>
+<li><p>Critical values are the values that indicate the edge of the critical region. Critical regions describe the entire area of values that indicate you reject the null hypothesis.</p></li>
+<li><p>Any value observed in the Red Region indicates that the Null hypothesis should be rejected</p></li>
+</ul>
+<center>
+<img src="/post/2018-03-21-inferential-statisics-part-i-basics_files/left%20right%20and%20two%20tailed%20test.jpeg" style="width:50.0%;height:50.0%" />
+</center>
+<div id="example-1" class="section level4">
+<h4>Example 1</h4>
+<ul>
+<li>In R, we can use the q() function to find the critical values.</li>
+<li>So for a two-tailed test with 95% confidence interval in R we get the critical value as -1.96 for the left tail and +1.96 for the right tail and the region as shown in the picture.</li>
+<li>Since this is a two tailed test with alpha of 0.05, half of the alpha will be in the left tail and half in the right tail, hence p=0.025 is given in the below R code.</li>
+<li><em>Note : A normal distribution with a mean of 0 and a standard deviation of 1 is called a standard normal distribution.</em></li>
+</ul>
+<pre class="r"><code>qnorm(p=0.025,mean=0,sd=1,lower.tail = TRUE)</code></pre>
+<pre><code>## [1] -1.959964</code></pre>
+<pre class="r"><code>qnorm(p=0.025,mean=0,sd=1,lower.tail = FALSE)</code></pre>
+<pre><code>## [1] 1.959964</code></pre>
+<center>
+<img src="/post/2018-03-21-inferential-statisics-part-i-basics_files/critical%20regions%20for%20two%20tailed%20z%20test.jpeg" style="width:50.0%;height:50.0%" />
+</center>
+</div>
+<div id="example-2" class="section level4">
+<h4>Example 2</h4>
+<ul>
+<li>For a left tailed test with alpha = 0.01 we get the critical value as -2.33 and for a right tailed test this would be 2.33</li>
+</ul>
+<pre class="r"><code>qnorm(p=0.01,mean=0,sd=1,lower.tail = TRUE)</code></pre>
+<pre><code>## [1] -2.326348</code></pre>
+<pre class="r"><code>qnorm(p=0.01,mean=0,sd=1,lower.tail = FALSE)</code></pre>
+<pre><code>## [1] 2.326348</code></pre>
+</div>
+<div id="example-3" class="section level4">
+<h4>Example 3</h4>
+<p>Find alpha for a given critical value Z = 1.96 for a right tailed test</p>
+<pre class="r"><code>pnorm(q=1.76,mean=0,sd=1,lower.tail = TRUE)</code></pre>
+<pre><code>## [1] 0.9607961</code></pre>
+</div>
+</div>
+<div id="p-value" class="section level3">
+<h3>P-value</h3>
+<ul>
+<li><strong>Assuming that the null hypothesis is true, the p-value gives the probability that the results from your sample data occurred by chance</strong></li>
+<li>So, a low value indicates :
+<ul>
+<li>Low probability that the results occurred by chance and</li>
+<li>that some relationship exists and</li>
+<li>that the results are statistically significant and</li>
+<li>hence the null hypothesis can be rejected</li>
+</ul></li>
+<li>For example, a p-value of .01 means there is only a 1% probability that the results from an experiment happened by chance</li>
+<li>A small p-value (typically ≤ 0.05) indicates strong evidence against the null hypothesis, so you reject the null hypothesis. A large p-value (&gt; 0.05) indicates weak evidence against the null hypothesis, so you fail to reject the null hypothesis</li>
+<li>The p-value is derived based on the probability distribution of the test-statistic (eg t-score or chi-score) that its associated with. This is done using table which looks something <a href="http://math.arizona.edu/~piegorsch/571A/TR194.pdf">like this</a></li>
+</ul>
+<center>
+<img src="/post/2018-03-21-inferential-statisics-part-i-basics_files/pvalues%20of%20t-distribution.jpeg" style="width:50.0%;height:50.0%" />
+</center>
+<ul>
+<li>Where <span class="math inline">\(\mu\)</span> is test statistic (in this case the t-value) and <span class="math inline">\(df\)</span> is the degrees of freedom. As you can see as the value of <span class="math inline">\(\mu\)</span> increases, the probability or the p-value decreases. Example 3 above shows how we can find the p-value in R</li>
+</ul>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<ul>
+<li>Type I - False Positive</li>
+<li>Type II - False Negative</li>
+<li>z-test, t-tests, chi-square test, ANOVA are examples of the types of statistical tests. Each of these tests have their own probability distribution and their own scores for testing the hypothesis.</li>
+<li>Assuming that the null hypothesis is true, the p-value gives the probability that the results from your sample data occurred by chance</li>
+</ul>
+<center>
+<img src="/post/2018-03-21-inferential-statisics-part-i-basics_files/IMG_20180317_202445632.jpg" style="width:70.0%;height:70.0%" />
+</center>
+</div>

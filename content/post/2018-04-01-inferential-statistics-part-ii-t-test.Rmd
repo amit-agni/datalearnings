@@ -1,0 +1,38 @@
+---
+title: Inferential Statistics Part II – T test
+author: Amit Agni
+date: '2018-04-01'
+slug: inferential-statistics-part-ii-t-test
+categories:
+  - Statistics
+tags:
+  - statistics
+  - all posts
+robots: noindex
+draft: true
+description: write in quotes
+output:
+  blogdown::html_page:
+    toc: yes
+    fig_height: 5
+    fig_width: 5
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.align='center')
+
+if(!require(pacman)) { install.packages("pacman"); library(pacman)}
+p_load(here,data.table,tidyverse,tictoc,kableExtra)
+p_load(cutlery)
+
+varPlotCaption <- "© Data Learnings"
+ggplot_color_theme <- "turquoise4"
+```
+
+<center>
+	<!-- feature image -->
+
+</center>
+<hr>
+
+
