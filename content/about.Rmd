@@ -1,0 +1,44 @@
+---
+title: About
+description: on a mission to use technology to extract knowledge and create data-driven products  
+slug: about
+robots: index
+
+---
+<center>
+![](/about_files/github-avatar2.png){width=10% height=10%}
+</center>
+
+### Me ###
+
+Hi, I'm Amit Agni. I am a data specialist at Virgin Australia. My day job involves extracting/analysing airline data to create data-driven products for sales, e-commerce and finance departments. I have been in the tech industry for over 20 years and worked across India, UAE, USA and Australia. 
+
+Since 2016, I have focused my career on data analytics and data science. I mostly use R for my work and intend to use Python in the near future.
+
+I am a passionate learner and love to update myself with latest happenings in the data world
+
+### Data Learnings ###
+
+This is my personal blog in which I write about everything in the data domain. In the blog, you will find  
+
+* the notes that I have taken while studying online courses and while reading books
+* the exploratory analysis and predictive models created as part of data competitions like Kaggle
+* documentation of my personal projects 
+
+I hope you learn something new while you’re here. If you'd like to connect/collaborate with me, you can add me on [Linkedin](https://www.linkedin.com/in/amitagni/") or [email me](mailto:amitagni2@gmail.com). I host my projects and repositories on [github](https://github.com/amit-agni/)
+
+
+### Acknowledgements ###
+
+This blog would not have been made possible, without the awesome community contributing to :
+
+* [Hugo](https://gohugo.io) - the blogging platform
+* [Minimal](https://github.com/calintat/minimal) - the theme used in the blog
+* [R blogdown](https://github.com/rstudio/blogdown) - the awesome package that makes creating posts so effortless
+* [Netlify](https://www.netlify.com) - the hosts for this blog
+* And the countless members of the tech community who share their knowledge via blogs and websites like [Stackoverflow](https://stackoverflow.com), [Stackexchange](https://stats.stackexchange.com) 
+    
+<hr>
+
+
+
