@@ -2,7 +2,7 @@ baseURL = "http://datalearnings.com/"
 languageCode = "en-us"
 title = "data"
 theme = "minimal"
-disqusShortname = "amitagni_disqus" # delete this to disable disqus comments
+disqusShortname = "www-datalearnings-com" # delete this to disable disqus comments
 googleAnalytics = "UA-28526370-4"
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
