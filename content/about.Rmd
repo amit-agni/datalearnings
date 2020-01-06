@@ -25,19 +25,23 @@ This is my personal blog in which I write about everything in the data domain. I
 * the exploratory analysis and predictive models created as part of data competitions like Kaggle
 * documentation of my personal projects 
 
-I hope the blog helps you in your own data journey. If you'd like to connect/collaborate with me, you can add me on [Linkedin](https://www.linkedin.com/in/amitagni/") or [email me](mailto:amitagni2@gmail.com). I host my projects and repositories on [github](https://github.com/amit-agni/)
+I hope it helps you in your own data journey. If you'd like to connect/collaborate with me, you can add me on [Linkedin](https://www.linkedin.com/in/amitagni/") or [email me](mailto:amitagni2@gmail.com). I host my projects and repositories on [github](https://github.com/amit-agni/)
 
 
 ### Acknowledgements ###
 
-This blog would not have been made possible, without the awesome community contributing to :
+This blog would not have been made possible, without the awesome community that contributes to :
 
 * [Hugo](https://gohugo.io) - the blogging platform
-* [Minimal](https://github.com/calintat/minimal) - the theme used in the blog
+* [Minimal](https://github.com/calintat/minimal) - the theme used by this blog
 * [R blogdown](https://github.com/rstudio/blogdown) - the awesome package that makes creating posts so effortless
 * [Netlify](https://www.netlify.com) - the hosts for this blog
 * And the countless members of the tech community who share their knowledge via blogs and websites like [Stackoverflow](https://stackoverflow.com), [Stackexchange](https://stats.stackexchange.com) 
     
+<center> 
+#### Thank You 
+#### 😊
+</center>
 <hr>
 
 
