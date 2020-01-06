@@ -357,6 +357,28 @@ pnorm(q=1.76,mean=0,sd=1,lower.tail = TRUE)
 
 * Where $\mu$ is test statistic (in this case the t-value) and $df$ is the degrees of freedom. As you can see as the value of $\mu$ increases, the probability or the p-value decreases. Example 3 above shows how we can find the p-value in R
 
+### Statistical tests
+
+* Statistical tests are used for making inferences about data. They tell us whether an observed pattern is due to random chance or not. 
+* They are broadly classified :
+  + Parametric tests are used when the data is normally distributed
+  + Non-parametric when data is non-normal
+* Commonly used Parametric tests
+  + Pearson correlation : Tests for the strength of association between continuous variables
+  + Spearman correlation is used when one or both of the variables are not assumed to be normally distributed and interval (but are assumed to be ordinal). The values of the variables are converted in ranks and then correlated. 
+  + Chi-square : Tests for the strength of association between categorical variables
+  + T-test : Look for the difference between the means of variables
+  + ANOVA : Tests the difference between group means after any other variance in the outcome variable is accounted for
+  + Regression : Assess if change in one variable predicts change in another variable
+* Commonly used non-parametric tests
+  + Wilcoxon rank-sum test
+  + Kruskal Wallis test
+* T-test vs ANONA vs MANOVA
+  + T-tests are used when there is one independent variable (with 2 levels) and one dependent variable
+  + One-way ANOVA is used when there is one independent variable (with more than 2 levels) and one dependent variable
+  + Two-way ANOVA is used when there are more one independent variable (with more than 2 levels each) and one dependent variable
+  + MANOVA : Complicated and are used when there are more than one dependent variables
+* In the next post, we will take a look at T-tests  
 
 ## Summary
 
