@@ -32,6 +32,7 @@ output:
 <li><a href="#two-tailed-vs-one-tailed-hypothesis">Two-tailed vs One-Tailed Hypothesis</a></li>
 <li><a href="#critical-values">Critical Values</a></li>
 <li><a href="#p-value">P-value</a></li>
+<li><a href="#statistical-tests">Statistical tests</a></li>
 <li><a href="#summary">Summary</a></li>
 </ul>
 </div>
@@ -391,6 +392,39 @@ ggplot() +
 </center>
 <ul>
 <li>Where <span class="math inline">\(\mu\)</span> is test statistic (in this case the t-value) and <span class="math inline">\(df\)</span> is the degrees of freedom. As you can see as the value of <span class="math inline">\(\mu\)</span> increases, the probability or the p-value decreases. Example 3 above shows how we can find the p-value in R</li>
+</ul>
+</div>
+<div id="statistical-tests" class="section level3">
+<h3>Statistical tests</h3>
+<ul>
+<li>Statistical tests are used for making inferences about data. They tell us whether an observed pattern is due to random chance or not.</li>
+<li>They are broadly classified :
+<ul>
+<li>Parametric tests are used when the data is normally distributed</li>
+<li>Non-parametric when data is non-normal</li>
+</ul></li>
+<li>Commonly used Parametric tests
+<ul>
+<li>Pearson correlation : Tests for the strength of association between continuous variables</li>
+<li>Spearman correlation is used when one or both of the variables are not assumed to be normally distributed and interval (but are assumed to be ordinal). The values of the variables are converted in ranks and then correlated.</li>
+<li>Chi-square : Tests for the strength of association between categorical variables</li>
+<li>T-test : Look for the difference between the means of variables</li>
+<li>ANOVA : Tests the difference between group means after any other variance in the outcome variable is accounted for</li>
+<li>Regression : Assess if change in one variable predicts change in another variable</li>
+</ul></li>
+<li>Commonly used non-parametric tests
+<ul>
+<li>Wilcoxon rank-sum test</li>
+<li>Kruskal Wallis test</li>
+</ul></li>
+<li>T-test vs ANONA vs MANOVA
+<ul>
+<li>T-tests are used when there is one independent variable (with 2 levels) and one dependent variable</li>
+<li>One-way ANOVA is used when there is one independent variable (with more than 2 levels) and one dependent variable</li>
+<li>Two-way ANOVA is used when there are more one independent variable (with more than 2 levels each) and one dependent variable</li>
+<li>MANOVA : Complicated and are used when there are more than one dependent variables</li>
+</ul></li>
+<li>In the next post, we will take a look at T-tests</li>
 </ul>
 </div>
 <div id="summary" class="section level2">

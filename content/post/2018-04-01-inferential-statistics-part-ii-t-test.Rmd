@@ -31,8 +31,12 @@ ggplot_color_theme <- "turquoise4"
 
 <center>
 	<!-- feature image -->
-
+![](/post/2018-04-01-inferential-statistics-part-ii-t-test_files/tom-wheatley-jVjwlfyJAkA-unsplash.jpg)
+*Photo by Tom Wheatley on Unsplash*
 </center>
 <hr>
+
+
+
 
 
