@@ -4,21 +4,30 @@ author: Amit Agni
 date: '2018-04-01'
 slug: inferential-statistics-part-ii-t-test
 categories:
-  - Statistics
+  - statistics
 tags:
   - statistics
   - all posts
-robots: noindex
-draft: true
-description: write in quotes
+robots: index
+description: "Types of T-tests : One-Sample, Unpaired and Paired t-tests"
 output:
   blogdown::html_page:
     toc: yes
-    fig_height: 5
-    fig_width: 5
+    fig_height: 2
+    fig_width: 4
 ---
 
 
+<div id="TOC">
+<ul>
+<li><a href="#t-test-vs-z-test">T-test vs Z-Test</a></li>
+<li><a href="#t-tests">T-tests</a></li>
+<li><a href="#one-sample-t-test">One Sample t-test</a></li>
+<li><a href="#unpaired-or-independent-two-sample-t-test">Unpaired or Independent Two Sample t-test</a></li>
+<li><a href="#paired-or-dependent-two-sample-t-test">Paired or Dependent Two Sample t-test</a></li>
+<li><a href="#summary">Summary</a></li>
+</ul>
+</div>
 
 <center>
 <!-- feature image -->
@@ -26,3 +35,220 @@ output:
 <em>Photo by Tom Wheatley on Unsplash</em>
 </center>
 <hr>
+<p>In the <a href="/inferential-statisics-part-i-basics/">previous post</a>, we looked at some of the basic statistical concepts. In this post, we will look at how t-tests can be used to making inferences about the population. We will use the iris dataset.</p>
+<div id="t-test-vs-z-test" class="section level3">
+<h3>T-test vs Z-Test</h3>
+<ul>
+<li>T-tests are used when the sample size is below 30 and when we don’t know the population standard deviation. If we know the population standard deviation and the sample size is above 30 then we use the Z-Test and its associated z-score</li>
+<li>T-tests are important because usually we don’t know anything about the population and we have to rely on the samples to make inferences about the population</li>
+</ul>
+</div>
+<div id="t-tests" class="section level3">
+<h3>T-tests</h3>
+<ul>
+<li>Also known as Student’s T Test are tests used for comparing means and how different they are from each other and whether those differences are only due to chance. They can be used to find if two sets of data are significantly different from each other.</li>
+<li>The T-tests gives us the t-score
+<ul>
+<li>The t score is a ratio between the difference between two groups and the difference within the groups</li>
+<li>It tells us whether one group is statistically significant to the other group</li>
+<li>A large t-score tells us that the groups are different. A small t-score tells us that the groups are similar</li>
+<li>A t score of 3 means that the groups are three times as different from each other as they are within each other.</li>
+<li>It is analogous to signal-to-noise ratio as explained in the One sample t-test section</li>
+<li>There are 3 types of T tests
+<ul>
+<li><strong>One sample t-test</strong> : Compare the mean of a population with a theoretical value</li>
+<li><strong>Unpaired or Independent Two sample t-test</strong> : Compare the mean of two independent samples</li>
+<li><strong>Paired or Dependent Two sample t-test</strong> : Compare the means between two related groups of samples</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+<div id="one-sample-t-test" class="section level3">
+<h3>One Sample t-test</h3>
+<ul>
+<li>The formula for 1-Sample t test is <span class="math inline">\(t = \frac{\overline{X} - \mu_{0} } { \sigma / \sqrt{n}}\)</span>
+<ul>
+<li><span class="math inline">\(\overline{X}\)</span> is the mean of the sample</li>
+<li><span class="math inline">\(\mu_{0}\)</span> is the null hypothesis value</li>
+<li><span class="math inline">\(\sigma\)</span> is the standard deviation</li>
+<li><span class="math inline">\(\sqrt{n}\)</span> is the square root of the sample size</li>
+</ul></li>
+<li>The equation is similar to the signal-to-noise ratio.</li>
+<li>The numerator is simply the difference between the mean of the sample and the expected value of the mean (of the population).
+<ul>
+<li>The null hypothesis is that sample has been taken from the population. This will happen when both the values are same and the equation gives 0 and the null hypotheses gets accepted.</li>
+<li>As the difference increases (either +ve or -ve), the signal also increases, possibly leading to the rejection of the null hypothesis.</li>
+</ul></li>
+<li>The denominator in the formula is actually the standard error of the mean, which is a measure of variability in the sample.
+<ul>
+<li>It measures the accuracy with which a sample represents a population.</li>
+<li>In statistics, a sample mean deviates from the actual mean of a population; this deviation is the standard error.</li>
+<li>A higher number indicates that the sample estimate is less accurate as it has more random error.</li>
+<li>This random error is the noise.</li>
+</ul></li>
+<li>If the noise is high, its possible that the numerator gets a large value but that doesn’t mean the null hypotheses can be rejected. Thats why we can use the t-test to see if the signal stands out from the noise or its a random error in the sample</li>
+<li><strong>For example a t-value of 10 implies the signal is 10 times the noise and probably a sign that the null hypothesis can be rejected and the alternate hypothesis that the sample is different from the population can be accepted.</strong></li>
+<li>A t-value of 0 indicates that the sample results exactly equal the null hypothesis.</li>
+</ul>
+<div id="example-1" class="section level4">
+<h4>Example 1</h4>
+<p>Lets use the Sepal.Width to illustrate the concept</p>
+<pre class="r"><code>p1 &lt;- iris %&gt;%
+  ggplot(aes(x=Sepal.Width)) +
+  geom_histogram(fill=&quot;cornsilk&quot;,binwidth=0.2) +
+  labs(x=&quot;Sepal Width&quot;
+       ,y=&quot;Count&quot;
+       ,subtitle=&quot;Approx normal distribution of Sepal Width&quot;
+    #   ,caption = varPlotCaption
+    ) +
+  theme_darklightmix(color_theme = ggplot_color_theme) +
+  scale_fill_brewer(palette = &quot;Set3&quot;)
+
+p2 &lt;- iris %&gt;%
+  ggplot(aes(y=Sepal.Width)) +
+  geom_boxplot(fill=&quot;cornsilk&quot;
+               ) +
+  labs(x=&quot;&quot;
+       ,y=&quot;Sepal Width&quot;
+       ,subtitle=&quot;Sepal Width boxplot&quot;
+     #  ,caption = varPlotCaption
+     ) +
+  theme_darklightmix(color_theme = ggplot_color_theme) +
+  scale_fill_brewer(palette = &quot;Set3&quot;)
+
+grid.arrange(p1, p2, ncol=2)</code></pre>
+<p><img src="/post/2018-04-01-inferential-statistics-part-ii-t-test_files/figure-html/unnamed-chunk-1-1.png" width="576" style="display: block; margin: auto;" /></p>
+<ul>
+<li>We will take sample of 10 observations and hypothecate that this sample belong to the population and its mean is equal to the mean of the population (ie 3.057333).</li>
+<li><strong>We get low t-score of 0.62714 and high p-value of 0.5361 proving our hypothesis. If the p-value was &lt;0.05 we would have rejected the null hpypothesis</strong></li>
+</ul>
+<pre class="r"><code>set.seed(2)
+t.test(sample(iris$Sepal.Width,10),
+ mu=mean(iris$Sepal.Width))</code></pre>
+<pre><code>## 
+##  One Sample t-test
+## 
+## data:  sample(iris$Sepal.Width, 10)
+## t = 1.158, df = 9, p-value = 0.2767
+## alternative hypothesis: true mean is not equal to 3.057333
+## 95 percent confidence interval:
+##  2.902223 3.537777
+## sample estimates:
+## mean of x 
+##      3.22</code></pre>
+</div>
+<div id="example-2" class="section level4">
+<h4>Example 2</h4>
+<ul>
+<li>Lets formulate another hypothesis and state that the Sepal.Width sample is drawn from the Petal.Width population.</li>
+<li><strong>We can see that the t-score is very high 12.5 and the p-value for the test is very low. Thus disproving our hypothesis as expected.</strong></li>
+</ul>
+<pre class="r"><code>set.seed(2)
+t.test(sample(iris$Sepal.Width,10), mu=mean(iris$Petal.Width))</code></pre>
+<pre><code>## 
+##  One Sample t-test
+## 
+## data:  sample(iris$Sepal.Width, 10)
+## t = 14.384, df = 9, p-value = 1.622e-07
+## alternative hypothesis: true mean is not equal to 1.199333
+## 95 percent confidence interval:
+##  2.902223 3.537777
+## sample estimates:
+## mean of x 
+##      3.22</code></pre>
+</div>
+</div>
+<div id="unpaired-or-independent-two-sample-t-test" class="section level3">
+<h3>Unpaired or Independent Two Sample t-test</h3>
+<ul>
+<li>Two sample tests are used to determine how different two samples are.</li>
+<li>The assumption are that both the samples are independent of each other and they follow normal distribution.</li>
+<li>The formula for Unpaired two sample T-test is given by <span class="math inline">\(t =\frac{(\overline{X_{1}} - \overline{X_{2}}) - (\mu_{1} - \mu_{2})}{SE _{(\overline{X_{1}} - \overline{X_{2}})}}\)</span>
+<ul>
+<li><span class="math inline">\(SE _{(\overline{X_{1}} - \overline{X_{2}})} = \sqrt{\frac{\sigma_{1}^2}{n_{1}} + \frac{\sigma_{2}^2}{n_{2}}}\)</span></li>
+</ul></li>
+<li>The formula to calculate the degrees of freedom is given below. This will be used for finding the p-value for the above t-value
+<center>
+<img src="/post/2018-04-01-inferential-statistics-part-ii-t-test_files/Unpaired%20T-test%20degrees%20of%20freedom.jpeg" style="width:30.0%;height:30.0%" />
+</center></li>
+</ul>
+<div id="example-1-two-groups-from-same-population" class="section level4">
+<h4>Example 1 : Two groups from same population</h4>
+<ul>
+<li>Lets randomly take 2 sets of 20 values from Sepal width (group 1 and group 2).</li>
+<li>The null hypothesis is both groups belong to the same population. <strong>We get a low tscore of 1.32 and a high probability of 19% in favour of the null hypotheses</strong></li>
+</ul>
+<pre class="r"><code>set.seed(123)
+t.test(sample(iris$Sepal.Width,20),sample(iris$Sepal.Width,20))</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  sample(iris$Sepal.Width, 20) and sample(iris$Sepal.Width, 20)
+## t = -0.50549, df = 34.315, p-value = 0.6164
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.3513272  0.2113272
+## sample estimates:
+## mean of x mean of y 
+##     2.955     3.025</code></pre>
+<ul>
+<li>Given the t-value and the degrees of freedom, the p-value can be calculated as follows</li>
+</ul>
+<pre class="r"><code>2*pt(q=-abs(1.3238),df=30.731)</code></pre>
+<pre><code>## [1] 0.195333</code></pre>
+</div>
+<div id="example-2-two-groups-from-different-population" class="section level4">
+<h4>Example 2 : Two groups from different population</h4>
+<ul>
+<li>Lets randomly take 2 sets of 20 values from Sepal width (group 1) and from Petal Width (group 2).</li>
+<li>The null hypothesis is both groups belong to the same population.</li>
+<li>We get a high t-score of 8.84 and a very low probability in favour of the null hypotheses, implying that the null hypothesis can be rejected</li>
+</ul>
+<pre class="r"><code>set.seed(123)
+t.test(sample(iris$Sepal.Width,20),sample(iris$Petal.Width,20))</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  sample(iris$Sepal.Width, 20) and sample(iris$Petal.Width, 20)
+## t = 9.933, df = 27.922, p-value = 1.15e-10
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  1.416847 2.153153
+## sample estimates:
+## mean of x mean of y 
+##     2.955     1.170</code></pre>
+<p><em>Note that : “Welch’s t-test is an adaptation of Student’s t-test, that is more reliable when the two samples have unequal variances (variance = square of standard deviation) and unequal sample sizes”</em></p>
+</div>
+</div>
+<div id="paired-or-dependent-two-sample-t-test" class="section level3">
+<h3>Paired or Dependent Two Sample t-test</h3>
+<ul>
+<li>It is essentially same as a one sample t-test and is used to compare the means of two related samples i.e when you have two values (pair of values) for the same samples (for example before and after measurements)</li>
+<li>The formula <span class="math inline">\(t = \frac{\overline{d} - \mu_{0} } { SE _{\overline{d}}}\)</span>
+<ul>
+<li><span class="math inline">\(\overline{d}\)</span> is the mean of the differences between the paired values</li>
+<li>The denominator <span class="math inline">\(SE _{\overline{d}} = \frac{\sigma_{d}}{\sqrt{n}}\)</span> is its standard error</li>
+<li><span class="math inline">\(\mu_{0}\)</span> is the null hypothesis value</li>
+</ul></li>
+<li>For a example a restaurant wants to determine whether their new menu items were effective. Assuming they would use the same “before” and “after” subjects, we can use a paired t-test to calculate the difference within each before-and-after pair of measurements, find the mean of these changes and determine whether this mean of changes is statistically significant</li>
+<li><strong>The paired t-test works well even if the distribution is not normal provided it is symmetric and unimodal and the difference in the paired values is normal.</strong></li>
+<li>For paired t-test the Null hypothesis states that the population mean of the differences equals the hypothesised mean of the differences</li>
+</ul>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<ul>
+<li><strong>p-value gives the probability of accepting the null hypothesis, hence a lower p-value indicates low probability of null hypothesis being true</strong></li>
+<li>Examples of a null hypothesis in t-test would be : groups belong to same population, groups are similar</li>
+<li>t-value gives the magnitude of the difference between the groups</li>
+<li>t-value is inversely proportional to p-value. Higher the t, lower the probability of the null hypothesis being True</li>
+<li>p-value is derived using the distribution of the t-values</li>
+<li>Further reading
+<ul>
+<li><a href="https://socialresearchmethods.net/kb/stat_t.php">This article</a> has good explanation on the signal-to-noise ratio for 2 sample T-test</li>
+<li><a href="https://cyfar.org/types-statistical-tests">This article</a> and <a href="https://cyfar.org/types-statistical-tests">this article</a> has the list of all the statistical tests</li>
+<li>Some examples of paired t-test are <a href="http://support.minitab.com/en-us/minitab/17/topic-library/basic-statistics-and-graphs/hypothesis-tests/tests-of-means/why-use-paired-t/">given here</a></li>
+<li>Explains how the p-value is derived from the probability distribution function of the test statistic under consideration (<a href="https://onlinecourses.science.psu.edu/statprogram/node/138">this</a> and <a href="http://blog.minitab.com/blog/statistics-and-quality-data-analysis/what-are-t-values-and-p-values-in-statistics">this</a> and <a href="http://blog.minitab.com/blog/adventures-in-statistics-2/understanding-t-tests-t-values-and-t-distributions">this</a> )</li>
+</ul></li>
+</ul>
+</div>

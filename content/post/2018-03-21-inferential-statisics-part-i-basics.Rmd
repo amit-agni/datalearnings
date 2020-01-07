@@ -4,7 +4,7 @@ author: Amit Agni
 date: '2018-03-21'
 slug: inferential-statisics-part-i-basics
 categories:
-  - Statistics
+  - statistics
 tags:
   - statistics
   - all posts
@@ -366,11 +366,11 @@ pnorm(q=1.76,mean=0,sd=1,lower.tail = TRUE)
 * Commonly used Parametric tests
   + Pearson correlation : Tests for the strength of association between continuous variables
   + Spearman correlation is used when one or both of the variables are not assumed to be normally distributed and interval (but are assumed to be ordinal). The values of the variables are converted in ranks and then correlated. 
-  + Chi-square : Tests for the strength of association between categorical variables
   + T-test : Look for the difference between the means of variables
   + ANOVA : Tests the difference between group means after any other variance in the outcome variable is accounted for
   + Regression : Assess if change in one variable predicts change in another variable
 * Commonly used non-parametric tests
+  + Chi-square : Tests for the strength of association between categorical variables. The test compares actual results to the expected results.
   + Wilcoxon rank-sum test
   + Kruskal Wallis test
 * T-test vs ANONA vs MANOVA
@@ -378,7 +378,7 @@ pnorm(q=1.76,mean=0,sd=1,lower.tail = TRUE)
   + One-way ANOVA is used when there is one independent variable (with more than 2 levels) and one dependent variable
   + Two-way ANOVA is used when there are more one independent variable (with more than 2 levels each) and one dependent variable
   + MANOVA : Complicated and are used when there are more than one dependent variables
-* In the next post, we will take a look at T-tests  
+* In the [next post](/inferential-statistics-part-ii-t-test/), we will take a look at T-tests  
 
 ## Summary
 
