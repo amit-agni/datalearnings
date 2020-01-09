@@ -20,8 +20,8 @@
     <!-- Related posts -->
     {{ $related := first 3 (where (where (where .Site.Pages.ByDate.Reverse ".Type" "==" "post") ".Params.tags" "intersect" .Params.tags) "Permalink" "!=" .Permalink) }}
     {{ if $related }}
-        <h4 class="page-header">Related</h4>
-        {{ range $related }} {{ partial "list-item" . }} {{ end }}
+        <h4 class="page-header">Related Posts</h4>
+        {{ range $related }} {{ partial "list-item_relatedPosts" . }} {{ end }}
     {{ end }}
 
 
