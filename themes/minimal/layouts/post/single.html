@@ -5,8 +5,14 @@
 
     <div>
         <h2>{{ .Title }}</h2>
-        <h5>{{ .Date.Format (.Site.Params.dateFormat | default "January 2, 2006") }}</h5>
+        <h5>{{ $readTime := cond (gt .ReadingTime 1) "mins" "min" }}
+        {{ .Date.Format (.Site.Params.dateFormat | default "January 2, 2006") }}  
+        . {{ .ReadingTime }} {{ $readTime }} read
+        </h5>
         {{ partial "tags" . }}
+        
+        
+
     </div>
 
     <div align="start" class="content">{{ .Content }}</div>
