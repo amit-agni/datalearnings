@@ -223,10 +223,9 @@ TukeyHSD(aov(len ~ supp + dose + supp * dose
 ```
 
 
-## Summary
+### Summary
 * **The null hypothesis for ANOVA is that the mean of the dependent variable is the same for all groups**
-
-Further learning
-* Balanced vs Unbalanced design experiments for ANOVA
-* Compare my results with http://www.sthda.com/english/wiki/two-way-anova-test-in-r
+* Further learning
+  + Balanced vs Unbalanced design experiments for ANOVA
+  + Compare the results with http://www.sthda.com/english/wiki/two-way-anova-test-in-r
 
