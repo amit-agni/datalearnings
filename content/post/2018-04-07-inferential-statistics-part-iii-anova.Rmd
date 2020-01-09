@@ -1,0 +1,232 @@
+---
+title: Inferential Statistics Part III – ANOVA
+author: Amit Agni
+date: '2018-04-07'
+slug: inferential-statistics-part-iii-anova
+categories:
+  - statistics
+tags:
+  - all posts
+  - statistics
+robots: index
+description: write in quotes
+output:
+  blogdown::html_page:
+    toc: yes
+    fig_height: 2
+    fig_width: 5
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.align='center')
+
+if(!require(cutlery)) { devtools::install_github("amit-agni/cutlery"); library(cutlery)}
+if(!require(pacman)) { install.packages("pacman"); library(pacman)}
+p_load(here,data.table,tidyverse,tictoc,kableExtra,gridExtra)
+
+options(scipen=999) 
+
+varPlotCaption <- "© Data Learnings"
+ggplot_color_theme <- "turquoise4"
+```
+
+<center>
+	<!-- feature image -->
+	![](/post/2018-04-07-inferential-statistics-part-iii-anova_files/tisma-jrdl-1AwGus3QVE4-unsplash.jpg)
+*Photo by Tisma Jrdl on Unsplash*
+
+</center>
+<hr>
+
+In the [previous post](/inferential-statistics-part-ii-t-test/), we looked at T-tests to compare the means of one or two samples. The T-tests can still be used for more than samples but there are 2 issues with it :
+
+* It will be tedious to compare every sample with every other samples
+* The probability of making Type I error -False Positive (when we reject Null instead of failing to reject) multiples exponentially. The probability of Type I error for a one sample T-test with alpha of 0.05 is 5%. For n number of independent t-tests this error is 1-(1-a)^n
+
+To overcome these issues in comparing more than two samples, we use ANOVA to check whether the variability in the sample means is so large that it seems unlikely to be from chance alone?
+
+There are 2 types of ANOVA tests 
+
+* One-way ANOVA is used when there is one independent variable (with more than 2 levels) and one dependent variable
+* Two-way ANOVA is used when there are more one independent variable (with more than 2 levels each) and one dependent variable
+
+
+### One-way ANOVA
+
+* The ANOVA is different from other tests as we have to compute different measures and then use them to calculate the F-score.
+* The measures that need to be computed for updating the table are given below
+
+<center>
+![](/post/2018-04-07-inferential-statistics-part-iii-anova_files/Oneway ANOVA measures.jpeg){width=50% height=50%}
+</center>
+
+* Total Sum of Squares $SS_{T}$  is the sum of the difference between each value y from the grand mean for N observations $SS_{T} = \sum (y - \bar{y}^2) = \sum y^2 - \frac{(\sum y)^2}{N}$ 
+* Sum of Squares Between $SS_{B}$  for k groups, $n_{k}$  observations in group k and $\bar y_{k}$ being the mean of the group k  is given by $SS_{B} = \sum n_{k} (\bar y_{k} - \bar {y})^2$ 
+* Sum of Squares Within groups $SS_{W} = SS_{T} - SS_{B}$ 
+* The degrees of freedom are given by
+  + $df_{Total} = N - 1$
+  + $df_{Between} = k - 1$
+  + $df_{Within} = N - k$ 
+* We then calculate the mean square error with the associated degrees of freedom.
+  + $MS_{B} = \frac {SS_{B}}{df_{Between}}$  measures between-group variability
+  + $MS_{W} = \frac {SS_{W}}{df_{Within}}$  measures variability within each of the groups
+* And finally the F statistic is the ratio $\frac {MS_{B}}{MS_{W}}$ 
+
+
+* When the null hypothesis is true any difference among the sample means are only due to chance and MSB and MSW should be equal. 
+* The larger the observed variability in the samples means MSB relative to the within group observations MSW, the larger F will be and strong evidence against the null hypothesis.
+
+
+#### Example
+* The first assumption of ANOVA is that all observations are independent of one another and randomly selected from the population which they represent. We will assume this is satisfied
+* The second assumption is that the the variance across groups must be almost the same. If we look at all the variables only Sepal.Width seems to be satisfying this condition.
+
+```{r}
+aggregate(x=iris[1:4],by = list(iris$Species), FUN=mean) %>%
+kable(format.args = list(decimal.mark = '.', big.mark = ",")) %>%
+kable_styling(bootstrap_options = "condensed"
+            ,full_width = FALSE
+            ,position = "center"
+            ,font_size = 10)
+
+aggregate(x=iris[1:4],by = list(iris$Species), FUN=sd) %>%
+kable(format.args = list(decimal.mark = '.', big.mark = ",")) %>%
+kable_styling(bootstrap_options = "condensed"
+            ,full_width = FALSE
+            ,position = "center"
+            ,font_size = 10)
+
+```
+* The third assumption the distribution should be approximately normal at each factor level. This is also satisfied, there are few outliers which we will ignore
+
+```{r fig.height=3}
+
+ggplot(data=iris[,c(2,5)]) +
+ geom_density(aes(x=Sepal.Width,fill=Species)) +
+ facet_wrap(~Species) +
+  labs(caption = varPlotCaption) +
+  theme_darklightmix(color_theme = ggplot_color_theme) +
+  scale_fill_brewer(palette="Set3")
+ 
+ggplot(data=iris[,c(2,5)]) +
+ geom_boxplot(aes(y=Sepal.Width,fill=Species)) +
+ facet_wrap(~Species) +
+  labs(caption = varPlotCaption) +
+  theme_darklightmix(color_theme = ggplot_color_theme)  +
+  scale_fill_brewer(palette="Set3")
+
+
+
+```
+
+
+* The ANOVA test gives us a F value of 49.16 which is much higher than the F-critical value of 3.06. 
+* And the probability that this high value could have occurred by chance is very less and hence we can reject the null hypothesis that the mean of all the three groups are equal.
+
+```{r}
+#get the critical value of the F statistic
+qf(df1=2,df2=147, p= 0.05,lower.tail=FALSE)
+# 3.057621
+
+summary(aov(iris$Sepal.Width ~ iris$Species))
+ 
+
+```
+
+* **Since we got a significant p-value then we can run post-hoc analysis to find which group means are different from each other** 
+* **Couple of methods of post-hoc analysis are Tukey Honest Significant Differences and Bonerroni post-hoc analysis**
+* We can see that the probability (p-adj) for the means of versicolor-setosa and  
+virginica-setosa to be equal is very very less. 
+
+```{r}
+TukeyHSD(aov(iris$Sepal.Width ~ iris$Species))
+```
+
+
+### Two way ANOVA
+
+* In one-way ANOVA, we had one dependent variable and one independent variable. 
+* In two way ANOVA we can have more than one independent variables, so we need to calculate a ratio that measures not only the variation between the dependent and independent variables, but also the interaction between the two independent variables.
+
+
+#### Example
+* We will use the ToothGrowth dataset in R. 
+  + The dataset has the observations of the tooth growth in 60 guinea pigs which were administered three doses of Vitamin C (0.1, 1 and 2 mg/day). 
+  + It also has the delivery methods using which these doses were administered – OJ (Orange Juice) and VC (ascorbic acid which is a form Vitamin C)
+
+* For two-way ANOVA, we have three null hypotheses:
+  1. In the population, the means for the rows equal each other. In the example above, we would say that the mean for the delivery methods are equal
+  2. In the population, the means for the columns equal each other. In the example above, we would say that the means for the three dosages are equal.
+  3. In the population, the null hypothesis would be that there is no interaction between the two variables. In the example above, we would say that there is no interaction between the delivery method and amount of dosage, or that all
+effects equal 0.
+
+* A quick look at the boxplot indicates there are couple of outliers and we will ignore them as before. It also indicates that Dose 2 resulted in longer tooth growth and so also Dose 1 given in Orange Juice
+
+```{r fig.height=3}
+str(ToothGrowth)
+
+ToothGrowth$dose <- as.factor(ToothGrowth$dose)
+
+ggplot(data=ToothGrowth) +
+ geom_boxplot(aes(x=dose,y=len,fill=supp)) + 
+   labs(subtitle="Box plot of tooth growth for various doses"
+   ,caption = varPlotCaption) +
+   theme_darklightmix(color_theme = ggplot_color_theme) +
+   scale_fill_brewer(palette = "Set3")
+
+
+
+```
+
+```{r eval = F}
+attach(ToothGrowth)
+aggregate(ToothGrowth$len, by=list(supp,dose),
+ FUN=mean,
+ na.rm=TRUE,
+ drop=TRUE) %>%
+spread(key=Group.2, value=x)
+ 
+aggregate(ToothGrowth$len, by=list(supp),FUN=mean, na.rm=TRUE)
+aggregate(ToothGrowth$len, by=list(dose),FUN=mean, na.rm=TRUE)
+
+```
+
+* Lets run the ANOVA test. We can see that F-values of dosage and the method of delivery are higher than the F critical values with alpha 0.05. The low probability indicating that this did not occur by some random chance but they are statistically significant.
+* If  we had to choose a lower critical value of say 0.02 then the interaction would not have been statistically significant and we could have concluded that there is no interaction between the dosage and the delivery method.
+
+```{r}
+
+summary(aov(len ~ supp + dose + supp * dose
+            ,data=ToothGrowth))
+#get the critical value of the F statistic
+qf(df1=1,df2=54, p= 0.05,lower.tail=FALSE)
+qf(df1=2,df2=54, p= 0.05,lower.tail=FALSE)
+ 
+
+```
+
+* The Tukey HSD is given below.
+  + The probability of mean tooth growth due to VC (Vit C) and OJ (Orange Juice) being equal is very less (0.0002312)
+  + Similarly probability of the mean of tooth growth (for different doses) being equal is also very low
+  + If we look at the interaction terms
+    + **VC:1-OJ:0.5** has a high probability of 26% which indicates a 1mg dose given through absorbic acid (VC:1) has same effect as that of 0.5mg dose given through orange juice (OJ:0.5)
+    + **VC:2-OJ:2** indicates the .......... TBD
+    
+    
+The interaction between OJ2-VC2 is not statistically significant with 100% probability that this occurred by random chance ? So also, VC1-OJ5 (26%), OJ2-OJ1 (32%) and VC2-OJ1(29%).
+
+Whereas the other interactions are statistically significant and need further investigation ?
+
+```{r}
+TukeyHSD(aov(len ~ supp + dose + supp * dose
+             ,data=ToothGrowth))
+```
+
+
+## Summary
+* **The null hypothesis for ANOVA is that the mean of the dependent variable is the same for all groups**
+
+Further learning
+* Balanced vs Unbalanced design experiments for ANOVA
+* Compare my results with http://www.sthda.com/english/wiki/two-way-anova-test-in-r
+
