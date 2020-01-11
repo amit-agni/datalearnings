@@ -9,7 +9,7 @@ tags:
   - all posts
   - statistics
 robots: index
-description: write in quotes
+description: ANOVA test can be used when there is one or more independent variables (with more than 2 factor levels)
 output:
   blogdown::html_page:
     toc: yes
@@ -23,6 +23,11 @@ output:
 <ul>
 <li><a href="#one-way-anova">One-way ANOVA</a></li>
 <li><a href="#two-way-anova">Two way ANOVA</a></li>
+<li><a href="#post-hoc-analysis">Post-hoc analysis</a></li>
+<li><a href="#example">Example</a></li>
+<li><a href="#inference">Inference</a></li>
+<li><a href="#anova-assumptions">ANOVA Assumptions</a></li>
+<li><a href="#unbalanced-anova">Unbalanced ANOVA</a></li>
 <li><a href="#summary">Summary</a></li>
 </ul>
 </div>
@@ -33,16 +38,15 @@ output:
 <em>Photo by Tisma Jrdl on Unsplash</em></p>
 </center>
 <hr>
-<p>In the <a href="/inferential-statistics-part-ii-t-test/">previous post</a>, we looked at T-tests to compare the means of one or two samples. The T-tests can still be used for more than samples but there are 2 issues with it :</p>
+<p>In the <a href="/inferential-statistics-part-ii-t-test/">previous post</a>, we looked at T-tests to compare the means of one or two samples. The T-tests can still be used for more than two samples but there are two issues with it :</p>
 <ul>
 <li>It will be tedious to compare every sample with every other samples</li>
 <li>The probability of making Type I error -False Positive (when we reject Null instead of failing to reject) multiples exponentially. The probability of Type I error for a one sample T-test with alpha of 0.05 is 5%. For n number of independent t-tests this error is 1-(1-a)^n</li>
 </ul>
-<p>To overcome these issues in comparing more than two samples, we use ANOVA to check whether the variability in the sample means is so large that it seems unlikely to be from chance alone?</p>
 <p>There are 2 types of ANOVA tests</p>
 <ul>
-<li>One-way ANOVA is used when there is one independent variable (with more than 2 levels) and one dependent variable</li>
-<li>Two-way ANOVA is used when there are more one independent variable (with more than 2 levels each) and one dependent variable</li>
+<li>One-way ANOVA is used when there is one independent variable (with more than factor 2 levels) and one dependent variable</li>
+<li>Two-way ANOVA is used when there are more one independent variable (with more than factor 2 levels each) and one dependent variable</li>
 </ul>
 <div id="one-way-anova" class="section level3">
 <h3>One-way ANOVA</h3>
@@ -55,8 +59,10 @@ output:
 </center>
 <ul>
 <li>Total Sum of Squares <span class="math inline">\(SS_{T}\)</span> is the sum of the difference between each value y from the grand mean for N observations <span class="math inline">\(SS_{T} = \sum (y - \bar{y}^2) = \sum y^2 - \frac{(\sum y)^2}{N}\)</span></li>
-<li>Sum of Squares Between <span class="math inline">\(SS_{B}\)</span> for k groups, <span class="math inline">\(n_{k}\)</span> observations in group k and <span class="math inline">\(\bar y_{k}\)</span> being the mean of the group k is given by <span class="math inline">\(SS_{B} = \sum n_{k} (\bar y_{k} - \bar {y})^2\)</span></li>
-<li>Sum of Squares Within groups <span class="math inline">\(SS_{W} = SS_{T} - SS_{B}\)</span></li>
+<li>Sum of Squares Between <span class="math inline">\(SS_{B}\)</span> for k groups, <span class="math inline">\(n_{k}\)</span> observations in group k and <span class="math inline">\(\bar y_{k}\)</span> being the mean of the group k is given by
+<span class="math inline">\(SS_{B} = \sum n_{k} (\bar y_{k} - \bar {y})^2\)</span></li>
+<li>Sum of Squares Within groups
+<span class="math inline">\(SS_{W} = SS_{T} - SS_{B}\)</span></li>
 <li>The degrees of freedom are given by
 <ul>
 <li><span class="math inline">\(df_{Total} = N - 1\)</span></li>
@@ -68,226 +74,10 @@ output:
 <li><span class="math inline">\(MS_{B} = \frac {SS_{B}}{df_{Between}}\)</span> measures between-group variability</li>
 <li><span class="math inline">\(MS_{W} = \frac {SS_{W}}{df_{Within}}\)</span> measures variability within each of the groups</li>
 </ul></li>
-<li><p>And finally the F statistic is the ratio <span class="math inline">\(\frac {MS_{B}}{MS_{W}}\)</span></p></li>
-<li>When the null hypothesis is true any difference among the sample means are only due to chance and MSB and MSW should be equal.</li>
-<li><p>The larger the observed variability in the samples means MSB relative to the within group observations MSW, the larger F will be and strong evidence against the null hypothesis.</p></li>
+<li>And finally the F statistic is the ratio <span class="math inline">\(\frac {MS_{B}}{MS_{W}}\)</span></li>
+<li>When the null hypothesis is true any difference among the sample means are only due to chance and MSB and MSW should be equal</li>
+<li>F will be larger when <span class="math inline">\(MS_{B}\)</span> will be larger than <span class="math inline">\(MS_{W}\)</span>, indicate a strong evidence against the null hypothesis</li>
 </ul>
-<div id="example" class="section level4">
-<h4>Example</h4>
-<ul>
-<li>The first assumption of ANOVA is that all observations are independent of one another and randomly selected from the population which they represent. We will assume this is satisfied</li>
-<li>The second assumption is that the the variance across groups must be almost the same. If we look at all the variables only Sepal.Width seems to be satisfying this condition.</li>
-</ul>
-<pre class="r"><code>aggregate(x=iris[1:4],by = list(iris$Species), FUN=mean) %&gt;%
-kable(format.args = list(decimal.mark = &#39;.&#39;, big.mark = &quot;,&quot;)) %&gt;%
-kable_styling(bootstrap_options = &quot;condensed&quot;
-            ,full_width = FALSE
-            ,position = &quot;center&quot;
-            ,font_size = 10)</code></pre>
-<table class="table table-condensed" style="font-size: 10px; width: auto !important; margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-Group.1
-</th>
-<th style="text-align:right;">
-Sepal.Length
-</th>
-<th style="text-align:right;">
-Sepal.Width
-</th>
-<th style="text-align:right;">
-Petal.Length
-</th>
-<th style="text-align:right;">
-Petal.Width
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-setosa
-</td>
-<td style="text-align:right;">
-5.006
-</td>
-<td style="text-align:right;">
-3.428
-</td>
-<td style="text-align:right;">
-1.462
-</td>
-<td style="text-align:right;">
-0.246
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-versicolor
-</td>
-<td style="text-align:right;">
-5.936
-</td>
-<td style="text-align:right;">
-2.770
-</td>
-<td style="text-align:right;">
-4.260
-</td>
-<td style="text-align:right;">
-1.326
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-virginica
-</td>
-<td style="text-align:right;">
-6.588
-</td>
-<td style="text-align:right;">
-2.974
-</td>
-<td style="text-align:right;">
-5.552
-</td>
-<td style="text-align:right;">
-2.026
-</td>
-</tr>
-</tbody>
-</table>
-<pre class="r"><code>aggregate(x=iris[1:4],by = list(iris$Species), FUN=sd) %&gt;%
-kable(format.args = list(decimal.mark = &#39;.&#39;, big.mark = &quot;,&quot;)) %&gt;%
-kable_styling(bootstrap_options = &quot;condensed&quot;
-            ,full_width = FALSE
-            ,position = &quot;center&quot;
-            ,font_size = 10)</code></pre>
-<table class="table table-condensed" style="font-size: 10px; width: auto !important; margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-Group.1
-</th>
-<th style="text-align:right;">
-Sepal.Length
-</th>
-<th style="text-align:right;">
-Sepal.Width
-</th>
-<th style="text-align:right;">
-Petal.Length
-</th>
-<th style="text-align:right;">
-Petal.Width
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-setosa
-</td>
-<td style="text-align:right;">
-0.3524897
-</td>
-<td style="text-align:right;">
-0.3790644
-</td>
-<td style="text-align:right;">
-0.1736640
-</td>
-<td style="text-align:right;">
-0.1053856
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-versicolor
-</td>
-<td style="text-align:right;">
-0.5161711
-</td>
-<td style="text-align:right;">
-0.3137983
-</td>
-<td style="text-align:right;">
-0.4699110
-</td>
-<td style="text-align:right;">
-0.1977527
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-virginica
-</td>
-<td style="text-align:right;">
-0.6358796
-</td>
-<td style="text-align:right;">
-0.3224966
-</td>
-<td style="text-align:right;">
-0.5518947
-</td>
-<td style="text-align:right;">
-0.2746501
-</td>
-</tr>
-</tbody>
-</table>
-<ul>
-<li>The third assumption the distribution should be approximately normal at each factor level. This is also satisfied, there are few outliers which we will ignore</li>
-</ul>
-<pre class="r"><code>ggplot(data=iris[,c(2,5)]) +
- geom_density(aes(x=Sepal.Width,fill=Species)) +
- facet_wrap(~Species) +
-  labs(caption = varPlotCaption) +
-  theme_darklightmix(color_theme = ggplot_color_theme) +
-  scale_fill_brewer(palette=&quot;Set3&quot;)</code></pre>
-<p><img src="/post/2018-04-07-inferential-statistics-part-iii-anova_files/figure-html/unnamed-chunk-2-1.png" width="480" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>ggplot(data=iris[,c(2,5)]) +
- geom_boxplot(aes(y=Sepal.Width,fill=Species)) +
- facet_wrap(~Species) +
-  labs(caption = varPlotCaption) +
-  theme_darklightmix(color_theme = ggplot_color_theme)  +
-  scale_fill_brewer(palette=&quot;Set3&quot;)</code></pre>
-<p><img src="/post/2018-04-07-inferential-statistics-part-iii-anova_files/figure-html/unnamed-chunk-2-2.png" width="480" style="display: block; margin: auto;" /></p>
-<ul>
-<li>The ANOVA test gives us a F value of 49.16 which is much higher than the F-critical value of 3.06.</li>
-<li>And the probability that this high value could have occurred by chance is very less and hence we can reject the null hypothesis that the mean of all the three groups are equal.</li>
-</ul>
-<pre class="r"><code>#get the critical value of the F statistic
-qf(df1=2,df2=147, p= 0.05,lower.tail=FALSE)</code></pre>
-<pre><code>## [1] 3.057621</code></pre>
-<pre class="r"><code># 3.057621
-
-summary(aov(iris$Sepal.Width ~ iris$Species))</code></pre>
-<pre><code>##               Df Sum Sq Mean Sq F value              Pr(&gt;F)    
-## iris$Species   2  11.35   5.672   49.16 &lt;0.0000000000000002 ***
-## Residuals    147  16.96   0.115                                
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<ul>
-<li><strong>Since we got a significant p-value then we can run post-hoc analysis to find which group means are different from each other</strong></li>
-<li><strong>Couple of methods of post-hoc analysis are Tukey Honest Significant Differences and Bonerroni post-hoc analysis</strong></li>
-<li>We can see that the probability (p-adj) for the means of versicolor-setosa and<br />
-virginica-setosa to be equal is very very less.</li>
-</ul>
-<pre class="r"><code>TukeyHSD(aov(iris$Sepal.Width ~ iris$Species))</code></pre>
-<pre><code>##   Tukey multiple comparisons of means
-##     95% family-wise confidence level
-## 
-## Fit: aov(formula = iris$Sepal.Width ~ iris$Species)
-## 
-## $`iris$Species`
-##                        diff         lwr        upr     p adj
-## versicolor-setosa    -0.658 -0.81885528 -0.4971447 0.0000000
-## virginica-setosa     -0.454 -0.61485528 -0.2931447 0.0000000
-## virginica-versicolor  0.204  0.04314472  0.3648553 0.0087802</code></pre>
-</div>
 </div>
 <div id="two-way-anova" class="section level3">
 <h3>Two way ANOVA</h3>
@@ -295,22 +85,23 @@ virginica-setosa to be equal is very very less.</li>
 <li>In one-way ANOVA, we had one dependent variable and one independent variable.</li>
 <li>In two way ANOVA we can have more than one independent variables, so we need to calculate a ratio that measures not only the variation between the dependent and independent variables, but also the interaction between the two independent variables.</li>
 </ul>
-<div id="example-1" class="section level4">
-<h4>Example</h4>
+</div>
+<div id="post-hoc-analysis" class="section level3">
+<h3>Post-hoc analysis</h3>
+<ul>
+<li>The ANOVA test gives us the significant variables for which the group means are different but if we have to know which pairs of the groups are different then we need to run post-hoc analysis</li>
+<li>Couple of methods of post-hoc analysis are Tukey Honest Significant Differences and Bonerroni post-hoc analysis</li>
+</ul>
+</div>
+<div id="example" class="section level3">
+<h3>Example</h3>
 <ul>
 <li>We will use the ToothGrowth dataset in R.
 <ul>
 <li>The dataset has the observations of the tooth growth in 60 guinea pigs which were administered three doses of Vitamin C (0.1, 1 and 2 mg/day).</li>
-<li>It also has the delivery methods using which these doses were administered – OJ (Orange Juice) and VC (ascorbic acid which is a form Vitamin C)</li>
+<li>It also has two supplement types using which these doses were administered – OJ (Orange Juice) and VC (ascorbic acid which is a form Vitamin C)</li>
 </ul></li>
-<li>For two-way ANOVA, we have three null hypotheses:
-<ol style="list-style-type: decimal">
-<li>In the population, the means for the rows equal each other. In the example above, we would say that the mean for the delivery methods are equal</li>
-<li>In the population, the means for the columns equal each other. In the example above, we would say that the means for the three dosages are equal.</li>
-<li>In the population, the null hypothesis would be that there is no interaction between the two variables. In the example above, we would say that there is no interaction between the delivery method and amount of dosage, or that all
-effects equal 0.</li>
-</ol></li>
-<li>A quick look at the boxplot indicates there are couple of outliers and we will ignore them as before. It also indicates that Dose 2 resulted in longer tooth growth and so also Dose 1 given in Orange Juice</li>
+<li>A quick look at the boxplot indicates there are couple of outliers but we will ignore them. It also indicates that Dose 2 resulted in longer tooth growth and so also Dose 1 given in Orange Juice</li>
 </ul>
 <pre class="r"><code>str(ToothGrowth)</code></pre>
 <pre><code>## &#39;data.frame&#39;:    60 obs. of  3 variables:
@@ -325,92 +116,274 @@ ggplot(data=ToothGrowth) +
    ,caption = varPlotCaption) +
    theme_darklightmix(color_theme = ggplot_color_theme) +
    scale_fill_brewer(palette = &quot;Set3&quot;)</code></pre>
-<p><img src="/post/2018-04-07-inferential-statistics-part-iii-anova_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>attach(ToothGrowth)
-aggregate(ToothGrowth$len, by=list(supp,dose),
- FUN=mean,
- na.rm=TRUE,
- drop=TRUE) %&gt;%
-spread(key=Group.2, value=x)
- 
-aggregate(ToothGrowth$len, by=list(supp),FUN=mean, na.rm=TRUE)
-aggregate(ToothGrowth$len, by=list(dose),FUN=mean, na.rm=TRUE)</code></pre>
+<p><img src="/post/2018-04-07-inferential-statistics-part-iii-anova_files/figure-html/unnamed-chunk-1-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p>We will run one-way ANOVA on dosage and supplement separately and then run the two-way ANOVA with both of them together with their interaction</p>
+<p><strong>One-way ANOVA on dose</strong></p>
 <ul>
-<li>Lets run the ANOVA test. We can see that F-values of dosage and the method of delivery are higher than the F critical values with alpha 0.05. The low probability indicating that this did not occur by some random chance but they are statistically significant.</li>
-<li>If we had to choose a lower critical value of say 0.02 then the interaction would not have been statistically significant and we could have concluded that there is no interaction between the dosage and the delivery method.</li>
+<li>Null hypothesis :
+<ul>
+<li>Mean tooth growth for the 3 doses is same</li>
+</ul></li>
+<li>Intepretation of the results
+<ul>
+<li>p-value &lt; 0.001 :
+<ul>
+<li>Reject the null hypothesis i.e</li>
+<li>Mean tooth growth is not the same ie different doses have different effect on the tooth growth</li>
+</ul></li>
+<li>F Statistic of 105 :
+<ul>
+<li>Much higher than the critical value of 12.01 at p=0.05</li>
+<li>ie between group variability (MSB) is much higher than within group variability (MSW)</li>
+</ul></li>
+<li>TukeyHSD :
+<ul>
+<li>Mean tooth growth is higher for larger doses</li>
+</ul></li>
+</ul></li>
 </ul>
-<pre class="r"><code>summary(aov(len ~ supp + dose + supp * dose
-            ,data=ToothGrowth))</code></pre>
+<pre class="r"><code>summary(aov(len~dose,data=ToothGrowth))</code></pre>
 <pre><code>##             Df Sum Sq Mean Sq F value               Pr(&gt;F)    
-## supp         1  205.4   205.4  15.572             0.000231 ***
-## dose         2 2426.4  1213.2  92.000 &lt; 0.0000000000000002 ***
-## supp:dose    2  108.3    54.2   4.107             0.021860 *  
-## Residuals   54  712.1    13.2                                 
+## dose         2   2426    1213   67.42 0.000000000000000953 ***
+## Residuals   57   1026      18                                 
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre class="r"><code>#get the critical value of the F statistic
-qf(df1=1,df2=54, p= 0.05,lower.tail=FALSE)</code></pre>
-<pre><code>## [1] 4.019541</code></pre>
-<pre class="r"><code>qf(df1=2,df2=54, p= 0.05,lower.tail=FALSE)</code></pre>
-<pre><code>## [1] 3.168246</code></pre>
-<ul>
-<li>The Tukey HSD is given below.
-<ul>
-<li>The probability of mean tooth growth due to VC (Vit C) and OJ (Orange Juice) being equal is very less (0.0002312)</li>
-<li>Similarly probability of the mean of tooth growth (for different doses) being equal is also very low</li>
-<li>If we look at the interaction terms
-<ul>
-<li><strong>VC:1-OJ:0.5</strong> has a high probability of 26% which indicates a 1mg dose given through absorbic acid (VC:1) has same effect as that of 0.5mg dose given through orange juice (OJ:0.5)</li>
-<li><strong>VC:2-OJ:2</strong> indicates the ………. TBD</li>
-</ul></li>
-</ul></li>
-</ul>
-<p>The interaction between OJ2-VC2 is not statistically significant with 100% probability that this occurred by random chance ? So also, VC1-OJ5 (26%), OJ2-OJ1 (32%) and VC2-OJ1(29%).</p>
-<p>Whereas the other interactions are statistically significant and need further investigation ?</p>
-<pre class="r"><code>TukeyHSD(aov(len ~ supp + dose + supp * dose
-             ,data=ToothGrowth))</code></pre>
+<pre class="r"><code>paste(&quot;Critical value of F Statisic:&quot;,qf(df1=1,df2 = 58, p= 0.05,lower.tail=F))</code></pre>
+<pre><code>## [1] &quot;Critical value of F Statisic: 4.00687288633273&quot;</code></pre>
+<pre class="r"><code>TukeyHSD(aov(len~factor(dose),data=ToothGrowth))</code></pre>
 <pre><code>##   Tukey multiple comparisons of means
 ##     95% family-wise confidence level
 ## 
-## Fit: aov(formula = len ~ supp + dose + supp * dose, data = ToothGrowth)
+## Fit: aov(formula = len ~ factor(dose), data = ToothGrowth)
 ## 
-## $supp
-##       diff       lwr       upr     p adj
-## VC-OJ -3.7 -5.579828 -1.820172 0.0002312
+## $`factor(dose)`
+##         diff       lwr       upr     p adj
+## 1-0.5  9.130  5.901805 12.358195 0.0000000
+## 2-0.5 15.495 12.266805 18.723195 0.0000000
+## 2-1    6.365  3.136805  9.593195 0.0000425</code></pre>
+<p><strong>One-way ANOVA on supplement type</strong></p>
+<ul>
+<li>Null hypothesis :
+<ul>
+<li>Mean tooth growth for the 2 supplement types is same</li>
+</ul></li>
+<li>Interpretation of results
+<ul>
+<li>p-value &gt; 0.05 :
+<ul>
+<li>Accept the null hypothesis i.e</li>
+<li>Mean tooth growth is the same ie different supplement types have no effect on the tooth growth</li>
+</ul></li>
+<li>F Statistic of 3.668 :
+<ul>
+<li>Lower than the critical value of 4 at p=0.05</li>
+<li>ie between group variability (MSB) is slightly higher than within group variability (MSW)</li>
+</ul></li>
+<li>TukeyHSD :
+<ul>
+<li>No TukeyHSD as the null hypothesis is not rejected and hence no need to quantify the effects</li>
+</ul></li>
+</ul></li>
+</ul>
+<pre class="r"><code>summary(aov(len~supp,data=ToothGrowth))</code></pre>
+<pre><code>##             Df Sum Sq Mean Sq F value Pr(&gt;F)  
+## supp         1    205  205.35   3.668 0.0604 .
+## Residuals   58   3247   55.98                 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>paste(&quot;Critical value of F Statisic:&quot;,qf(df1=1,df2 = 58, p= 0.05,lower.tail=F))</code></pre>
+<pre><code>## [1] &quot;Critical value of F Statisic: 4.00687288633273&quot;</code></pre>
+<p><strong>Two-way ANOVA on both</strong></p>
+<ul>
+<li>Null hypothesis :
+<ul>
+<li>Mean tooth growth for the 3 doses is same</li>
+<li>Mean tooth growth for the 2 supplement types is same</li>
+<li>The interaction between the dose and supplement type has no effect on the tooth growth</li>
+</ul></li>
+<li>Interpretation of results
+<ul>
+<li>p-values :
+<ul>
+<li><strong>Dose has p-value &lt; 0.05</strong>
+<ul>
+<li>Reject the null hypothesis that the 3 doses have the same effect on tooth growth ie</li>
+<li>The 3 doses are significantly different as seen in the One-Way ANOVA</li>
+</ul></li>
+<li><strong>Supplement type now has p-value &lt; 0.05</strong>
+<ul>
+<li>Reject the null hypothesis that the 2 supplement types have same effect on tooth growth ie</li>
+<li>The supp type now has significant effect on the tooth growth, after controling for the level of dose and the interaction effect dose * supp</li>
+</ul></li>
+<li><strong>dose:supp has p-value &lt; 0.05</strong>
+<ul>
+<li>Reject the null hypothesis</li>
+<li>If the significant value was chosen at say 0.02 then we could have accepted the null hypothesis ie the interaction has no effect on tooth growth</li>
+</ul></li>
+</ul></li>
+<li>TukeyHSD :
+<ul>
+<li><strong>dose</strong>
+<ul>
+<li>The interpretaton for dose is same as that in One-way ANOVA</li>
+</ul></li>
+<li><strong>supp</strong> :
+<ul>
+<li>The mean tooth growth of VC is lower than that achieved by OJ (diff of -3.7)</li>
+<li>Even though in this case the Tukey HSD is not needed as there are only two factor levels</li>
+</ul></li>
+<li><strong>dose*supp</strong> :
+<ul>
+<li>We will look at couple of cases</li>
+<li><strong>0.5:VC-2:OJ</strong> : The mean tooth growth due to 0.5:VC is much lower than 2:OJ and the effect is significant with p-adj &lt; 0.05</li>
+<li><strong>2:VC-1:OJ</strong> : The diff in mean tooth growth is 3.44 with a p adj of &gt; 0.05 indicating that they have the same/similar effect on tooth growth</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+<pre class="r"><code>summary(aov(len~dose*supp,data=ToothGrowth))</code></pre>
+<pre><code>##             Df Sum Sq Mean Sq F value               Pr(&gt;F)    
+## dose         2 2426.4  1213.2  92.000 &lt; 0.0000000000000002 ***
+## supp         1  205.4   205.4  15.572             0.000231 ***
+## dose:supp    2  108.3    54.2   4.107             0.021860 *  
+## Residuals   54  712.1    13.2                                 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>#paste(&quot;Critical value of F Statisic:&quot;,qf(df1=1,df2 = 58, p= 0.05,lower.tail=F))
+
+TukeyHSD(aov(len~factor(dose)*supp,data=ToothGrowth))</code></pre>
+<pre><code>##   Tukey multiple comparisons of means
+##     95% family-wise confidence level
 ## 
-## $dose
+## Fit: aov(formula = len ~ factor(dose) * supp, data = ToothGrowth)
+## 
+## $`factor(dose)`
 ##         diff       lwr       upr     p adj
 ## 1-0.5  9.130  6.362488 11.897512 0.0000000
 ## 2-0.5 15.495 12.727488 18.262512 0.0000000
 ## 2-1    6.365  3.597488  9.132512 0.0000027
 ## 
-## $`supp:dose`
-##                diff        lwr        upr     p adj
-## VC:0.5-OJ:0.5 -5.25 -10.048124 -0.4518762 0.0242521
-## OJ:1-OJ:0.5    9.47   4.671876 14.2681238 0.0000046
-## VC:1-OJ:0.5    3.54  -1.258124  8.3381238 0.2640208
-## OJ:2-OJ:0.5   12.83   8.031876 17.6281238 0.0000000
-## VC:2-OJ:0.5   12.91   8.111876 17.7081238 0.0000000
-## OJ:1-VC:0.5   14.72   9.921876 19.5181238 0.0000000
-## VC:1-VC:0.5    8.79   3.991876 13.5881238 0.0000210
-## OJ:2-VC:0.5   18.08  13.281876 22.8781238 0.0000000
-## VC:2-VC:0.5   18.16  13.361876 22.9581238 0.0000000
-## VC:1-OJ:1     -5.93 -10.728124 -1.1318762 0.0073930
-## OJ:2-OJ:1      3.36  -1.438124  8.1581238 0.3187361
-## VC:2-OJ:1      3.44  -1.358124  8.2381238 0.2936430
-## OJ:2-VC:1      9.29   4.491876 14.0881238 0.0000069
-## VC:2-VC:1      9.37   4.571876 14.1681238 0.0000058
-## VC:2-OJ:2      0.08  -4.718124  4.8781238 1.0000000</code></pre>
+## $supp
+##       diff       lwr       upr     p adj
+## VC-OJ -3.7 -5.579828 -1.820172 0.0002312
+## 
+## $`factor(dose):supp`
+##                 diff        lwr         upr     p adj
+## 1:OJ-0.5:OJ     9.47   4.671876  14.2681238 0.0000046
+## 2:OJ-0.5:OJ    12.83   8.031876  17.6281238 0.0000000
+## 0.5:VC-0.5:OJ  -5.25 -10.048124  -0.4518762 0.0242521
+## 1:VC-0.5:OJ     3.54  -1.258124   8.3381238 0.2640208
+## 2:VC-0.5:OJ    12.91   8.111876  17.7081238 0.0000000
+## 2:OJ-1:OJ       3.36  -1.438124   8.1581238 0.3187361
+## 0.5:VC-1:OJ   -14.72 -19.518124  -9.9218762 0.0000000
+## 1:VC-1:OJ      -5.93 -10.728124  -1.1318762 0.0073930
+## 2:VC-1:OJ       3.44  -1.358124   8.2381238 0.2936430
+## 0.5:VC-2:OJ   -18.08 -22.878124 -13.2818762 0.0000000
+## 1:VC-2:OJ      -9.29 -14.088124  -4.4918762 0.0000069
+## 2:VC-2:OJ       0.08  -4.718124   4.8781238 1.0000000
+## 1:VC-0.5:VC     8.79   3.991876  13.5881238 0.0000210
+## 2:VC-0.5:VC    18.16  13.361876  22.9581238 0.0000000
+## 2:VC-1:VC       9.37   4.571876  14.1681238 0.0000058</code></pre>
 </div>
+<div id="inference" class="section level3">
+<h3>Inference</h3>
+<ul>
+<li>dose has the most significant effect on tooth growth</li>
+<li>supplement type on its own doesn’t have much effect but its effect increases when combined with the dose variable</li>
+<li>Thus changing supplement methods or the dose of vitamin C, will significantly impact the tooth growth</li>
+</ul>
+</div>
+<div id="anova-assumptions" class="section level3">
+<h3>ANOVA Assumptions</h3>
+<ul>
+<li>ANOVA has three assumptions
+<ul>
+<li>All observations are independent of one another and randomly selected from the population which they represent</li>
+<li>The variance across groups must be almost the same</li>
+<li>The distribution should be approximately normal at each factor level</li>
+</ul></li>
+</ul>
+<p>The homogeneity of the variances can be verified using the residuals vs fitted plot which shows that the residuals are uniformly distributed around the x axis and that there is no relationship between residuals and fitted values. It can also be checked using car::leveneTest()</p>
+<pre class="r"><code>plot(aov(len~dose*supp,data=ToothGrowth),1)</code></pre>
+<p><img src="/post/2018-04-07-inferential-statistics-part-iii-anova_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p>The normality assumption can be checked using the QQ plot which shows that the residuals are along the diagonal line It can also be verified using the Shapiro Wilk test. If it failed, then we would do transformation of the dependent variable.</p>
+<pre class="r"><code>plot(aov(len~dose*supp,data=ToothGrowth),2)</code></pre>
+<p><img src="/post/2018-04-07-inferential-statistics-part-iii-anova_files/figure-html/unnamed-chunk-6-1.png" width="480" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>shapiro.test(x = residuals(aov(len~dose*supp,data=ToothGrowth)))</code></pre>
+<pre><code>## 
+##  Shapiro-Wilk normality test
+## 
+## data:  residuals(aov(len ~ dose * supp, data = ToothGrowth))
+## W = 0.98499, p-value = 0.6694</code></pre>
+</div>
+<div id="unbalanced-anova" class="section level3">
+<h3>Unbalanced ANOVA</h3>
+<ul>
+<li>The ToothGrowth dataset was balanced the number of observations in each group were equal</li>
+<li>If it was not balanced then we would use car::Anova()</li>
+</ul>
+<pre class="r"><code>table(ToothGrowth$supp,ToothGrowth$dose) %&gt;%
+kable(format.args = list(decimal.mark = &#39;.&#39;, big.mark = &quot;,&quot;)) %&gt;%
+kable_styling(bootstrap_options = &quot;condensed&quot;
+            ,full_width = FALSE
+            ,position = &quot;center&quot;
+            ,font_size = 10)</code></pre>
+<table class="table table-condensed" style="font-size: 10px; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+0.5
+</th>
+<th style="text-align:right;">
+1
+</th>
+<th style="text-align:right;">
+2
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+OJ
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+VC
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="summary" class="section level3">
 <h3>Summary</h3>
 <ul>
-<li><strong>The null hypothesis for ANOVA is that the mean of the dependent variable is the same for all groups</strong></li>
+<li>The null hypothesis for ANOVA is that the mean of the dependent variable is the same for all groups</li>
 <li>Further learning
 <ul>
-<li>Balanced vs Unbalanced design experiments for ANOVA</li>
-<li>Compare the results with <a href="http://www.sthda.com/english/wiki/two-way-anova-test-in-r" class="uri">http://www.sthda.com/english/wiki/two-way-anova-test-in-r</a></li>
+<li>Unbalanced design experiments for ANOVA</li>
+<li>See also <a href="http://www.sthda.com/english/wiki/two-way-anova-test-in-r" class="uri">http://www.sthda.com/english/wiki/two-way-anova-test-in-r</a></li>
 </ul></li>
 </ul>
 </div>

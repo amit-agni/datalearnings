@@ -9,7 +9,7 @@ tags:
   - all posts
   - statistics
 robots: index
-description: write in quotes
+description: ANOVA test can be used when there is one or more independent variables (with more than 2 factor levels)
 output:
   blogdown::html_page:
     toc: yes
@@ -38,18 +38,15 @@ ggplot_color_theme <- "turquoise4"
 </center>
 <hr>
 
-In the [previous post](/inferential-statistics-part-ii-t-test/), we looked at T-tests to compare the means of one or two samples. The T-tests can still be used for more than samples but there are 2 issues with it :
+In the [previous post](/inferential-statistics-part-ii-t-test/), we looked at T-tests to compare the means of one or two samples. The T-tests can still be used for more than two samples but there are two issues with it :
 
 * It will be tedious to compare every sample with every other samples
 * The probability of making Type I error -False Positive (when we reject Null instead of failing to reject) multiples exponentially. The probability of Type I error for a one sample T-test with alpha of 0.05 is 5%. For n number of independent t-tests this error is 1-(1-a)^n
 
-To overcome these issues in comparing more than two samples, we use ANOVA to check whether the variability in the sample means is so large that it seems unlikely to be from chance alone?
-
 There are 2 types of ANOVA tests 
 
-* One-way ANOVA is used when there is one independent variable (with more than 2 levels) and one dependent variable
-* Two-way ANOVA is used when there are more one independent variable (with more than 2 levels each) and one dependent variable
-
+* One-way ANOVA is used when there is one independent variable (with more than factor 2 levels) and one dependent variable
+* Two-way ANOVA is used when there are more one independent variable (with more than factor 2 levels each) and one dependent variable
 
 ### One-way ANOVA
 
@@ -61,8 +58,10 @@ There are 2 types of ANOVA tests
 </center>
 
 * Total Sum of Squares $SS_{T}$  is the sum of the difference between each value y from the grand mean for N observations $SS_{T} = \sum (y - \bar{y}^2) = \sum y^2 - \frac{(\sum y)^2}{N}$ 
-* Sum of Squares Between $SS_{B}$  for k groups, $n_{k}$  observations in group k and $\bar y_{k}$ being the mean of the group k  is given by $SS_{B} = \sum n_{k} (\bar y_{k} - \bar {y})^2$ 
-* Sum of Squares Within groups $SS_{W} = SS_{T} - SS_{B}$ 
+* Sum of Squares Between $SS_{B}$  for k groups, $n_{k}$  observations in group k and $\bar y_{k}$ being the mean of the group k  is given by
+$SS_{B} = \sum n_{k} (\bar y_{k} - \bar {y})^2$ 
+* Sum of Squares Within groups
+$SS_{W} = SS_{T} - SS_{B}$ 
 * The degrees of freedom are given by
   + $df_{Total} = N - 1$
   + $df_{Between} = k - 1$
@@ -71,76 +70,8 @@ There are 2 types of ANOVA tests
   + $MS_{B} = \frac {SS_{B}}{df_{Between}}$  measures between-group variability
   + $MS_{W} = \frac {SS_{W}}{df_{Within}}$  measures variability within each of the groups
 * And finally the F statistic is the ratio $\frac {MS_{B}}{MS_{W}}$ 
-
-
-* When the null hypothesis is true any difference among the sample means are only due to chance and MSB and MSW should be equal. 
-* The larger the observed variability in the samples means MSB relative to the within group observations MSW, the larger F will be and strong evidence against the null hypothesis.
-
-
-#### Example
-* The first assumption of ANOVA is that all observations are independent of one another and randomly selected from the population which they represent. We will assume this is satisfied
-* The second assumption is that the the variance across groups must be almost the same. If we look at all the variables only Sepal.Width seems to be satisfying this condition.
-
-```{r}
-aggregate(x=iris[1:4],by = list(iris$Species), FUN=mean) %>%
-kable(format.args = list(decimal.mark = '.', big.mark = ",")) %>%
-kable_styling(bootstrap_options = "condensed"
-            ,full_width = FALSE
-            ,position = "center"
-            ,font_size = 10)
-
-aggregate(x=iris[1:4],by = list(iris$Species), FUN=sd) %>%
-kable(format.args = list(decimal.mark = '.', big.mark = ",")) %>%
-kable_styling(bootstrap_options = "condensed"
-            ,full_width = FALSE
-            ,position = "center"
-            ,font_size = 10)
-
-```
-* The third assumption the distribution should be approximately normal at each factor level. This is also satisfied, there are few outliers which we will ignore
-
-```{r fig.height=3}
-
-ggplot(data=iris[,c(2,5)]) +
- geom_density(aes(x=Sepal.Width,fill=Species)) +
- facet_wrap(~Species) +
-  labs(caption = varPlotCaption) +
-  theme_darklightmix(color_theme = ggplot_color_theme) +
-  scale_fill_brewer(palette="Set3")
- 
-ggplot(data=iris[,c(2,5)]) +
- geom_boxplot(aes(y=Sepal.Width,fill=Species)) +
- facet_wrap(~Species) +
-  labs(caption = varPlotCaption) +
-  theme_darklightmix(color_theme = ggplot_color_theme)  +
-  scale_fill_brewer(palette="Set3")
-
-
-
-```
-
-
-* The ANOVA test gives us a F value of 49.16 which is much higher than the F-critical value of 3.06. 
-* And the probability that this high value could have occurred by chance is very less and hence we can reject the null hypothesis that the mean of all the three groups are equal.
-
-```{r}
-#get the critical value of the F statistic
-qf(df1=2,df2=147, p= 0.05,lower.tail=FALSE)
-# 3.057621
-
-summary(aov(iris$Sepal.Width ~ iris$Species))
- 
-
-```
-
-* **Since we got a significant p-value then we can run post-hoc analysis to find which group means are different from each other** 
-* **Couple of methods of post-hoc analysis are Tukey Honest Significant Differences and Bonerroni post-hoc analysis**
-* We can see that the probability (p-adj) for the means of versicolor-setosa and  
-virginica-setosa to be equal is very very less. 
-
-```{r}
-TukeyHSD(aov(iris$Sepal.Width ~ iris$Species))
-```
+* When the null hypothesis is true any difference among the sample means are only due to chance and MSB and MSW should be equal
+* F will be larger when $MS_{B}$ will be larger than $MS_{W}$, indicate a strong evidence against the null hypothesis
 
 
 ### Two way ANOVA
@@ -148,19 +79,16 @@ TukeyHSD(aov(iris$Sepal.Width ~ iris$Species))
 * In one-way ANOVA, we had one dependent variable and one independent variable. 
 * In two way ANOVA we can have more than one independent variables, so we need to calculate a ratio that measures not only the variation between the dependent and independent variables, but also the interaction between the two independent variables.
 
+### Post-hoc analysis
+* The ANOVA test gives us the significant variables for which the group means are different but if we have to know which pairs of the groups are different then we need to run post-hoc analysis
+* Couple of methods of post-hoc analysis are Tukey Honest Significant Differences and Bonerroni post-hoc analysis
 
-#### Example
+
+### Example
 * We will use the ToothGrowth dataset in R. 
   + The dataset has the observations of the tooth growth in 60 guinea pigs which were administered three doses of Vitamin C (0.1, 1 and 2 mg/day). 
-  + It also has the delivery methods using which these doses were administered – OJ (Orange Juice) and VC (ascorbic acid which is a form Vitamin C)
-
-* For two-way ANOVA, we have three null hypotheses:
-  1. In the population, the means for the rows equal each other. In the example above, we would say that the mean for the delivery methods are equal
-  2. In the population, the means for the columns equal each other. In the example above, we would say that the means for the three dosages are equal.
-  3. In the population, the null hypothesis would be that there is no interaction between the two variables. In the example above, we would say that there is no interaction between the delivery method and amount of dosage, or that all
-effects equal 0.
-
-* A quick look at the boxplot indicates there are couple of outliers and we will ignore them as before. It also indicates that Dose 2 resulted in longer tooth growth and so also Dose 1 given in Orange Juice
+  + It also has two supplement types using which these doses were administered – OJ (Orange Juice) and VC (ascorbic acid which is a form Vitamin C)
+* A quick look at the boxplot indicates there are couple of outliers but we will ignore them. It also indicates that Dose 2 resulted in longer tooth growth and so also Dose 1 given in Orange Juice
 
 ```{r fig.height=3}
 str(ToothGrowth)
@@ -178,54 +106,146 @@ ggplot(data=ToothGrowth) +
 
 ```
 
-```{r eval = F}
-attach(ToothGrowth)
-aggregate(ToothGrowth$len, by=list(supp,dose),
- FUN=mean,
- na.rm=TRUE,
- drop=TRUE) %>%
-spread(key=Group.2, value=x)
- 
-aggregate(ToothGrowth$len, by=list(supp),FUN=mean, na.rm=TRUE)
-aggregate(ToothGrowth$len, by=list(dose),FUN=mean, na.rm=TRUE)
+
+We will run one-way ANOVA on dosage and supplement separately and then run the two-way ANOVA with both of them together with their interaction
+  
+**One-way ANOVA on dose**
+
+* Null hypothesis : 
+  + Mean tooth growth for the 3 doses is same
+* Intepretation of the results
+  * p-value < 0.001 :
+    + Reject the null hypothesis i.e
+    + Mean tooth growth is not the same ie different doses have different effect on the tooth growth
+  * F Statistic of 105 :
+    + Much higher than the critical value of 12.01 at p=0.05
+    + ie between group variability (MSB) is much higher than within group variability (MSW)
+  * TukeyHSD :
+    + Mean tooth growth is higher for larger doses
+
+```{r}
+summary(aov(len~dose,data=ToothGrowth))
+
+paste("Critical value of F Statisic:",qf(df1=1,df2 = 58, p= 0.05,lower.tail=F))
+
+TukeyHSD(aov(len~factor(dose),data=ToothGrowth))
 
 ```
 
-* Lets run the ANOVA test. We can see that F-values of dosage and the method of delivery are higher than the F critical values with alpha 0.05. The low probability indicating that this did not occur by some random chance but they are statistically significant.
-* If  we had to choose a lower critical value of say 0.02 then the interaction would not have been statistically significant and we could have concluded that there is no interaction between the dosage and the delivery method.
+**One-way ANOVA on supplement type**
 
+* Null hypothesis : 
+  + Mean tooth growth for the 2 supplement types is same
+* Interpretation of results
+  * p-value > 0.05 :
+    + Accept the null hypothesis i.e
+    + Mean tooth growth is the same ie different supplement types have no effect on the tooth growth
+  * F Statistic of 3.668 :
+    + Lower than the critical value of 4 at p=0.05
+    + ie between group variability (MSB) is slightly higher than within group variability (MSW)
+  * TukeyHSD :
+    + No TukeyHSD as the null hypothesis is not rejected and hence no need to quantify the effects
+  
 ```{r}
 
-summary(aov(len ~ supp + dose + supp * dose
-            ,data=ToothGrowth))
-#get the critical value of the F statistic
-qf(df1=1,df2=54, p= 0.05,lower.tail=FALSE)
-qf(df1=2,df2=54, p= 0.05,lower.tail=FALSE)
- 
+summary(aov(len~supp,data=ToothGrowth))
+
+paste("Critical value of F Statisic:",qf(df1=1,df2 = 58, p= 0.05,lower.tail=F))
+
 
 ```
 
-* The Tukey HSD is given below.
-  + The probability of mean tooth growth due to VC (Vit C) and OJ (Orange Juice) being equal is very less (0.0002312)
-  + Similarly probability of the mean of tooth growth (for different doses) being equal is also very low
-  + If we look at the interaction terms
-    + **VC:1-OJ:0.5** has a high probability of 26% which indicates a 1mg dose given through absorbic acid (VC:1) has same effect as that of 0.5mg dose given through orange juice (OJ:0.5)
-    + **VC:2-OJ:2** indicates the .......... TBD
-    
-    
-The interaction between OJ2-VC2 is not statistically significant with 100% probability that this occurred by random chance ? So also, VC1-OJ5 (26%), OJ2-OJ1 (32%) and VC2-OJ1(29%).
+**Two-way ANOVA on both**
 
-Whereas the other interactions are statistically significant and need further investigation ?
 
+* Null hypothesis : 
+  + Mean tooth growth for the 3 doses is same
+  + Mean tooth growth for the 2 supplement types is same
+  + The interaction between the dose and supplement type has no effect on the tooth growth
+* Interpretation of results
+  * p-values :
+    + **Dose has p-value < 0.05**
+      + Reject the null hypothesis that the 3 doses have the same effect on tooth growth ie
+      + The 3 doses are significantly different as seen in the One-Way ANOVA
+    + **Supplement type now has p-value < 0.05**
+      + Reject the null hypothesis that the 2 supplement types have same effect on tooth growth ie
+      + The supp type now has significant effect on the tooth growth, after controling for the level of dose and the interaction effect dose * supp
+    + **dose:supp has p-value < 0.05**
+      + Reject the null hypothesis
+      + If the significant value was chosen at say 0.02 then we could have accepted the null hypothesis ie the interaction has no effect on tooth growth
+  * TukeyHSD :
+    + **dose**
+      + The interpretaton for dose is same as that in One-way ANOVA
+    + **supp** :
+      + The mean tooth growth of VC is lower than that achieved by OJ (diff of -3.7)
+      + Even though in this case the Tukey HSD is not needed as there are only two factor levels
+    + **dose\*supp** :
+      + We will look at couple of cases
+      + **0.5:VC-2:OJ** : The mean tooth growth due to 0.5:VC is much lower than 2:OJ and the effect is significant with p-adj < 0.05
+      + **2:VC-1:OJ** : The diff in mean tooth growth is 3.44 with a p adj of > 0.05 indicating that they have the same/similar effect on tooth growth
+    
 ```{r}
-TukeyHSD(aov(len ~ supp + dose + supp * dose
-             ,data=ToothGrowth))
+
+summary(aov(len~dose*supp,data=ToothGrowth))
+
+#paste("Critical value of F Statisic:",qf(df1=1,df2 = 58, p= 0.05,lower.tail=F))
+
+TukeyHSD(aov(len~factor(dose)*supp,data=ToothGrowth))
+
+
+```
+  
+
+### Inference
+* dose has the most significant effect on tooth growth
+* supplement type on its own doesn't have much effect but its effect increases when combined with the dose variable
+* Thus changing supplement methods or the dose of vitamin C, will significantly impact the tooth growth
+
+
+### ANOVA Assumptions
+* ANOVA has three assumptions
+  + All observations are independent of one another and randomly selected from the population which they represent
+  + The variance across groups must be almost the same
+  + The distribution should be approximately normal at each factor level
+  
+The homogeneity of the variances can be verified using the residuals vs fitted plot which shows that the residuals are uniformly distributed around the x axis and that there is no relationship between residuals and fitted values. It can also be checked using car::leveneTest()
+
+
+```{r fig.height=4}
+
+plot(aov(len~dose*supp,data=ToothGrowth),1)
+
+```
+  
+The normality assumption can be checked using the QQ plot which shows that the residuals are along the diagonal line It can also be verified using the Shapiro Wilk test. If it failed, then we would do transformation of the dependent variable.
+
+```{r fig.height=4}
+plot(aov(len~dose*supp,data=ToothGrowth),2)
+shapiro.test(x = residuals(aov(len~dose*supp,data=ToothGrowth)))
+
+```
+
+### Unbalanced ANOVA
+* The ToothGrowth dataset was balanced the number of observations in each group were equal
+* If it was not balanced then we would use car::Anova()
+```{r}
+table(ToothGrowth$supp,ToothGrowth$dose) %>%
+kable(format.args = list(decimal.mark = '.', big.mark = ",")) %>%
+kable_styling(bootstrap_options = "condensed"
+            ,full_width = FALSE
+            ,position = "center"
+            ,font_size = 10)
+
+            
+
+
+
 ```
 
 
 ### Summary
-* **The null hypothesis for ANOVA is that the mean of the dependent variable is the same for all groups**
+* The null hypothesis for ANOVA is that the mean of the dependent variable is the same for all groups
 * Further learning
-  + Balanced vs Unbalanced design experiments for ANOVA
-  + Compare the results with http://www.sthda.com/english/wiki/two-way-anova-test-in-r
+  + Unbalanced design experiments for ANOVA
+  + See also http://www.sthda.com/english/wiki/two-way-anova-test-in-r
 
