@@ -4,9 +4,7 @@ author: Amit Agni
 date: '2018-04-10'
 slug: linear-regression-part-i-simple
 categories:
-  - regression
 tags:
-  - regression
   - all posts
 robots: noindex
 description: Explains the concepts around simple linear regression like residuals, t and pvalues, Fstatistic, standardised beta coefficients

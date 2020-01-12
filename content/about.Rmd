@@ -9,21 +9,24 @@ robots: index
 ![](/about_files/github-avatar2.png){width=10% height=10%}
 </center>
 
+
 ### Me
 
 Hi, I'm Amit Agni. I am a data specialist at Virgin Australia. My day job involves analysing airline data to create data-driven products for sales, e-commerce and finance departments. I have been in the tech industry for over 20 years and worked across India, UAE, USA and Australia. 
 
 Since 2016, I have focused my career on data analytics and data science. I mostly use R for my work and intend to use Python in the near future.
 
-I am an eternal learner so love to update myself with latest happenings in the data world.
+I am an eternal learner and I love to update myself with latest happenings in the data world.
 
 ### Data Learnings 
 
 This is my personal blog in which I write about everything in the data domain. In the blog, you will find  
 
 * the notes that I have taken while studying online courses and while reading books
-* the exploratory analysis and predictive models created as part of data competitions like Kaggle
+* the exploratory analysis and predictive models created as part of data competitions like Kaggle, Analytics Vidhya, etc
 * documentation of my personal projects 
+
+The blog is created using the awesome R blogdown package. The entire [source code](https://github.com/amit-agni/datalearnings) is available as a github repo.
 
 I hope it helps you in your own data journey. If you'd like to connect/collaborate with me, you can add me on [Linkedin](https://www.linkedin.com/in/amitagni/") or [email me](mailto:amitagni2@gmail.com). I host my projects and repositories on [github](https://github.com/amit-agni/)
 
@@ -34,14 +37,14 @@ This blog would not have been made possible, without the awesome community that 
 
 * [Hugo](https://gohugo.io) - the blogging platform
 * [Minimal](https://github.com/calintat/minimal) - the theme used by this blog
-* [R blogdown](https://github.com/rstudio/blogdown) - the awesome package that makes creating posts so effortless
+* [R blogdown](https://github.com/rstudio/blogdown) - R package for blogging
 * [Netlify](https://www.netlify.com) - the hosts for this blog
 * And the countless members of the tech community who share their knowledge via blogs and websites like [Stackoverflow](https://stackoverflow.com), [Stackexchange](https://stats.stackexchange.com) 
 
 
-### Disclaimer
-All the content/views/opinions/experiencies mentioned in this website are my own and do not reflect that of my employer. The information given in this website is true to the best of my knowledge and I don't make any guarantees or promises regarding its accuracy, reliability or completeness. If you do rely on any information on this website, then it is at your own risk and I will not be held liable.
-As this is a personal blog created to document my learnings, some of its content may have similarities with my resources (ie books, online courses, etc)
+### Disclaimer / Terms of use
+All the content/views/opinions/experiencies mentioned in this website are my own and do not reflect that of my employer. The information given in this website is true to the best of my knowledge and I don't make any guarantees or promises regarding its accuracy, reliability or completeness. If you do rely on any information on this website, then it is at your own risk and I will not be held liable for any consequences thereof.
+As this is a personal blog that I have created to document my learnings, some of its content may have similarities with the resources that I have used to learn (ie books, online courses, etc). I have tried my best to give the due credit wherever possible but if you see that I have not then please let me know and I will make the necessary changes. I have no intention of taking credit for the work that is not of my making.
 
 <center> 
 #### Thank You 
