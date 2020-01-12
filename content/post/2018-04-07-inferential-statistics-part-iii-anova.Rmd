@@ -9,7 +9,7 @@ tags:
   - all posts
   - statistics
 robots: index
-description: ANOVA test can be used when there is one or more independent variables (with more than 2 factor levels)
+description: Explains the concepts of Analysis of Variance (ANOVA) test with a simple end-to-end example 
 output:
   blogdown::html_page:
     toc: yes
@@ -41,7 +41,9 @@ ggplot_color_theme <- "turquoise4"
 In the [previous post](/inferential-statistics-part-ii-t-test/), we looked at T-tests to compare the means of one or two samples. The T-tests can still be used for more than two samples but there are two issues with it :
 
 * It will be tedious to compare every sample with every other samples
-* The probability of making Type I error -False Positive (when we reject Null instead of failing to reject) multiples exponentially. The probability of Type I error for a one sample T-test with alpha of 0.05 is 5%. For n number of independent t-tests this error is 1-(1-a)^n
+* The probability of making Type I error -False Positive (when we reject Null instead of failing to reject) multiples exponentially. 
+
+The ANOVA methods were developed by Ronald Fisher as an extension for t and z tests. They measure the between-group variability vs the within-group variability. They can be used to compare two or more groups and find if there is a relationship that exists between them.
 
 There are 2 types of ANOVA tests 
 
@@ -71,7 +73,7 @@ $SS_{W} = SS_{T} - SS_{B}$
   + $MS_{W} = \frac {SS_{W}}{df_{Within}}$  measures variability within each of the groups
 * And finally the F statistic is the ratio $\frac {MS_{B}}{MS_{W}}$ 
 * When the null hypothesis is true any difference among the sample means are only due to chance and MSB and MSW should be equal
-* F will be larger when $MS_{B}$ will be larger than $MS_{W}$, indicate a strong evidence against the null hypothesis
+* F will be larger when $MS_{B}$ will be larger than $MS_{W}$, indicate a strong evidence against the null hypothesis. If there is no difference between the groups it will be close to 1 (accept null hypothesis)
 
 
 ### Two way ANOVA
@@ -109,7 +111,7 @@ ggplot(data=ToothGrowth) +
 
 We will run one-way ANOVA on dosage and supplement separately and then run the two-way ANOVA with both of them together with their interaction
   
-**One-way ANOVA on dose**
+#### **One-way ANOVA on dose**
 
 * Null hypothesis : 
   + Mean tooth growth for the 3 doses is same
@@ -132,7 +134,7 @@ TukeyHSD(aov(len~factor(dose),data=ToothGrowth))
 
 ```
 
-**One-way ANOVA on supplement type**
+#### **One-way ANOVA on supplement type**
 
 * Null hypothesis : 
   + Mean tooth growth for the 2 supplement types is same
@@ -155,7 +157,7 @@ paste("Critical value of F Statisic:",qf(df1=1,df2 = 58, p= 0.05,lower.tail=F))
 
 ```
 
-**Two-way ANOVA on both**
+#### **Two-way ANOVA on both**
 
 
 * Null hypothesis : 
@@ -205,7 +207,7 @@ TukeyHSD(aov(len~factor(dose)*supp,data=ToothGrowth))
 ### ANOVA Assumptions
 * ANOVA has three assumptions
   + All observations are independent of one another and randomly selected from the population which they represent
-  + The variance across groups must be almost the same
+  + The variance across groups must be almost the same(homoscedasticity)
   + The distribution should be approximately normal at each factor level
   
 The homogeneity of the variances can be verified using the residuals vs fitted plot which shows that the residuals are uniformly distributed around the x axis and that there is no relationship between residuals and fitted values. It can also be checked using car::leveneTest()
@@ -247,5 +249,9 @@ kable_styling(bootstrap_options = "condensed"
 * The null hypothesis for ANOVA is that the mean of the dependent variable is the same for all groups
 * Further learning
   + Unbalanced design experiments for ANOVA
+  + Three classes of models
+    +  Fixed-effects model (class I) 
+    + Random-effects model (class II) 
+    + Mixed-effects model (class III)
   + See also http://www.sthda.com/english/wiki/two-way-anova-test-in-r
 

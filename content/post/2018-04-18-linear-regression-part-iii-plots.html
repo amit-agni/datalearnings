@@ -1,0 +1,110 @@
+---
+title: Linear Regression Part III - Plots
+author: Amit Agni
+date: '2018-04-18'
+slug: linear-regression-part-iii-plots
+categories:
+  - regression
+tags:
+  - all posts
+  - regression
+robots: index
+description: Looks at the residual plots given by the linear regression model in R [WIP]
+output:
+  blogdown::html_page:
+    toc: yes
+    fig_height: 4
+    fig_width: 6
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#residual-vs-fitted-plot">1. Residual vs Fitted Plot</a></li>
+<li><a href="#normal-q-q-plot">2. Normal Q-Q plot</a></li>
+<li><a href="#scale-location">3. Scale-Location</a></li>
+<li><a href="#cooks-distance">4. Cooks Distance</a></li>
+<li><a href="#residuals-vs-leverage">5. Residuals vs Leverage</a></li>
+<li><a href="#cooks-distance-vs-leverage">6. Cooks distance vs Leverage</a></li>
+<li><a href="#summary">Summary</a></li>
+</ul>
+</div>
+
+<center>
+<!-- feature image -->
+<img src="/post/2018-04-18-linear-regression-part-iii-plots_files/manik-rathee-a8YV2C3yBMk-unsplash.jpg" />
+Photo by Manik Rathee on Unsplash
+</center>
+<hr>
+<p>In the <a href="/linear-regression-part-i-simple/">Simple</a> and <a href="/linear-regression-part-ii-multiple/">Multiple Linear Regression</a>, we saw the various metrics that we can use to validate our model. A high R-squared value and F statistics with low p-value generally indicates a good model. But its possible that the relationship between the dependent and the independent variables is not linear. We may have to include a quadratic term or a log transformation or we ma have left out an important variable.</p>
+<p>We can use the regression plots to discover more about our model and have a look at the residuals to see if there are any trends or patterns in their distributions.</p>
+<div id="residual-vs-fitted-plot" class="section level3">
+<h3>1. Residual vs Fitted Plot</h3>
+<p>It is a scatter plot of the residuals on the y axis and fitted or the predicted values on the x axis. This is a very important plot and is useful in detecting non-linearity, unequal error variances, and outliers.</p>
+<ul>
+<li>A good residual vs fitted plot will have the following characteristics
+<ul>
+<li>The residuals “bounce randomly” around the 0 line. This suggests that the assumption that the relationship is linear is reasonable.</li>
+<li>The residuals roughly form a “horizontal band” around the 0 line. This suggests that the variances of the error terms are equal.</li>
+<li>No one residual “stands out” from the basic random pattern of residuals. This suggests that there are no outliers.</li>
+</ul></li>
+<li>The residual vs fitted plot for our model shows that
+<ul>
+<li>Even though there is not a distinct pattern in the distribution of the residuals, we can see that there are more residuals below the 0 line</li>
+<li>The Scatterplot smoother Red line that shows the average value of the residuals at each value of fitted value is not perfectly flat.</li>
+<li>There are outliers that may need further investigation. We have highlighted 6 outliers using the id.n parameter</li>
+</ul></li>
+</ul>
+<pre class="r"><code>lm.fit &lt;- lm(mpg~wt+qsec+drat, data = mtcars)
+plot(lm.fit, which = 1,id.n = 6)</code></pre>
+<p><img src="/post/2018-04-18-linear-regression-part-iii-plots_files/figure-html/unnamed-chunk-1-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>Lets try removing these 6 outliers from our data and see if it has any impact. Even though the plot hasn’t changed much we can see that the R-squared has improved from 83% to 91%</p>
+<pre class="r"><code>lm.fit &lt;- lm(mpg~wt+qsec+drat, data = mtcars)
+summary(lm.fit)$r.squared</code></pre>
+<pre><code>## [1] 0.8370214</code></pre>
+<pre class="r"><code>remove_outliers &lt;- c(&quot;Chrysler Imperial&quot;, &quot;Pontiac Firebird&quot;, &quot;Fiat 128&quot;,
+ &quot;Toyota Corolla&quot;,&quot;Lotus Europa&quot;, &quot;Toyota Corona&quot;)
+ 
+lm.fit &lt;- lm(mpg~wt+qsec+drat,
+ data = mtcars[!rownames(mtcars) %in% remove_outliers,])
+plot(lm.fit, which = 1)</code></pre>
+<p><img src="/post/2018-04-18-linear-regression-part-iii-plots_files/figure-html/unnamed-chunk-2-1.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>summary(lm.fit)$r.squared</code></pre>
+<pre><code>## [1] 0.9152388</code></pre>
+</div>
+<div id="normal-q-q-plot" class="section level3">
+<h3>2. Normal Q-Q plot</h3>
+<p>This plot shows if residuals are normally distributed. Do residuals follow a straight line well or do they deviate severely? It’s good if residuals are lined well on the straight dashed line. In particular, if the residual tend to be larger in magnitude than what we would expect from the normal distribution, then our p-values and confidence intervals may be too optimisitic. i.e., we may fail to adequately account for the full variability of the data.</p>
+<pre class="r"><code>plot(lm.fit, which = 2)</code></pre>
+<p><img src="/post/2018-04-18-linear-regression-part-iii-plots_files/figure-html/unnamed-chunk-3-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+<div id="scale-location" class="section level3">
+<h3>3. Scale-Location</h3>
+<p>It’s also called Spread-Location plot. This plot shows if residuals are spread equally along the ranges of predictors. This is how you can check the assumption of equal variance (homoscedasticity). It’s good if you see a horizontal line with equally (randomly) spread points.</p>
+<pre class="r"><code>plot(lm.fit, which = 3)</code></pre>
+<p><img src="/post/2018-04-18-linear-regression-part-iii-plots_files/figure-html/unnamed-chunk-4-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cooks-distance" class="section level3">
+<h3>4. Cooks Distance</h3>
+<p>In regression, cook’s distance is a measure of influence of a single observation on the predicted dependent variable. The higher the value the more influence a particular observation plays in the overall model fit.</p>
+<p>As a cut off of influence, we use the value of four divided by the degrees of freedom in the multiple regression model.</p>
+<pre class="r"><code>lm.fit &lt;- lm(mpg~wt+qsec+drat, data = mtcars)
+plot(lm.fit, which = 4, cook.levels = 4/ lm.fit$df)</code></pre>
+<p><img src="/post/2018-04-18-linear-regression-part-iii-plots_files/figure-html/unnamed-chunk-5-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+<div id="residuals-vs-leverage" class="section level3">
+<h3>5. Residuals vs Leverage</h3>
+<p>We can see that all the cases are within the Cook’s distance (Red) lines suggesting there are no influential cases.</p>
+<pre class="r"><code>lm.fit &lt;- lm(mpg~wt+qsec+drat, data = mtcars)
+plot(lm.fit, which = 5)</code></pre>
+<p><img src="/post/2018-04-18-linear-regression-part-iii-plots_files/figure-html/unnamed-chunk-6-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cooks-distance-vs-leverage" class="section level3">
+<h3>6. Cooks distance vs Leverage</h3>
+<pre class="r"><code>plot(lm.fit, which = 6)</code></pre>
+<p><img src="/post/2018-04-18-linear-regression-part-iii-plots_files/figure-html/unnamed-chunk-7-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+<div id="summary" class="section level3">
+<h3>Summary</h3>
+<p>This post is Work in Progress</p>
+</div>

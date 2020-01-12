@@ -1,0 +1,96 @@
+---
+title: Linear Regression Part II - Multiple
+author: Amit Agni
+date: '2018-04-14'
+slug: linear-regression-part-ii-multiple
+categories:
+  - regression
+tags:
+  - regression
+  - all posts
+robots: noindex
+description: Explains Multiple linear regression and the concepts of VIF and Partial correlation [WIP]
+output:
+  blogdown::html_page:
+    toc: yes
+    fig_height: 3
+    fig_width: 4
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.align='center')
+
+if(!require(cutlery)) { devtools::install_github("amit-agni/cutlery"); library(cutlery)}
+if(!require(pacman)) { install.packages("pacman"); library(pacman)}
+p_load(here,data.table,tidyverse,tictoc,kableExtra,gridExtra,QuantPsyc,car,ppcor)
+
+varPlotCaption <- "© Data Learnings"
+ggplot_color_theme <- "turquoise4"
+```
+
+<center>
+	<!-- feature image -->
+	![](/post/2018-04-14-linear-regression-part-ii-multiple_files/kenneth-thewissen-D76DklsG-5U-unsplash.jpg)
+Photo by Kenneth Thewissen on Unsplash
+</center>
+<hr>
+
+In the previous article, we took a detailed look at [Simple Linear Regression](/linear-regression-part-i-simple/). In this post, we will take a quick look at Multiple Linear Regression in which there is more than one independent variables to predict the value of the dependent variable (y). 
+
+Lets introduce two more independent variables qsec and drat and analyse the results. In simple regression, the coefficient estimate (or the slope) of wt was -5.3445 and when we introduce additional variables the estimate changes to -4.3978 because of the impact of the additional variables.
+
+The estimate tells us how much the dependent variable is expected to increase when that independent variable increases by one unit, holding all the other independent variables constant.
+
+Looking at the summary() of the model, we can make the following observations :
+
+* The residuals are more or less normally distributed
+* wt and qsec are statistically significant as they have very low p values.
+* The p-value of drat is higher than our cut off of 0.05 and its 95% confidence interval contains 0, both indicating that its not statistically significant
+* The multiple R-squared indicates that the model accounts for 83% of the variance
+* The F statistic represents the overall model prediction. The value of 47.93 is greater than the critical value of 2.94 and a low probability indicates that it is statistically significant.
+* The absolute values of the standardised betas indicates wt has the strongest effect of 0.71
+
+
+```{r}
+lm.fit <- lm(mpg~wt+qsec+drat, data = mtcars)
+summary(lm.fit)
+ 
+qf(p=0.05, df1 = 3, df2 = 28, lower.tail = FALSE)
+confint(lm.fit)
+QuantPsyc::lm.beta(lm.fit)
+
+```
+
+There are couple of additional concepts in multiple regression that we need to look at
+
+### Variance Inflation Factor (VIF)
+
+In a multiple regression model, it is possible that one of the dependent variables can be linearly predicted from the other dependent variables. This phenomenon is called multicollinearity. And we can use Variance Inflation Factor (VIF) to measure this.
+
+The definition as per Wikipedia is 
+
+> “In statistics, the variance inflation factor (VIF) is the ratio of variance in a model with multiple terms, divided by the variance of a model with one term alone. It quantifies the severity of multicollinearity in an ordinary least squares regression analysis. It provides an index that measures how much the variance (the square of the estimate’s standard deviation) of an estimated regression coefficient is increased because of collinearity.”
+
+Lets find the VIF for the independent variables in our model. We will use the vif() from the car package.
+
+```{r}
+car::vif(lm.fit)
+```
+
+To explain this further, we will create another model with qsec as the dependent variable and wt and drat as the independent variables. This model gives us multiple R-squared of 0.033 which is variance explained by this model. We can conclude that wt and drat are able to explain only about 3% of the variance in qsec, which inturn implies that there is no (or very little) correlation between qsec and the other 2 variables. And hence qsec doesnt display collinearity with the remaining variables.
+
+But how is this related to VIF ? If we take the reciprocal of the VIF of qsec we get 0.967 which is same as the variance unexplained by our new model (1-0.033 = 0.967). This is also known as the tolerance.
+
+In other words, tolerance is defined as that concept that says this is how much variance is left over in this particular independent variable once we know all of the other independents in the model. A really low amount of variance left over means that this particular independent is highly redundant with everything else in the model.
+
+The general rule of thumb is that any variable that has a VIF of over five (five or larger) or a tolerance of 0.2 is kind of redundant. Effectively saying that we have only got about 20% of the variance of this independent variable left over once I account for all of the other variables in the model. And hence can be omitted from the model.
+
+
+### Partial Correlation
+
+Partial correlation is the correlation between 2 variables holding other variables constant. It gives the proportion of variance accounted for uniquely by each variable.
+```{r}
+ppcor::pcor(mtcars[,c(1,6,7)])
+```
+
+This post is Work in Progress

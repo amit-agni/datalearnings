@@ -9,7 +9,7 @@ tags:
   - all posts
   - statistics
 robots: index
-description: ANOVA test can be used when there is one or more independent variables (with more than 2 factor levels)
+description: Explains the concepts of Analysis of Variance (ANOVA) test with a simple end-to-end example 
 output:
   blogdown::html_page:
     toc: yes
@@ -41,8 +41,9 @@ output:
 <p>In the <a href="/inferential-statistics-part-ii-t-test/">previous post</a>, we looked at T-tests to compare the means of one or two samples. The T-tests can still be used for more than two samples but there are two issues with it :</p>
 <ul>
 <li>It will be tedious to compare every sample with every other samples</li>
-<li>The probability of making Type I error -False Positive (when we reject Null instead of failing to reject) multiples exponentially. The probability of Type I error for a one sample T-test with alpha of 0.05 is 5%. For n number of independent t-tests this error is 1-(1-a)^n</li>
+<li>The probability of making Type I error -False Positive (when we reject Null instead of failing to reject) multiples exponentially.</li>
 </ul>
+<p>The ANOVA methods were developed by Ronald Fisher as an extension for t and z tests. They measure the between-group variability vs the within-group variability. They can be used to compare two or more groups and find if there is a relationship that exists between them.</p>
 <p>There are 2 types of ANOVA tests</p>
 <ul>
 <li>One-way ANOVA is used when there is one independent variable (with more than factor 2 levels) and one dependent variable</li>
@@ -76,7 +77,7 @@ output:
 </ul></li>
 <li>And finally the F statistic is the ratio <span class="math inline">\(\frac {MS_{B}}{MS_{W}}\)</span></li>
 <li>When the null hypothesis is true any difference among the sample means are only due to chance and MSB and MSW should be equal</li>
-<li>F will be larger when <span class="math inline">\(MS_{B}\)</span> will be larger than <span class="math inline">\(MS_{W}\)</span>, indicate a strong evidence against the null hypothesis</li>
+<li>F will be larger when <span class="math inline">\(MS_{B}\)</span> will be larger than <span class="math inline">\(MS_{W}\)</span>, indicate a strong evidence against the null hypothesis. If there is no difference between the groups it will be close to 1 (accept null hypothesis)</li>
 </ul>
 </div>
 <div id="two-way-anova" class="section level3">
@@ -118,7 +119,8 @@ ggplot(data=ToothGrowth) +
    scale_fill_brewer(palette = &quot;Set3&quot;)</code></pre>
 <p><img src="/post/2018-04-07-inferential-statistics-part-iii-anova_files/figure-html/unnamed-chunk-1-1.png" width="480" style="display: block; margin: auto;" /></p>
 <p>We will run one-way ANOVA on dosage and supplement separately and then run the two-way ANOVA with both of them together with their interaction</p>
-<p><strong>One-way ANOVA on dose</strong></p>
+<div id="one-way-anova-on-dose" class="section level4">
+<h4><strong>One-way ANOVA on dose</strong></h4>
 <ul>
 <li>Null hypothesis :
 <ul>
@@ -161,7 +163,9 @@ ggplot(data=ToothGrowth) +
 ## 1-0.5  9.130  5.901805 12.358195 0.0000000
 ## 2-0.5 15.495 12.266805 18.723195 0.0000000
 ## 2-1    6.365  3.136805  9.593195 0.0000425</code></pre>
-<p><strong>One-way ANOVA on supplement type</strong></p>
+</div>
+<div id="one-way-anova-on-supplement-type" class="section level4">
+<h4><strong>One-way ANOVA on supplement type</strong></h4>
 <ul>
 <li>Null hypothesis :
 <ul>
@@ -193,7 +197,9 @@ ggplot(data=ToothGrowth) +
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>paste(&quot;Critical value of F Statisic:&quot;,qf(df1=1,df2 = 58, p= 0.05,lower.tail=F))</code></pre>
 <pre><code>## [1] &quot;Critical value of F Statisic: 4.00687288633273&quot;</code></pre>
-<p><strong>Two-way ANOVA on both</strong></p>
+</div>
+<div id="two-way-anova-on-both" class="section level4">
+<h4><strong>Two-way ANOVA on both</strong></h4>
 <ul>
 <li>Null hypothesis :
 <ul>
@@ -285,6 +291,7 @@ TukeyHSD(aov(len~factor(dose)*supp,data=ToothGrowth))</code></pre>
 ## 2:VC-0.5:VC    18.16  13.361876  22.9581238 0.0000000
 ## 2:VC-1:VC       9.37   4.571876  14.1681238 0.0000058</code></pre>
 </div>
+</div>
 <div id="inference" class="section level3">
 <h3>Inference</h3>
 <ul>
@@ -299,7 +306,7 @@ TukeyHSD(aov(len~factor(dose)*supp,data=ToothGrowth))</code></pre>
 <li>ANOVA has three assumptions
 <ul>
 <li>All observations are independent of one another and randomly selected from the population which they represent</li>
-<li>The variance across groups must be almost the same</li>
+<li>The variance across groups must be almost the same(homoscedasticity)</li>
 <li>The distribution should be approximately normal at each factor level</li>
 </ul></li>
 </ul>
@@ -383,6 +390,12 @@ VC
 <li>Further learning
 <ul>
 <li>Unbalanced design experiments for ANOVA</li>
+<li>Three classes of models
+<ul>
+<li>Fixed-effects model (class I)</li>
+<li>Random-effects model (class II)</li>
+<li>Mixed-effects model (class III)</li>
+</ul></li>
 <li>See also <a href="http://www.sthda.com/english/wiki/two-way-anova-test-in-r" class="uri">http://www.sthda.com/english/wiki/two-way-anova-test-in-r</a></li>
 </ul></li>
 </ul>

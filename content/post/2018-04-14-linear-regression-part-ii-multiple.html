@@ -1,0 +1,127 @@
+---
+title: Linear Regression Part II - Multiple
+author: Amit Agni
+date: '2018-04-14'
+slug: linear-regression-part-ii-multiple
+categories:
+  - regression
+tags:
+  - regression
+  - all posts
+robots: noindex
+description: Explains Multiple linear regression and the concepts of VIF and Partial correlation [WIP]
+output:
+  blogdown::html_page:
+    toc: yes
+    fig_height: 3
+    fig_width: 4
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#variance-inflation-factor-vif">Variance Inflation Factor (VIF)</a></li>
+<li><a href="#partial-correlation">Partial Correlation</a></li>
+</ul>
+</div>
+
+<center>
+<!-- feature image -->
+<img src="/post/2018-04-14-linear-regression-part-ii-multiple_files/kenneth-thewissen-D76DklsG-5U-unsplash.jpg" />
+Photo by Kenneth Thewissen on Unsplash
+</center>
+<hr>
+<p>In the previous article, we took a detailed look at <a href="/linear-regression-part-i-simple/">Simple Linear Regression</a>. In this post, we will take a quick look at Multiple Linear Regression in which there is more than one independent variables to predict the value of the dependent variable (y).</p>
+<p>Lets introduce two more independent variables qsec and drat and analyse the results. In simple regression, the coefficient estimate (or the slope) of wt was -5.3445 and when we introduce additional variables the estimate changes to -4.3978 because of the impact of the additional variables.</p>
+<p>The estimate tells us how much the dependent variable is expected to increase when that independent variable increases by one unit, holding all the other independent variables constant.</p>
+<p>Looking at the summary() of the model, we can make the following observations :</p>
+<ul>
+<li>The residuals are more or less normally distributed</li>
+<li>wt and qsec are statistically significant as they have very low p values.</li>
+<li>The p-value of drat is higher than our cut off of 0.05 and its 95% confidence interval contains 0, both indicating that its not statistically significant</li>
+<li>The multiple R-squared indicates that the model accounts for 83% of the variance</li>
+<li>The F statistic represents the overall model prediction. The value of 47.93 is greater than the critical value of 2.94 and a low probability indicates that it is statistically significant.</li>
+<li>The absolute values of the standardised betas indicates wt has the strongest effect of 0.71</li>
+</ul>
+<pre class="r"><code>lm.fit &lt;- lm(mpg~wt+qsec+drat, data = mtcars)
+summary(lm.fit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = mpg ~ wt + qsec + drat, data = mtcars)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.1152 -1.8273 -0.2696  1.0502  5.5010 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  11.3945     8.0689   1.412  0.16892    
+## wt           -4.3978     0.6781  -6.485 5.01e-07 ***
+## qsec          0.9462     0.2616   3.616  0.00116 ** 
+## drat          1.6561     1.2269   1.350  0.18789    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.56 on 28 degrees of freedom
+## Multiple R-squared:  0.837,  Adjusted R-squared:  0.8196 
+## F-statistic: 47.93 on 3 and 28 DF,  p-value: 3.723e-11</code></pre>
+<pre class="r"><code>qf(p=0.05, df1 = 3, df2 = 28, lower.tail = FALSE)</code></pre>
+<pre><code>## [1] 2.946685</code></pre>
+<pre class="r"><code>confint(lm.fit)</code></pre>
+<pre><code>##                  2.5 %    97.5 %
+## (Intercept) -5.1339149 27.922817
+## wt          -5.7868161 -3.008776
+## qsec         0.4102527  1.482155
+## drat        -0.8571278  4.169418</code></pre>
+<pre class="r"><code>QuantPsyc::lm.beta(lm.fit)</code></pre>
+<pre><code>##         wt       qsec       drat 
+## -0.7139693  0.2805421  0.1469244</code></pre>
+<p>There are couple of additional concepts in multiple regression that we need to look at</p>
+<div id="variance-inflation-factor-vif" class="section level3">
+<h3>Variance Inflation Factor (VIF)</h3>
+<p>In a multiple regression model, it is possible that one of the dependent variables can be linearly predicted from the other dependent variables. This phenomenon is called multicollinearity. And we can use Variance Inflation Factor (VIF) to measure this.</p>
+<p>The definition as per Wikipedia is</p>
+<blockquote>
+<p>“In statistics, the variance inflation factor (VIF) is the ratio of variance in a model with multiple terms, divided by the variance of a model with one term alone. It quantifies the severity of multicollinearity in an ordinary least squares regression analysis. It provides an index that measures how much the variance (the square of the estimate’s standard deviation) of an estimated regression coefficient is increased because of collinearity.”</p>
+</blockquote>
+<p>Lets find the VIF for the independent variables in our model. We will use the vif() from the car package.</p>
+<pre class="r"><code>car::vif(lm.fit)</code></pre>
+<pre><code>##       wt     qsec     drat 
+## 2.082097 1.033884 2.035472</code></pre>
+<p>To explain this further, we will create another model with qsec as the dependent variable and wt and drat as the independent variables. This model gives us multiple R-squared of 0.033 which is variance explained by this model. We can conclude that wt and drat are able to explain only about 3% of the variance in qsec, which inturn implies that there is no (or very little) correlation between qsec and the other 2 variables. And hence qsec doesnt display collinearity with the remaining variables.</p>
+<p>But how is this related to VIF ? If we take the reciprocal of the VIF of qsec we get 0.967 which is same as the variance unexplained by our new model (1-0.033 = 0.967). This is also known as the tolerance.</p>
+<p>In other words, tolerance is defined as that concept that says this is how much variance is left over in this particular independent variable once we know all of the other independents in the model. A really low amount of variance left over means that this particular independent is highly redundant with everything else in the model.</p>
+<p>The general rule of thumb is that any variable that has a VIF of over five (five or larger) or a tolerance of 0.2 is kind of redundant. Effectively saying that we have only got about 20% of the variance of this independent variable left over once I account for all of the other variables in the model. And hence can be omitted from the model.</p>
+</div>
+<div id="partial-correlation" class="section level3">
+<h3>Partial Correlation</h3>
+<p>Partial correlation is the correlation between 2 variables holding other variables constant. It gives the proportion of variance accounted for uniquely by each variable.</p>
+<pre class="r"><code>ppcor::pcor(mtcars[,c(1,6,7)])</code></pre>
+<pre><code>## $estimate
+##             mpg         wt      qsec
+## mpg   1.0000000 -0.8885492 0.5456251
+## wt   -0.8885492  1.0000000 0.4176413
+## qsec  0.5456251  0.4176413 1.0000000
+## 
+## $p.value
+##               mpg           wt        qsec
+## mpg  0.000000e+00 2.518948e-11 0.001499883
+## wt   2.518948e-11 0.000000e+00 0.019400101
+## qsec 1.499883e-03 1.940010e-02 0.000000000
+## 
+## $statistic
+##             mpg         wt     qsec
+## mpg    0.000000 -10.429771 3.506179
+## wt   -10.429771   0.000000 2.475278
+## qsec   3.506179   2.475278 0.000000
+## 
+## $n
+## [1] 32
+## 
+## $gp
+## [1] 1
+## 
+## $method
+## [1] &quot;pearson&quot;</code></pre>
+<p>This post is Work in Progress</p>
+</div>
