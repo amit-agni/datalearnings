@@ -6,6 +6,7 @@ categories:
   - regression
 tags:
   - all posts
+  - regression
 slug: linear-regression-part-iii-plots
 robots: index
 description: Looks at the residual plots given by the linear regression model in R

@@ -6,6 +6,7 @@ categories:
   - regression
 tags:
   - all posts
+  - regression
 slug: linear-regression-part-i-simple
 robots: noindex
 description: Explains the concepts around simple linear regression like residuals,
