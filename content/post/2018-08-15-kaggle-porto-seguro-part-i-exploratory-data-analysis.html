@@ -1,0 +1,131 @@
+---
+title: Kaggle Porto Seguro Part I - Exploratory Data Analysis
+author: Amit Agni
+date: '2018-08-15'
+slug: kaggle-porto-seguro-part-i-exploratory-data-analysis
+categories:
+  - kaggle
+tags:
+  - kaggle
+robots: index
+draft: true
+description: EDA 
+output:
+  blogdown::html_page:
+    toc: yes
+    fig_height: 3
+    fig_width: 4
+---
+
+
+
+<center>
+<!-- feature image -->
+</center>
+<hr>
+<p>Porto Seguro is Brazilian insurance company. They hosted a Kaggle competition in Nov 2017 to predict the probability that a driver will initiate an auto insurance claim in the next year. We will conduct an exploratory data analysis in this post. To reproduce this document, please download the datasets from the Kaggle website. The training set has around 600K rows and 59 columns.</p>
+<blockquote>
+<p>In the train and test data, features that belong to similar groupings are tagged as such in the feature names (e.g., ind, reg, car, calc). In addition, feature names include the postfix bin to indicate binary features and cat to indicate categorical features. Features without these designations are either continuous or ordinal. Values of -1 indicate that the feature was missing from the observation. The target columns signifies whether or not a claim was filed for that policy holder.</p>
+</blockquote>
+<p>This was the first Kaggle competition that I participated. In this post, I will do a exploratory analysis of the data. The training set has around 600k observations and 59 features (including the target feature and an id feature)</p>
+<pre class="r"><code>#train file stored outside the blog files
+root &lt;- &#39;/Mac Backup/R-Large-Items/porto/&#39;
+DT_train &lt;- fread(file=paste(root,&#39;train.csv&#39;,sep=&#39;&#39;))
+dim(DT_train)</code></pre>
+<pre><code>## [1] 595212     59</code></pre>
+<p>The first thing that I look at in a dataset is whether there are any missing values. The missing value and its imputation is a interesting topic that I am hoping to cover in the future. I have used the <code>plot_missing</code> from the excellent <code>DataExplorer</code> package to get an idea of the missing values.</p>
+<p>The missing values were coded as -1 which I have converted to NA and I am plotting only the features that had missing values. Majority of the features either don’t have missing values or they are within an acceptable range of less than 2%. Except for 4 features that have significant volume is missingness.</p>
+<pre class="r"><code>DT_train[DT_train == -1] &lt;- NA
+#lapply(DT_train,function(x) sum(is.na(x))/length(x))
+cols_NA &lt;- names(which(lapply(DT_train,function(x) sum(is.na(x))/length(x)) &gt;0))
+DataExplorer::plot_missing(DT_train[,..cols_NA]
+                           ,theme_config = theme_darklightmix(color_theme = ggplot_color_theme)
+                           ,title = &quot;Missing values&quot;) </code></pre>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>There are 17 features that are postfixed with ‘bin’. These are binary features and as such have values of 0 and 1. 99% of observations have zero values for the features <code>ps_ind_10, ps_ind_11, ps_ind_12 and ps_ind_13</code>. For the predictive modeling, these features would not add much values and I would probably look at dropping them.</p>
+<pre class="r"><code>cols_bin &lt;- grep(&quot;bin&quot;,names(DT_train),value = T)
+
+DT_train[,..cols_bin] %&gt;%
+  melt(measure.vars = 1:ncol(.)) %&gt;%
+  .[,.(freq=.N),.(variable,value)] %&gt;%
+  .[,.(value,freq,freqPct=freq/sum(freq)),variable] %&gt;%
+  ggplot(aes(x=factor(value),y=freq/1e3,fill=factor(value))) +
+  geom_col() +
+  facet_wrap(~variable,scales=&quot;free&quot;,ncol=3) +
+  scale_y_continuous(labels = scales::unit_format(unit = &quot;K&quot;)) +
+#  scale_x_discrete(breaks = c(0,1)) +
+  geom_text(aes(label = paste(round(100*freqPct,1),&quot;%&quot;,sep=&quot;&quot;)), position = position_stack(vjust = 0.5), size = 2) +
+  theme_darklightmix(color_theme = ggplot_color_theme,legend_position = &quot;none&quot;) +
+  scale_fill_brewer(palette = &quot;Set3&quot;) +
+  labs(x=&quot;value&quot;
+  ,y=&quot;count&quot;
+  ,subtitle=&quot;Distribution of bin variables&quot;
+  ,caption = varPlotCaption)</code></pre>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>There are 14 features that are postfixed with cat. These are categorical features. While majority of them have less than 10 levels, there are some features like <code>ps_ind_06_cat</code> and <code>ps_car_11_cat</code> that have higher number of levels. As these are column plots, the variability is not clear, so I will include <code>ps_car_11_cat</code> in the following histogram plots</p>
+<pre class="r"><code>cols_cat &lt;- grep(&quot;cat&quot;,names(DT_train),value = T)
+
+DT_train[,..cols_cat] %&gt;%
+  melt(measure.vars = 1:ncol(.)) %&gt;%
+  .[,.(freq=.N),.(variable,value)] %&gt;%
+  .[,.(value,freq,freqPct=freq/sum(freq,na.rm = T)),variable] %&gt;%
+  ggplot(aes(x=factor(value),y=freq/1e3,fill=factor(..x..))) +
+  geom_col() +
+  facet_wrap(~variable,scales=&quot;free&quot;,ncol=3) +
+  scale_y_continuous(labels = scales::unit_format(unit = &quot;K&quot;)) +
+#  scale_x_discrete(breaks = c(0,1)) +
+  geom_text(aes(label = paste(round(100*freqPct,1),&quot;%&quot;,sep=&quot;&quot;)), position = position_stack(vjust = 0.5), size = 2) +
+  theme_darklightmix(color_theme = ggplot_color_theme,legend_position = &quot;none&quot;) +
+  scale_fill_brewer(palette = &quot;Set3&quot;) +
+  labs(x=&quot;value&quot;
+  ,y=&quot;count&quot;
+  ,subtitle=&quot;Distribution of cat variables&quot;
+  ,caption = varPlotCaption)</code></pre>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Remaining 26 features are either continuous or ordinal are have been plotted below</p>
+<pre class="r"><code>#remove id and target and add one variable from cat
+cols_others &lt;- names(DT_train)[!names(DT_train) %in% c(cols_bin,cols_cat,&quot;id&quot;,&quot;target&quot;)]
+cols_others &lt;- c(cols_others,&quot;ps_car_11_cat&quot;)
+fn_extraPolate &lt;- colorRampPalette(brewer.pal(6, &quot;Set3&quot;))
+
+DT_train[,..cols_others] %&gt;%
+  melt(measure.vars = 1:ncol(.)) %&gt;%
+  ggplot(aes(x=value,y=..count../1e3,fill=variable)) +
+  geom_histogram(na.rm = T) +
+  facet_wrap(~variable,scales=&quot;free&quot;,ncol=3) +
+  scale_y_continuous(labels = scales::unit_format(unit = &quot;K&quot;)) +
+#  scale_x_discrete(breaks = c(0,1)) +
+  theme_darklightmix(color_theme = ggplot_color_theme,legend_position = &quot;none&quot;) +
+#  scale_fill_continuous()
+  scale_fill_manual(values = fn_extraPolate(length(cols_others))) +
+#  scale_fill_brewer(palette = &quot;Set3&quot;) +
+  labs(x=&quot;value&quot;
+  ,y=&quot;count&quot;
+  ,subtitle=&quot;Distribution of remaining variables&quot;
+  ,caption = varPlotCaption)</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>This was an quick overview of the feature set. Next step is to see how these features are correlated</p>
+<pre class="r"><code>table(DT_train$ps_calc_01,DT_train$target)
+
+table(DT_train$ps_calc_01,DT_train$ps_calc_02)
+
+cor(DT_train$ps_calc_01,DT_train$ps_calc_02,method = &quot;spearman&quot;)
+
+chisq.test(DT_train$ps_calc_01,DT_train$ps_calc_02)
+
+chisq.test(DT_train$ps_calc_01,DT_train$target)</code></pre>
+<pre class="r"><code>dimRed_lowVariance(DT_train)
+
+index &lt;- caret::createDataPartition(DT_train$target
+                             ,p = 0.3
+                             ,list = FALSE
+                             ,times = 1)
+
+DT_sample &lt;- DT_train[index]
+DataExplorer::plot_bar(DT_sample
+                       ,ncol=4
+                       ,nrow = 8
+                       ,theme_config = theme_darklightmix(color_theme = ggplot_color_theme)
+                       ,title = &quot;Distribution of bin variables&quot;) +
+  scale_fill_manual(values =&quot;cornsilk&quot;)</code></pre>

@@ -1,0 +1,96 @@
+---
+title: Book - Numsense Data Science for layman
+author: Amit Agni
+date: '2018-07-07'
+slug: book-numsense-data-science-for-layman
+categories:
+  - books
+tags:
+  - books
+robots: noindex
+description: Book review and notes for personal reference
+output:
+  blogdown::html_page:
+    toc: yes
+    fig_height: 3
+    fig_width: 4
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.align='center')
+
+if(!require(cutlery)) { devtools::install_github("amit-agni/cutlery"); library(cutlery)}
+if(!require(pacman)) { install.packages("pacman"); library(pacman)}
+p_load(here,data.table,tidyverse,tictoc,kableExtra,gridExtra)
+
+varPlotCaption <- "© Data Learnings"
+ggplot_color_theme <- "turquoise4"
+```
+
+<center>
+	<!-- feature image -->
+![](/post/2018-07-07-book-numsense-data-science-for-layman_files/florencia-viadana-1J8k0qqUfYY-unsplash.jpg)
+Photo by Florencia Viadana on Unsplash
+</center>
+<hr>
+
+Numsense! Data Science for the Layman is a number one best seller in Amazon. Its a short read of less than 150 pages and is an excellent intuitive primer on some of the popular machine learning algorithms – k-Means, PCA, Association rules, SNA, Regression, kNN,, SVM, Decision Trees, RFs, NNs, and A/B testing. The best part that I liked about the book is the list of limitations and advantages of the algorithms given at the end of each chapter.
+
+This post has the notes that I had highlighted from the book and are directly quoted from the book (It is primarily for my future personal reference) 
+
+### 1. Basics in a Nutshell
+* One way to keep a model’s overall complexity in check is to introduce a penalty parameter, in a step known as regularization. This new parameter penalizes any increase in a model’s complexity by artificially inflating prediction error, thus enabling the algorithm to account for both complexity and accuracy in optimizing its original parameters. By keeping a model simple, we help to maintain its generalizability.
+
+### 2. k-Means Clustering
+* A scree plot shows how within- cluster scatter decreases as the number of clusters increases. If all members belong to a single cluster, within- cluster scatter would be at its maximum. As we increase the number of clusters, clusters grow more compact and their members more homogenous.
+* Each data point can only be assigned to one cluster.
+* Clusters are assumed to be spherical. The iterative process of finding data points closest to a cluster center is akin to narrowing the cluster’s radius, so that the resulting cluster resembles a compact sphere. This might pose a problem if the shape of an actual cluster is, for instance, an ellipse—such elongated clusters might be truncated, with their members subsumed into nearby clusters.
+* Clusters are assumed to be discrete. k-means clustering does not permit clusters to overlap, nor to be nested within each other.
+* **A good strategy might be to start with k-means clustering for a basic understanding of the data structure, before delving into more advanced methods to mitigate its limitations.**
+* k- means clustering works best for spherical, non- overlapping clusters.
+
+
+### 3. Principal Component Analysis
+* PCA makes an important assumption that dimensions with the largest spread of data points are also the most useful. However, this may not be true. A popular counter example is the task of counting pancakes arranged in a stack.
+* A key challenge with PCA is that interpretations of generated components have to be inferred, and sometimes, we may struggle to explain why variables would be combined in a certain way.
+* Orthogonal Components. PCA always generates orthogonal principal components, which means that components are positioned at 90 degrees to each other. However, this assumption is restrictive as informative dimensions may not be orthogonal. To resolve this, we can use an alternative technique known as Independent Component Analysis (ICA).
+* **When in doubt, you could always consider running an ICA to verify and complement results from a PCA.**
+* Each principal component is a weighted sum of original variables.
+
+### 4. Association Rules
+* One way to reduce the number of itemset configurations we need to consider is to make use of the apriori principle. Simply put, the apriori principle states that if an itemset is infrequent, then any larger itemsets containing it must also be infrequent. This means that if {beer} was found to be infrequent, so too must be {beer, pizza}. 
+* Spurious Associations. Associations could also happen by chance among a large number of items. To ensure that discovered associations are generalizable, they should be validated (see Chapter 1.4).
+* Despite these limitations, association rules remain an intuitive method to identify patterns in moderately- sized datasets.
+
+### 5. Social Network Analysis
+* The Louvain method helps us to uncover more significant clusters by first detecting smaller clusters, and then merging them if appropriate. Its simplicity and efficiency makes the Louvain method a popular choice for network clustering. But, it does have its limitations:
+* Social network analysis is a technique that allows us to map and analyze relationships between entities.
+* The Louvain method identifies clusters in a network in a way that maximizes interactions within clusters and minimizes those between clusters. It works best when clusters are equally sized and discrete.
+
+### 6. Regression Analysis / Gradient Descent
+* The gradient descent algorithm makes an initial guess on a set of suitable weights, before starting an iterative process of applying these weights to every data point to make predictions, and then tweaking these weights in order to reduce overall prediction error.
+* Gradient descent is used for optimising the parameters of regression equation
+* Sensitivity to Outliers. As regression analysis accounts for all data points equally, having just a few data points with extreme values could skew the trend line significantly. To detect this, we could use scatterplots to identify outliers before further analysis.
+* To overcome multicollinearity, we could either exclude correlated predictors prior to analysis, or use more advanced techniques such as lasso or ridge regression.
+* However, some trends might be curved, such as in Figure 2a, and we might need to transform the predictor values or use alternative algorithms such as support vector machines (see Chapter 8).
+* Regression analysis works best when there is little correlation between predictors, no outliers, and when the expected trend is a straight line.
+
+### 7. k-Nearest Neighbors and Anomaly Detection
+* k-NN is not limited merely to predicting groups or values of data points. It can also be used to identify anomalies, such as in fraud detection.
+* Imbalanced Classes. If there are multiple classes to be predicted, and the classes differ drastically in size, data points belonging to the smallest class might be overshadowed by those from larger classes and suffer from higher risk of misclassification. To improve accuracy, we could use weighted voting instead of majority voting, which would ensure that the classes of closer neighbors are weighted more heavily than those further away.
+
+
+### 8. Support Vector Machine
+* uses a buffer zone that allows a few data points to be on the incorrect side of the boundary. It also employs the kernel trick to efficiently derive curved boundaries. SVM works best when data points from a large sample have to be classified into two distinct groups.
+
+### 9. Decision Tree
+* Instability. As decision trees are grown by splitting data points into homogeneous groups, a slight change in the data could trigger changes to the split, and result in a different tree. As
+* Inaccuracy. Using the best binary question to split the data at the start might not lead to the most accurate predictions. Sometimes, less effective splits used initially may lead to better predictions subsequently.
+* There are two methods to diversifying trees: The first method chooses different combinations of binary questions at random to grow multiple trees, and then aggregates the predictions from those trees. This technique is known as building a random forest (see Chapter 10). Instead of choosing binary questions at random, the second method strategically selects binary questions, such that prediction accuracy for each subsequent tree improves incrementally. A weighted average of predictions from all trees is then taken to obtain the result. This technique is known as gradient boosting.
+
+### 10. Random Forests
+* Bootstrap aggregating (also termed as bagging) is used to create thousands of decision trees that are adequately different from each other. To ensure minimal correlation between trees, each tree is generated from a random subset of the training data, using a random subset of predictor variables. This allows us to grow trees that are dissimilar, but which still retain certain predictive powers.
+* Bootstrap aggregating involves generating a series of uncorrelated decision trees by randomly restricting variables during the splitting process, while ensembling involves combining the predictions of these trees.
+
+
+
