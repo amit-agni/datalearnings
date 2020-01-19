@@ -3,8 +3,6 @@ title: Book - Numsense Data Science for layman
 author: Amit Agni
 date: '2018-07-07'
 slug: book-numsense-data-science-for-layman
-categories:
-  - books
 tags:
   - books
 robots: noindex
