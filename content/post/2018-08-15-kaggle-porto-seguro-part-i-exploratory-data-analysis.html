@@ -2,17 +2,18 @@
 title: Kaggle Porto Seguro Part I - Exploratory Data Analysis
 author: Amit Agni
 date: '2018-08-15'
-slug: kaggle-porto-seguro-part-i-exploratory-data-analysis
 tags:
-  - kaggle
+  - all posts
+slug: kaggle-porto-seguro-part-i-exploratory-data-analysis
 robots: index
-description: Exploring feature set, Normality testing, Correlation between different variable types (eg Phi Coefficient, ChiSquare Test)
-draft: false
+description: Explores the feature set, normality testing, correlation between different
+  variable types (using Phi Coefficient, ChiSquare Test, etc.)
+draft: no
 output:
   blogdown::html_page:
     toc: yes
     fig_height: 7
-    fig_width: 9
+    fig_width: 8
 ---
 
 <script src="/rmarkdown-libs/kePrint/kePrint.js"></script>
@@ -36,9 +37,11 @@ output:
 
 <center>
 <!-- feature image -->
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/viraj-rajankar-miBpTBgIaw8-unsplash.jpg" />
+Photo by Viraj Rajankar on Unsplash</p>
 </center>
 <hr>
-<p>Porto Seguro is Brazilian insurance company. They hosted a <a href="https://www.kaggle.com/c/porto-seguro-safe-driver-prediction">Kaggle competition</a> in Nov 2017 to predict the probability that a driver will initiate an auto insurance claim in the next year. This was the first Kaggle competition that I participated. In this post, I will do an exploratory analysis of the data and also use some statistical inference tests.</p>
+<p>Porto Seguro is Brazilian insurance company. They hosted a <a href="https://www.kaggle.com/c/porto-seguro-safe-driver-prediction">Kaggle competition</a> in Nov 2017 to predict the probability that a driver will initiate an auto insurance claim in the next year. This was the first Kaggle competition that I participated. In this post, I will do an exploratory analysis of the training data and also try some statistical inference tests.</p>
 <div id="data-description" class="section level3">
 <h3>Data description</h3>
 <p>The training set has around 600k observations and 59 features (including the target feature and an id feature) and test set has around 900K rows. Below was the given description :</p>
@@ -67,13 +70,13 @@ cols_NA &lt;- names(which(lapply(DT_train,function(x) sum(is.na(x))/length(x)) &
 DataExplorer::plot_missing(DT_train[,..cols_NA]
                            ,theme_config = theme_darklightmix(color_theme = ggplot_color_theme)
                            ,title = &quot;Missing values&quot;) </code></pre>
-<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-2-1.png" width="864" style="display: block; margin: auto;" /></p>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-2-1.png" width="768" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>visdat::vis_dat(dplyr::sample_n(DT_train[,..cols_NA],60000),warn_large_data = F)  +
   theme_darklightmix(color_theme = ggplot_color_theme,legend_position = &quot;right&quot;) +
   labs(title=&quot;Missing value distribution (sample size 60K)&quot;
   ,caption = varPlotCaption) +
         theme(axis.text.x = element_text(angle =45,hjust=0.2))</code></pre>
-<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-3-1.png" width="864" style="display: block; margin: auto;" /></p>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-3-1.png" width="768" style="display: block; margin: auto;" /></p>
 </div>
 <div id="basic-imputation" class="section level3">
 <h3>Basic imputation</h3>
@@ -89,7 +92,7 @@ DataExplorer::plot_missing(DT_train[,..cols_NA]
 <pre class="r"><code>DataExplorer::plot_histogram(DT_train[,..cols_NA]
                            ,theme_config = theme_darklightmix(color_theme = ggplot_color_theme)
                            ,title = &quot;Distribution of the features with missing values&quot;) </code></pre>
-<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-4-1.png" width="864" style="display: block; margin: auto;" /></p>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-4-1.png" width="768" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>cols_NA_cat &lt;- c(&quot;ps_ind_02_cat&quot;,&quot;ps_ind_04_cat&quot;,&quot;ps_ind_05_cat&quot;,&quot;ps_car_01_cat&quot;,&quot;ps_car_02_cat&quot;,&quot;ps_car_03_cat&quot;,&quot;ps_car_05_cat&quot;,&quot;ps_car_07_cat&quot;,&quot;ps_car_09_cat&quot;,&quot;ps_car_11&quot;)
 DT_train[,(cols_NA_cat) := lapply(.SD,na.tools::na.most_freq), .SDcols = cols_NA_cat ]
 
@@ -120,7 +123,7 @@ DT_train[,..cols_bin] %&gt;%
   ,y=&quot;count&quot;
   ,title=&quot;Distribution of bin variables&quot;
   ,caption = varPlotCaption)</code></pre>
-<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-5-1.png" width="864" style="display: block; margin: auto;" /></p>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-5-1.png" width="768" style="display: block; margin: auto;" /></p>
 </div>
 <div id="categorical-features" class="section level3">
 <h3>Categorical features</h3>
@@ -149,7 +152,7 @@ DT_train[,..cols_cat] %&gt;%
   ,y=&quot;count&quot;
   ,title=&quot;Distribution of cat variables&quot;
   ,caption = varPlotCaption)</code></pre>
-<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-6-1.png" width="864" style="display: block; margin: auto;" /></p>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-6-1.png" width="768" style="display: block; margin: auto;" /></p>
 </div>
 <div id="remaining-features" class="section level3">
 <h3>Remaining features</h3>
@@ -174,7 +177,7 @@ DT_train[,..cols_others] %&gt;%
   ,y=&quot;count&quot;
   ,title=&quot;Distribution of remaining variables&quot;
   ,caption = varPlotCaption)</code></pre>
-<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-7-1.png" width="864" style="display: block; margin: auto;" /></p>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-7-1.png" width="768" style="display: block; margin: auto;" /></p>
 </div>
 <div id="do-the-features-follow-a-normal-distribution" class="section level3">
 <h3>Do the features follow a normal distribution ?</h3>
@@ -208,14 +211,20 @@ DT_train[1:100,..cols_others_normal] %&gt;%
   ,y=&quot;count&quot;
   ,title=&quot;QQ Plots - Normality Testing&quot;
   ,caption = varPlotCaption)</code></pre>
-<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-8-1.png" width="864" style="display: block; margin: auto;" /></p>
-<p><strong>How about using statistical tests for normality</strong>
-* There are couple of them :Shapiro-Wilk and Kolmogorov-Smirnov Test
-* The null hypothesis for these tests is that the distribution is normal
-+ Hence a p-value &lt;&lt; 0.05 means would reject the null hypothesis
-* From the below table we can see that none of the features are normal
-+ This might not be 100% correct as these tests don’t work well for large datasets
-+ And they expect the distribution to be perfectly normal</p>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-8-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p><strong>How about using statistical tests for normality</strong></p>
+<ul>
+<li>There are couple of them :Shapiro-Wilk and Kolmogorov-Smirnov Test</li>
+<li>The null hypothesis for these tests is that the distribution is normal
+<ul>
+<li>Hence a p-value &lt;&lt; 0.05 means would reject the null hypothesis</li>
+</ul></li>
+<li>From the below table we can see that none of the features are normal
+<ul>
+<li>This might not be 100% correct as these tests don’t work well for large datasets</li>
+<li>And they expect the distribution to be perfectly normal</li>
+</ul></li>
+</ul>
 <pre class="r"><code>shap &lt;-  DT_train[,lapply(.SD,function(x) shapiro.test(sample(x,5000))$p.value)
          ,.SDcols = cols_others_normal] %&gt;% melt(value.name =&quot;Shapiro pValue&quot;)
       
@@ -360,7 +369,7 @@ ggcorrplot::ggcorrplot(correl, hc.order = FALSE, type = &quot;lower&quot;,lab=F,
             ,axis.title = element_blank()
             ,panel.grid.major =element_line(size=0.8)
             ,panel.grid.major.x  = element_blank())</code></pre>
-<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-10-1.png" width="864" style="display: block; margin: auto;" /></p>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-10-1.png" width="768" style="display: block; margin: auto;" /></p>
 <ul>
 <li>Can the R <code>cor</code> function be used to find the correlation between different variable types i.e binary, continuous, etc ?</li>
 <li>As per it this <a href="https://researchbasics.education.uconn.edu/types_of_correlations/#">article</a> it looks like there are other statistical tests available for checking the correlation or the independence of features depending on the type of variable.</li>
@@ -552,7 +561,7 @@ p2 &lt;- ggcorrplot::ggcorrplot(phi, hc.order = FALSE, type = &quot;lower&quot;,
 
 
 gridExtra::grid.arrange(p1, p2, ncol=2)</code></pre>
-<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-12-1.png" width="864" style="display: block; margin: auto;" /></p>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-12-1.png" width="768" style="display: block; margin: auto;" /></p>
 </div>
 <div id="binary-binary-correlation-chi-square-test-cramerv" class="section level3">
 <h3>Binary-Binary Correlation (Chi-Square test / CramerV)</h3>
@@ -601,7 +610,7 @@ p2 &lt;- ggcorrplot::ggcorrplot(crammerV, hc.order = FALSE, type = &quot;lower&q
             ,panel.grid.major.x  = element_blank()) 
 
 gridExtra::grid.arrange(p1, p2, ncol=2)</code></pre>
-<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-13-1.png" width="864" style="display: block; margin: auto;" /></p>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-13-1.png" width="768" style="display: block; margin: auto;" /></p>
 </div>
 <div id="continuous---binary-kruskal-wallis-rank-sum-test" class="section level3">
 <h3>Continuous - Binary (Kruskal-Wallis Rank Sum Test)</h3>
@@ -852,7 +861,7 @@ p2 &lt;- ggplot(out,aes(x=Correlation,y=pvalue)) +
   ,caption = varPlotCaption)
 
 gridExtra::grid.arrange(p1, p2, ncol=2)</code></pre>
-<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-14-1.png" width="864" style="display: block; margin: auto;" /></p>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-14-1.png" width="768" style="display: block; margin: auto;" /></p>
 <p>This post has already crossed a 10 mins read, so I will stop here and write another post to continue with the EDA.</p>
 </div>
 <div id="summary-key-learnings" class="section level3">
