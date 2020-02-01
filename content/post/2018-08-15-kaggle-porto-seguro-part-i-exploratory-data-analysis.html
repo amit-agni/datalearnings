@@ -3,46 +3,105 @@ title: Kaggle Porto Seguro Part I - Exploratory Data Analysis
 author: Amit Agni
 date: '2018-08-15'
 slug: kaggle-porto-seguro-part-i-exploratory-data-analysis
-categories:
-  - kaggle
 tags:
   - kaggle
 robots: index
-draft: true
-description: EDA 
+description: Exploring feature set, Normality testing, Correlation between different variable types (eg Phi Coefficient, ChiSquare Test)
+draft: false
 output:
   blogdown::html_page:
     toc: yes
-    fig_height: 3
-    fig_width: 4
+    fig_height: 7
+    fig_width: 9
 ---
 
+<script src="/rmarkdown-libs/kePrint/kePrint.js"></script>
 
+<div id="TOC">
+<ul>
+<li><a href="#data-description">Data description</a></li>
+<li><a href="#missing-values">Missing values</a></li>
+<li><a href="#basic-imputation">Basic imputation</a></li>
+<li><a href="#binary-features">Binary Features</a></li>
+<li><a href="#categorical-features">Categorical features</a></li>
+<li><a href="#remaining-features">Remaining features</a></li>
+<li><a href="#do-the-features-follow-a-normal-distribution">Do the features follow a normal distribution ?</a></li>
+<li><a href="#correlation">Correlation</a></li>
+<li><a href="#binary-binary-correlation-phi-coefficient">Binary-Binary Correlation (Phi Coefficient)</a></li>
+<li><a href="#binary-binary-correlation-chi-square-test-cramerv">Binary-Binary Correlation (Chi-Square test / CramerV)</a></li>
+<li><a href="#continuous---binary-kruskal-wallis-rank-sum-test">Continuous - Binary (Kruskal-Wallis Rank Sum Test)</a></li>
+<li><a href="#summary-key-learnings">Summary / Key Learnings</a></li>
+</ul>
+</div>
 
 <center>
 <!-- feature image -->
 </center>
 <hr>
-<p>Porto Seguro is Brazilian insurance company. They hosted a Kaggle competition in Nov 2017 to predict the probability that a driver will initiate an auto insurance claim in the next year. We will conduct an exploratory data analysis in this post. To reproduce this document, please download the datasets from the Kaggle website. The training set has around 600K rows and 59 columns.</p>
-<blockquote>
-<p>In the train and test data, features that belong to similar groupings are tagged as such in the feature names (e.g., ind, reg, car, calc). In addition, feature names include the postfix bin to indicate binary features and cat to indicate categorical features. Features without these designations are either continuous or ordinal. Values of -1 indicate that the feature was missing from the observation. The target columns signifies whether or not a claim was filed for that policy holder.</p>
-</blockquote>
-<p>This was the first Kaggle competition that I participated. In this post, I will do a exploratory analysis of the data. The training set has around 600k observations and 59 features (including the target feature and an id feature)</p>
+<p>Porto Seguro is Brazilian insurance company. They hosted a <a href="https://www.kaggle.com/c/porto-seguro-safe-driver-prediction">Kaggle competition</a> in Nov 2017 to predict the probability that a driver will initiate an auto insurance claim in the next year. This was the first Kaggle competition that I participated. In this post, I will do an exploratory analysis of the data and also use some statistical inference tests.</p>
+<div id="data-description" class="section level3">
+<h3>Data description</h3>
+<p>The training set has around 600k observations and 59 features (including the target feature and an id feature) and test set has around 900K rows. Below was the given description :</p>
 <pre class="r"><code>#train file stored outside the blog files
 root &lt;- &#39;/Mac Backup/R-Large-Items/porto/&#39;
 DT_train &lt;- fread(file=paste(root,&#39;train.csv&#39;,sep=&#39;&#39;))
-dim(DT_train)</code></pre>
-<pre><code>## [1] 595212     59</code></pre>
-<p>The first thing that I look at in a dataset is whether there are any missing values. The missing value and its imputation is a interesting topic that I am hoping to cover in the future. I have used the <code>plot_missing</code> from the excellent <code>DataExplorer</code> package to get an idea of the missing values.</p>
-<p>The missing values were coded as -1 which I have converted to NA and I am plotting only the features that had missing values. Majority of the features either don’t have missing values or they are within an acceptable range of less than 2%. Except for 4 features that have significant volume is missingness.</p>
+DT_test &lt;- fread(file=paste(root,&#39;test.csv&#39;,sep=&#39;&#39;))
+# dim(DT_train)
+# dim(DT_test)</code></pre>
+<blockquote>
+<p>In the train and test data, features that belong to similar groupings are tagged as such in the feature names (e.g., ind, reg, car, calc). In addition, feature names include the postfix bin to indicate binary features and cat to indicate categorical features. Features without these designations are either continuous or ordinal. Values of -1 indicate that the feature was missing from the observation. The target columns signifies whether or not a claim was filed for that policy holder.</p>
+</blockquote>
+</div>
+<div id="missing-values" class="section level3">
+<h3>Missing values</h3>
+<ul>
+<li>The first thing that I look at in a dataset is whether there are any missing values.</li>
+<li>The missing value and its imputation is a interesting topic that I am hoping to cover in the future. I have used the <code>plot_missing</code> from the excellent <code>DataExplorer</code> package to get an idea of the missing values.</li>
+<li>The missing values were coded as -1 that I have converted to NA and I am plotting only the features that had missing values.</li>
+<li>There are 13 features with missing values and four of them (<code>ps_car_14</code>,<code>ps_reg_03</code>,<code>ps_car_05_cat</code> and <code>ps_car_03_cat</code>) have significant volume of missingness</li>
+<li>The distribution of the missing values is shown in the following plot</li>
+</ul>
 <pre class="r"><code>DT_train[DT_train == -1] &lt;- NA
 #lapply(DT_train,function(x) sum(is.na(x))/length(x))
 cols_NA &lt;- names(which(lapply(DT_train,function(x) sum(is.na(x))/length(x)) &gt;0))
 DataExplorer::plot_missing(DT_train[,..cols_NA]
                            ,theme_config = theme_darklightmix(color_theme = ggplot_color_theme)
                            ,title = &quot;Missing values&quot;) </code></pre>
-<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>There are 17 features that are postfixed with ‘bin’. These are binary features and as such have values of 0 and 1. 99% of observations have zero values for the features <code>ps_ind_10, ps_ind_11, ps_ind_12 and ps_ind_13</code>. For the predictive modeling, these features would not add much values and I would probably look at dropping them.</p>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-2-1.png" width="864" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>visdat::vis_dat(dplyr::sample_n(DT_train[,..cols_NA],60000),warn_large_data = F)  +
+  theme_darklightmix(color_theme = ggplot_color_theme,legend_position = &quot;right&quot;) +
+  labs(title=&quot;Missing value distribution (sample size 60K)&quot;
+  ,caption = varPlotCaption) +
+        theme(axis.text.x = element_text(angle =45,hjust=0.2))</code></pre>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-3-1.png" width="864" style="display: block; margin: auto;" /></p>
+</div>
+<div id="basic-imputation" class="section level3">
+<h3>Basic imputation</h3>
+<ul>
+<li>Missing value imputation is an extensive topic and there are many advanced algorithms and packages like mice, Amelia, expectation maximisation etc. that can be used</li>
+<li>But for this analysis, I will rely on the simplest methods :
+<ul>
+<li>Mode imputation for categorical features</li>
+<li>Median imputation for the continuous features.</li>
+</ul></li>
+<li>I could have handcoded the functions but they are available in the <code>na.tools</code> package</li>
+</ul>
+<pre class="r"><code>DataExplorer::plot_histogram(DT_train[,..cols_NA]
+                           ,theme_config = theme_darklightmix(color_theme = ggplot_color_theme)
+                           ,title = &quot;Distribution of the features with missing values&quot;) </code></pre>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-4-1.png" width="864" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>cols_NA_cat &lt;- c(&quot;ps_ind_02_cat&quot;,&quot;ps_ind_04_cat&quot;,&quot;ps_ind_05_cat&quot;,&quot;ps_car_01_cat&quot;,&quot;ps_car_02_cat&quot;,&quot;ps_car_03_cat&quot;,&quot;ps_car_05_cat&quot;,&quot;ps_car_07_cat&quot;,&quot;ps_car_09_cat&quot;,&quot;ps_car_11&quot;)
+DT_train[,(cols_NA_cat) := lapply(.SD,na.tools::na.most_freq), .SDcols = cols_NA_cat ]
+
+cols_NA_cont &lt;- c(&quot;ps_car_14&quot;,&quot;ps_reg_03&quot;,&quot;ps_car_12&quot;)
+DT_train[,(cols_NA_cont) := lapply(.SD,na.tools::na.median), .SDcols = cols_NA_cont ]</code></pre>
+</div>
+<div id="binary-features" class="section level3">
+<h3>Binary Features</h3>
+<ul>
+<li>There are 17 features that are postfixed with ‘bin’. These are binary features and as such have values of 0 and 1.</li>
+<li>99% of observations have zero values for the features <code>ps_ind_10, ps_ind_11, ps_ind_12 and ps_ind_13</code>. For the predictive modeling, these features would not add much values and I would probably look at dropping them.</li>
+</ul>
 <pre class="r"><code>cols_bin &lt;- grep(&quot;bin&quot;,names(DT_train),value = T)
 
 DT_train[,..cols_bin] %&gt;%
@@ -59,10 +118,19 @@ DT_train[,..cols_bin] %&gt;%
   scale_fill_brewer(palette = &quot;Set3&quot;) +
   labs(x=&quot;value&quot;
   ,y=&quot;count&quot;
-  ,subtitle=&quot;Distribution of bin variables&quot;
+  ,title=&quot;Distribution of bin variables&quot;
   ,caption = varPlotCaption)</code></pre>
-<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>There are 14 features that are postfixed with cat. These are categorical features. While majority of them have less than 10 levels, there are some features like <code>ps_ind_06_cat</code> and <code>ps_car_11_cat</code> that have higher number of levels. As these are column plots, the variability is not clear, so I will include <code>ps_car_11_cat</code> in the following histogram plots</p>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-5-1.png" width="864" style="display: block; margin: auto;" /></p>
+</div>
+<div id="categorical-features" class="section level3">
+<h3>Categorical features</h3>
+<ul>
+<li>There are 14 features that are postfixed with cat. These are categorical features.</li>
+<li>While majority of them have less than 10 levels, there are some features like <code>ps_ind_06_cat</code> and <code>ps_car_11_cat</code> that have higher number of levels.
+<ul>
+<li>As these are column plots, the variability is not clear, so I will include <code>ps_car_11_cat</code> in the following histogram plots</li>
+</ul></li>
+</ul>
 <pre class="r"><code>cols_cat &lt;- grep(&quot;cat&quot;,names(DT_train),value = T)
 
 DT_train[,..cols_cat] %&gt;%
@@ -79,9 +147,12 @@ DT_train[,..cols_cat] %&gt;%
   scale_fill_brewer(palette = &quot;Set3&quot;) +
   labs(x=&quot;value&quot;
   ,y=&quot;count&quot;
-  ,subtitle=&quot;Distribution of cat variables&quot;
+  ,title=&quot;Distribution of cat variables&quot;
   ,caption = varPlotCaption)</code></pre>
-<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-6-1.png" width="864" style="display: block; margin: auto;" /></p>
+</div>
+<div id="remaining-features" class="section level3">
+<h3>Remaining features</h3>
 <p>Remaining 26 features are either continuous or ordinal are have been plotted below</p>
 <pre class="r"><code>#remove id and target and add one variable from cat
 cols_others &lt;- names(DT_train)[!names(DT_train) %in% c(cols_bin,cols_cat,&quot;id&quot;,&quot;target&quot;)]
@@ -101,31 +172,775 @@ DT_train[,..cols_others] %&gt;%
 #  scale_fill_brewer(palette = &quot;Set3&quot;) +
   labs(x=&quot;value&quot;
   ,y=&quot;count&quot;
-  ,subtitle=&quot;Distribution of remaining variables&quot;
+  ,title=&quot;Distribution of remaining variables&quot;
   ,caption = varPlotCaption)</code></pre>
-<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
-<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>This was an quick overview of the feature set. Next step is to see how these features are correlated</p>
-<pre class="r"><code>table(DT_train$ps_calc_01,DT_train$target)
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-7-1.png" width="864" style="display: block; margin: auto;" /></p>
+</div>
+<div id="do-the-features-follow-a-normal-distribution" class="section level3">
+<h3>Do the features follow a normal distribution ?</h3>
+<ul>
+<li>Some of the prediction algorithms require the continuous features to follow a normal distribution. This can be verified by different ways :
+<ul>
+<li>Histogram</li>
+<li>QQ Plots</li>
+<li>Shapiro-Wilk Test</li>
+<li>Kolmogorov-Smirnov Test</li>
+<li>Anderson-Darling test</li>
+</ul></li>
+<li>We already know that the binary and categorical features do not follow normal distribution.</li>
+<li>Let’s look at few of the features that looked like normally distributed in the histograms (plotted above)
+<ul>
+<li>Only <code>ps_calc_10</code>, <code>ps_calc_14</code> and to certain extent <code>ps_calc_11</code> shows clear normal distribution</li>
+<li><code>ps_reg_03</code>, <code>ps_car_14</code> and <code>ps_car_13</code> (not shown) is influenced by outliers and will need to be treated</li>
+</ul></li>
+</ul>
+<pre class="r"><code>cols_others_normal &lt;- c(&quot;ps_ind_03&quot;, &quot;ps_ind_15&quot;, &quot;ps_reg_03&quot;,&quot;ps_car_14&quot;, &quot;ps_car_15&quot;, &quot;ps_calc_06&quot;, &quot;ps_calc_10&quot;, &quot;ps_calc_11&quot;, &quot;ps_calc_14&quot;)
 
-table(DT_train$ps_calc_01,DT_train$ps_calc_02)
+DT_train[1:100,..cols_others_normal] %&gt;%
+  melt(measure.vars = 1:ncol(.)) %&gt;%
+  ggplot(aes(sample = value,color = variable)) +
+  stat_qq() + 
+  stat_qq_line() +
+  facet_wrap(~variable, scales = &quot;free&quot;, ncol = 3) +
+  theme_darklightmix(color_theme = ggplot_color_theme,legend_position = &quot;none&quot;) +
+  scale_color_manual(values = fn_extraPolate(length(cols_others_normal))) +
+  labs(x=&quot;value&quot;
+  ,y=&quot;count&quot;
+  ,title=&quot;QQ Plots - Normality Testing&quot;
+  ,caption = varPlotCaption)</code></pre>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-8-1.png" width="864" style="display: block; margin: auto;" /></p>
+<p><strong>How about using statistical tests for normality</strong>
+* There are couple of them :Shapiro-Wilk and Kolmogorov-Smirnov Test
+* The null hypothesis for these tests is that the distribution is normal
++ Hence a p-value &lt;&lt; 0.05 means would reject the null hypothesis
+* From the below table we can see that none of the features are normal
++ This might not be 100% correct as these tests don’t work well for large datasets
++ And they expect the distribution to be perfectly normal</p>
+<pre class="r"><code>shap &lt;-  DT_train[,lapply(.SD,function(x) shapiro.test(sample(x,5000))$p.value)
+         ,.SDcols = cols_others_normal] %&gt;% melt(value.name =&quot;Shapiro pValue&quot;)
+      
+ks &lt;-  DT_train[,lapply(.SD,function(x) ks.test(x,rnorm,3)$p.value)
+         ,.SDcols = cols_others_normal] %&gt;% melt(value.name =&quot;KS pValue&quot;) 
 
-cor(DT_train$ps_calc_01,DT_train$ps_calc_02,method = &quot;spearman&quot;)
+batchtools::ijoin(shap,ks,by=&quot;variable&quot;)  %&gt;% fn_kable()</code></pre>
+<table class="table table-condensed" style="font-size: 10px; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+variable
+</th>
+<th style="text-align:right;">
+Shapiro pValue
+</th>
+<th style="text-align:right;">
+KS pValue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+ps_ind_03
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ps_ind_15
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ps_reg_03
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ps_car_14
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ps_car_15
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ps_calc_06
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ps_calc_10
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ps_calc_11
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ps_calc_14
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="correlation" class="section level3">
+<h3>Correlation</h3>
+<ul>
+<li>I have used R <code>cor</code> function to see if there is correlation among the features and it does not look like there is not much.
+<ul>
+<li>Except for <code>ps_ind_12_bin</code> and <code>ps_ind_14</code> has a high correlation coefficient of 0.89</li>
+<li>This gives a nice overall picture of the feature space, even though it violates some of the assumptions of Pearson correlation i.e. normality, linearity and homoscedasticity.</li>
+</ul></li>
+</ul>
+<pre class="r"><code>correl &lt;- cor(DT_train,method=&quot;pearson&quot;)
 
-chisq.test(DT_train$ps_calc_01,DT_train$ps_calc_02)
+ggcorrplot::ggcorrplot(correl, hc.order = FALSE, type = &quot;lower&quot;,lab=F,lab_size = 2,outline.color = &quot;black&quot;) +
+    labs(title=&quot;Pearson correlation of all features&quot;
+    ,caption = varPlotCaption) +
+    theme_darklightmix(color_theme = ggplot_color_theme
+                       ,legend_position = &quot;bottom&quot;) +
+      theme(axis.text.x = element_text(angle =90,hjust=1,vjust = 0.5)
+            ,axis.title = element_blank()
+            ,panel.grid.major =element_line(size=0.8)
+            ,panel.grid.major.x  = element_blank())</code></pre>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-10-1.png" width="864" style="display: block; margin: auto;" /></p>
+<ul>
+<li>Can the R <code>cor</code> function be used to find the correlation between different variable types i.e binary, continuous, etc ?</li>
+<li>As per it this <a href="https://researchbasics.education.uconn.edu/types_of_correlations/#">article</a> it looks like there are other statistical tests available for checking the correlation or the independence of features depending on the type of variable.</li>
+<li>I have used the <code>datapasta</code> package to create the below table by copy pasting the values from Excel</li>
+</ul>
+<pre class="r"><code>#datapasta::tribble_paste()
 
-chisq.test(DT_train$ps_calc_01,DT_train$target)</code></pre>
-<pre class="r"><code>dimRed_lowVariance(DT_train)
+cor_types  &lt;- tibble::tribble(
+                             ~Test, ~Notation,                                            ~`Variable types`,                                                          ~Assumptions,
+                       &quot;Pearson’s&quot;,     &quot;r&quot;,                                                       &quot;Both continuous&quot;,                           &quot;Normality, Linearity and Homoscedasticity&quot;,
+                             &quot;Phi&quot;,     &quot;f&quot;,                                                           &quot;Both binary&quot;,                                                                 &quot;TBD&quot;,
+                     &quot;Contingency&quot;,     &quot;C&quot;,                                                      &quot;Both categorical&quot;,                                                                 &quot;TBD&quot;,
+                  &quot;Point-Biserial&quot;, &quot;rpbis&quot;,                                                   &quot;Continuous - Binary&quot;, &quot;No outliers, Approximately normal, equal variance for each category&quot;,
+                        &quot;Biserial&quot;,  &quot;rbis&quot;,                          &quot;Both continuous but converted to Categorical&quot;,                                                                 &quot;TBD&quot;,
+                     &quot;Tetrachoric&quot;,    &quot;rt&quot;,                               &quot;Both continuous but converted to Binary&quot;,                                                                 &quot;TBD&quot;,
+                             &quot;Eta&quot;,     &quot;h&quot;, &quot;Both are continuous and are used to detect curvilinear relationships.&quot;,                                                                 &quot;TBD&quot;,
+                      &quot;Rank Order&quot;,     &quot;r&quot;,                                               &quot;Both are rank (ordinal)&quot;,                                                                 &quot;TBD&quot;
+                  )
 
-index &lt;- caret::createDataPartition(DT_train$target
-                             ,p = 0.3
-                             ,list = FALSE
-                             ,times = 1)
+cor_types %&gt;% fn_kable</code></pre>
+<table class="table table-condensed" style="font-size: 10px; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Test
+</th>
+<th style="text-align:left;">
+Notation
+</th>
+<th style="text-align:left;">
+Variable types
+</th>
+<th style="text-align:left;">
+Assumptions
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Pearson’s
+</td>
+<td style="text-align:left;">
+r
+</td>
+<td style="text-align:left;">
+Both continuous
+</td>
+<td style="text-align:left;">
+Normality, Linearity and Homoscedasticity
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Phi
+</td>
+<td style="text-align:left;">
+f
+</td>
+<td style="text-align:left;">
+Both binary
+</td>
+<td style="text-align:left;">
+TBD
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Contingency
+</td>
+<td style="text-align:left;">
+C
+</td>
+<td style="text-align:left;">
+Both categorical
+</td>
+<td style="text-align:left;">
+TBD
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Point-Biserial
+</td>
+<td style="text-align:left;">
+rpbis
+</td>
+<td style="text-align:left;">
+Continuous - Binary
+</td>
+<td style="text-align:left;">
+No outliers, Approximately normal, equal variance for each category
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Biserial
+</td>
+<td style="text-align:left;">
+rbis
+</td>
+<td style="text-align:left;">
+Both continuous but converted to Categorical
+</td>
+<td style="text-align:left;">
+TBD
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tetrachoric
+</td>
+<td style="text-align:left;">
+rt
+</td>
+<td style="text-align:left;">
+Both continuous but converted to Binary
+</td>
+<td style="text-align:left;">
+TBD
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Eta
+</td>
+<td style="text-align:left;">
+h
+</td>
+<td style="text-align:left;">
+Both are continuous and are used to detect curvilinear relationships.
+</td>
+<td style="text-align:left;">
+TBD
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rank Order
+</td>
+<td style="text-align:left;">
+r
+</td>
+<td style="text-align:left;">
+Both are rank (ordinal)
+</td>
+<td style="text-align:left;">
+TBD
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="binary-binary-correlation-phi-coefficient" class="section level3">
+<h3>Binary-Binary Correlation (Phi Coefficient)</h3>
+<ul>
+<li>As per the above article we can use the <code>Phi Coefficient</code> to determine the correlation of binary features</li>
+<li>Is the Pearson Correlation different from the Phi Coefficient ?</li>
+<li>I don’t think so as I am getting the same results. Does this mean the <code>cor</code> function internally takes care of correlation of binary variable. I will need to investigate</li>
+<li>I have used the <code>PairApply</code> function from the <code>DescTools</code> package for pair-wise column computations</li>
+</ul>
+<pre class="r"><code>cor &lt;- PairApply(DT_train[,..cols_bin],FUN = cor)
+p1 &lt;- ggcorrplot::ggcorrplot(cor, hc.order = FALSE, type = &quot;lower&quot;,lab=T,lab_size = 2,outline.color = &quot;black&quot;
+                       ,legend.title = &quot;p-value&quot;
+                       ,digits = 2) +
+    labs(title=&quot;Correlation&quot;
+         ,subtitle =  &quot;High indicates stronger relationship&quot;
+    ,caption = varPlotCaption) +
+    theme_darklightmix(color_theme = ggplot_color_theme
+                       ,legend_position = &quot;bottom&quot;) +
+      theme(axis.text.x = element_text(angle =90,hjust=1,vjust = 0.5)
+            ,axis.title = element_blank()
+            ,panel.grid.major =element_line(size=0.8)
+            ,panel.grid.major.x  = element_blank()) 
 
-DT_sample &lt;- DT_train[index]
-DataExplorer::plot_bar(DT_sample
-                       ,ncol=4
-                       ,nrow = 8
-                       ,theme_config = theme_darklightmix(color_theme = ggplot_color_theme)
-                       ,title = &quot;Distribution of bin variables&quot;) +
-  scale_fill_manual(values =&quot;cornsilk&quot;)</code></pre>
+phi &lt;- PairApply(DT_train[,..cols_bin],FUN = function(x,y) psych::phi(table(x,y)))
+p2 &lt;- ggcorrplot::ggcorrplot(phi, hc.order = FALSE, type = &quot;lower&quot;,lab=T,lab_size = 2,outline.color = &quot;black&quot;
+                       ,legend.title = &quot;p-value&quot;
+                       ,digits = 2) +
+    labs(title=&quot;Phi Coefficient&quot;
+         ,subtitle =  &quot;Correlation coefficient for binary variables&quot;
+    ,caption = varPlotCaption) +
+    theme_darklightmix(color_theme = ggplot_color_theme
+                       ,legend_position = &quot;bottom&quot;) +
+      theme(axis.text.x = element_text(angle =90,hjust=1,vjust = 0.5)
+            ,axis.title = element_blank()
+            ,panel.grid.major =element_line(size=0.8)
+            ,panel.grid.major.x  = element_blank()) 
+
+
+gridExtra::grid.arrange(p1, p2, ncol=2)</code></pre>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-12-1.png" width="864" style="display: block; margin: auto;" /></p>
+</div>
+<div id="binary-binary-correlation-chi-square-test-cramerv" class="section level3">
+<h3>Binary-Binary Correlation (Chi-Square test / CramerV)</h3>
+<ul>
+<li>Continuing with the assumption that Pearson’s correlation cannot be used for Binary features, I thought of checking the results against Chi-Square test</li>
+<li>Chi-square test is useful in two scenarios :
+<ul>
+<li>To check if the sample comes from a population (goodness of fit test)</li>
+<li>To check if two categorical variables are independent
+<ul>
+<li>Low chi-square implies relationship exists</li>
+<li>High chi-square implies no relationship</li>
+</ul></li>
+</ul></li>
+<li>The CramerV gives the strength of the relationship</li>
+<li>But these results also seem to be inline with what I got from Pearson’s correlation</li>
+</ul>
+<pre class="r"><code>cols_bin &lt;- grep(&quot;bin&quot;,names(DT_train),value = T)
+
+chiSqPValue &lt;- PairApply(DT_train[,..cols_bin],FUN = function(x,y) chisq.test(x,y)$p.value)
+p1&lt;- ggcorrplot::ggcorrplot(chiSqPValue, hc.order = FALSE, type = &quot;lower&quot;,lab=T,lab_size = 2,outline.color = &quot;black&quot;
+                       ,legend.title = &quot;p-value&quot;
+                       ,digits = 2) +
+    labs(title=&quot;ChiSq Test p-values&quot;
+         ,subtitle = &quot;Low values indicates relationship exists&quot;
+    ,caption = varPlotCaption) +
+    theme_darklightmix(color_theme = ggplot_color_theme
+                       ,legend_position = &quot;bottom&quot;) +
+      theme(axis.text.x = element_text(angle =90,hjust=1,vjust = 0.5)
+            ,axis.title = element_blank()
+            ,panel.grid.major =element_line(size=0.8)
+            ,panel.grid.major.x  = element_blank()) 
+
+crammerV &lt;- PairApply(DT_train[,..cols_bin],FUN = DescTools::CramerV)
+p2 &lt;- ggcorrplot::ggcorrplot(crammerV, hc.order = FALSE, type = &quot;lower&quot;,lab=T,lab_size = 2,outline.color = &quot;black&quot;
+                       ,legend.title = &quot;p-value&quot;
+                       ,digits = 2) +
+    labs(title=&quot;cramerV&quot;
+         ,subtitle =  &quot;High indicates stronger relationship&quot;
+    ,caption = varPlotCaption) +
+    theme_darklightmix(color_theme = ggplot_color_theme
+                       ,legend_position = &quot;bottom&quot;) +
+      theme(axis.text.x = element_text(angle =90,hjust=1,vjust = 0.5)
+            ,axis.title = element_blank()
+            ,panel.grid.major =element_line(size=0.8)
+            ,panel.grid.major.x  = element_blank()) 
+
+gridExtra::grid.arrange(p1, p2, ncol=2)</code></pre>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-13-1.png" width="864" style="display: block; margin: auto;" /></p>
+</div>
+<div id="continuous---binary-kruskal-wallis-rank-sum-test" class="section level3">
+<h3>Continuous - Binary (Kruskal-Wallis Rank Sum Test)</h3>
+<ul>
+<li>There are multiple ways in which we can test the dependence of Continuous-Categorical variables
+<ul>
+<li>One-way ANOVA</li>
+<li>Logistic Regression</li>
+<li>Point biserial correlation</li>
+<li>Kruskal-Wallis Rank Sum Test</li>
+</ul></li>
+<li>The Kruskal-Wallis Rank Sum tests is a non-parametric test and hence can be used for non-normal distributions (unlike ANOVA that expects the continuous variable to be normal)
+<ul>
+<li>The Null hypothesis is that the both the variables are dependent</li>
+<li>Hence, a p-value of &lt;&lt; 0.05 will reject the null hypothesis</li>
+</ul></li>
+<li><strong>There are few combinations that result in high p-value but they have low Pearson’s correlation coefficient. Does this mean they are dependent ?</strong></li>
+</ul>
+<pre class="r"><code>cols_bin &lt;- grep(&quot;bin&quot;,names(DT_train),value = T)
+cols_others &lt;- names(DT_train)[!names(DT_train) %in% c(cols_bin,cols_cat,&quot;id&quot;,&quot;target&quot;)]
+grid&lt;- expand.grid(cols_bin,cols_others,stringsAsFactors = F,KEEP.OUT.ATTRS = F)
+out_cor &lt;- 
+map2(.x=grid$Var1,.y=grid$Var2,.f = function(v1,v2){
+  cols &lt;- c(v1,v2)
+  list(v1,v2,cor(DT_train[,..cols],use=&quot;pairwise.complete.obs&quot;)[1,2])
+  
+}) 
+out_cor &lt;- rbindlist(out_cor) %&gt;% .[order(V3)]
+setnames(out_cor,&quot;V3&quot;,&quot;Correlation&quot;)
+out_kruskal &lt;-map2(.x=grid$Var1,.y=grid$Var2,.f = function(v1,v2){
+  cols &lt;- c(v1,v2)
+  k &lt;- kruskal.test(x=DT_train[[v2]],g=DT_train[[v1]])
+  list(v1,v2,statistic=k$statistic,pvalue=round(k$p.value,10))
+  
+}) 
+out_kruskal &lt;- rbindlist(out_kruskal) %&gt;% .[order(-pvalue)]
+setnames(out_kruskal,&quot;statistic&quot;,&quot;KW - Statistic&quot;)
+out &lt;- batchtools::ijoin(out_cor,out_kruskal,by=c(&quot;V1&quot;,&quot;V2&quot;))
+
+out[order(-pvalue)][1:10] %&gt;% fn_kable(position = &quot;float_left&quot;,caption = &quot;Top 10 p-value&quot;)</code></pre>
+<table class="table table-condensed" style="font-size: 10px; width: auto !important; float: left; margin-right: 10px;">
+<caption style="font-size: initial !important;">
+<span id="tab:unnamed-chunk-14">Table 1: </span>Top 10 p-value
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+V1
+</th>
+<th style="text-align:left;">
+V2
+</th>
+<th style="text-align:right;">
+Correlation
+</th>
+<th style="text-align:right;">
+KW - Statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+ps_calc_20_bin
+</td>
+<td style="text-align:left;">
+ps_reg_03
+</td>
+<td style="text-align:right;">
+0.0002519
+</td>
+<td style="text-align:right;">
+0.0003591
+</td>
+<td style="text-align:right;">
+0.9848819
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ps_calc_20_bin
+</td>
+<td style="text-align:left;">
+ps_calc_11
+</td>
+<td style="text-align:right;">
+-0.0001643
+</td>
+<td style="text-align:right;">
+0.0005204
+</td>
+<td style="text-align:right;">
+0.9817993
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ps_calc_20_bin
+</td>
+<td style="text-align:left;">
+ps_car_15
+</td>
+<td style="text-align:right;">
+0.0002138
+</td>
+<td style="text-align:right;">
+0.0005890
+</td>
+<td style="text-align:right;">
+0.9806376
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ps_calc_15_bin
+</td>
+<td style="text-align:left;">
+ps_calc_02
+</td>
+<td style="text-align:right;">
+0.0000345
+</td>
+<td style="text-align:right;">
+0.0007271
+</td>
+<td style="text-align:right;">
+0.9784874
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ps_calc_18_bin
+</td>
+<td style="text-align:left;">
+ps_reg_03
+</td>
+<td style="text-align:right;">
+0.0002220
+</td>
+<td style="text-align:right;">
+0.0007388
+</td>
+<td style="text-align:right;">
+0.9783160
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ps_calc_19_bin
+</td>
+<td style="text-align:left;">
+ps_calc_05
+</td>
+<td style="text-align:right;">
+0.0002651
+</td>
+<td style="text-align:right;">
+0.0015041
+</td>
+<td style="text-align:right;">
+0.9690632
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ps_ind_12_bin
+</td>
+<td style="text-align:left;">
+ps_calc_11
+</td>
+<td style="text-align:right;">
+0.0001290
+</td>
+<td style="text-align:right;">
+0.0015448
+</td>
+<td style="text-align:right;">
+0.9686480
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ps_ind_09_bin
+</td>
+<td style="text-align:left;">
+ps_calc_09
+</td>
+<td style="text-align:right;">
+0.0000841
+</td>
+<td style="text-align:right;">
+0.0016159
+</td>
+<td style="text-align:right;">
+0.9679351
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ps_ind_13_bin
+</td>
+<td style="text-align:left;">
+ps_calc_11
+</td>
+<td style="text-align:right;">
+-0.0001858
+</td>
+<td style="text-align:right;">
+0.0016465
+</td>
+<td style="text-align:right;">
+0.9676327
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ps_calc_19_bin
+</td>
+<td style="text-align:left;">
+ps_car_12
+</td>
+<td style="text-align:right;">
+-0.0003419
+</td>
+<td style="text-align:right;">
+0.0021382
+</td>
+<td style="text-align:right;">
+0.9631184
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>p1 &lt;- ggplot(out,aes(x=Correlation,y=`KW - Statistic`)) +
+  geom_point() +
+  coord_cartesian(ylim = c(0,11000)) +
+  theme_darklightmix(color_theme = ggplot_color_theme,legend_position = &quot;none&quot;) +
+  labs(subtitle=&quot;KW Statistics vs Correlation Coefficient&quot;
+  ,caption = varPlotCaption)
+
+p2 &lt;- ggplot(out,aes(x=Correlation,y=pvalue)) +
+  geom_point(position = &quot;jitter&quot;) +
+  theme_darklightmix(color_theme = ggplot_color_theme,legend_position = &quot;none&quot;) +
+  labs(subtitle=&quot;pValue of KW vs Correlation Coefficient&quot;
+  ,caption = varPlotCaption)
+
+gridExtra::grid.arrange(p1, p2, ncol=2)</code></pre>
+<p><img src="/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/figure-html/unnamed-chunk-14-1.png" width="864" style="display: block; margin: auto;" /></p>
+<p>This post has already crossed a 10 mins read, so I will stop here and write another post to continue with the EDA.</p>
+</div>
+<div id="summary-key-learnings" class="section level3">
+<h3>Summary / Key Learnings</h3>
+<ul>
+<li>The features in the dataset were encoded and their meanings were not provided. Hence, I have not attempted to write how the insights relate to the real-world business</li>
+<li>The objective was to run through the R code and further my understanding of key statistical concepts</li>
+<li>New packages and functions that I learnt while writing this post
+<ul>
+<li><code>na.tools</code> package for basic missing value imputation</li>
+<li>In the histogram plot, I used the special variable <code>..count..</code> to show the count of the respective features
+<ul>
+<li>As per the documentation, these are special variables computed from the aesthetics</li>
+<li>Alternative way of using them is by calling them within the <code>ggplot2::stat(count)</code> function</li>
+<li><code>ggplot(aes(x=value,y=..count../1e3,fill=variable))</code></li>
+</ul></li>
+<li>Ran the Shapiro-Wilk <code>shapiro.test</code> and Kolmogorov-Smirnov <code>ks.test</code> tests for normality
+<ul>
+<li>Shapiro-Wilk test works for sample size &lt; 5000</li>
+<li>Both tests expect the distribution to be perfectly normal</li>
+</ul></li>
+<li>The results of Pearson’s correlation <code>cor</code> were not different from the results of some other tests
+<ul>
+<li>Phi coefficient is used for binary-binary variables <code>psych::phi(table(x,y))</code></li>
+<li><strong>Kruskal test is used for categorical-continuous variables, but I was not able to come to conclusion and will need further reading</strong></li>
+</ul></li>
+</ul></li>
+<li>References/Further Reading
+<ul>
+<li><a href="https://researchbasics.education.uconn.edu/types_of_correlations/#">Correlation of different variable types</a></li>
+<li><a href="https://libguides.library.kent.edu/SPSS/ChiSquare">SPSS Tutorials</a></li>
+<li><a href="https://medium.com/@outside2SDs/an-overview-of-correlation-measures-between-categorical-and-continuous-variables-4c7f85610365">An overview of correlation measures between categorical and continuous variables</a></li>
+</ul></li>
+</ul>
+<pre class="r"><code>### Low variance features
+This was an quick overview of the feature set. Next step is to see how these features are correlated.
+
+But before that, I will remove the features that show low variance. For example the `ps_ind_10_bin` has only 0 values and it will not have much predictive value. We can use the `var` function is R to find these features, but it is always a good practice to look at the plots. </code></pre>
+<pre class="r"><code>DT_train[,lapply(.SD,var)] %&gt;% melt() %&gt;% .[order(value)] %&gt;% .[1:10] %&gt;%
+  kable(format.args = list(decimal.mark = &#39;.&#39;, big.mark = &quot;,&quot;)) %&gt;%
+  kable_styling(bootstrap_options = &quot;condensed&quot;
+            ,full_width = FALSE
+            ,position = &quot;left&quot;
+            ,font_size = 10)
+
+lowVarianceFeatures &lt;- c(&quot;ps_ind_10_bin&quot;,&quot;ps_ind_13_bin&quot;,&quot;ps_ind_11_bin&quot;,&quot;ps_car_10_cat&quot;,&quot;ps_ind_12_bin&quot;)
+DT_train[,(lowVarianceFeatures) := NULL]
+
+
+#Bin-Bin
+cor(DT_train$ps_ind_18_bin,DT_train$ps_calc_15_bin)
+CramerV(factor(DT_train$ps_ind_18_bin),factor(DT_train$ps_calc_15_bin))
+Phi(DT_train$ps_ind_18_bin,DT_train$ps_calc_15_bin)
+
+#Bin-Continuous
+cor(DT_train$ps_ind_18_bin,DT_train$ps_calc_14)
+summary(aov(ps_calc_14~ps_ind_18_bin,data=DT_train))
+var(DT_train$ps_calc_14)
+aggregate(formula = ps_calc_14~ps_ind_18_bin,data=DT_train, FUN = var)
+kruskal.test(DT_train$ps_calc_14,DT_train$ps_ind_18_bin)
+
+#Cat-Continuous
+cor(DT_train$ps_car_02_cat,DT_train$ps_car_13,use=&quot;pairwise.complete.obs&quot;)
+summary(aov(ps_car_13~ps_car_02_cat,data=DT_train))
+var(DT_train$ps_car_13)
+aggregate(formula = ps_car_13~ps_car_02_cat,data=DT_train, FUN = var)
+K &lt;- kruskal.test(DT_train$ps_car_13,DT_train$ps_car_02_cat)
+
+
+cols_bin &lt;- grep(&quot;bin&quot;,names(DT_train),value = T)
+cols_cat &lt;- grep(&quot;cat&quot;,names(DT_train),value = T)
+cols_others &lt;- names(DT_train)[!names(DT_train) %in% c(cols_bin,cols_cat,&quot;id&quot;,&quot;target&quot;)]
+
+
+
+cols_bin &lt;- grep(&quot;bin&quot;,names(DT_train),value = T)
+correl &lt;- cor(DT_train[,..cols_bin])
+ggcorrplot::ggcorrplot(correl, hc.order = FALSE, type = &quot;lower&quot;,lab=TRUE,lab_size = 2) +
+  ggtitle(&quot;bin cor&quot;)
+
+cols_cat &lt;- grep(&quot;cat&quot;,names(DT_train),value = T)
+correl &lt;- cor(DT_train[,..cols_cat] )
+ggcorrplot::ggcorrplot(correl, hc.order = FALSE, type = &quot;lower&quot;,lab=TRUE,lab_size = 2) +
+  ggtitle(&quot;cat cor&quot;)
+
+cols_others &lt;- names(DT_train)[!names(DT_train) %in% c(cols_bin,cols_cat,&quot;id&quot;,&quot;target&quot;)]
+cols_others &lt;- c(cols_others,&quot;ps_car_11_cat&quot;)
+correl &lt;- cor(DT_train[,..cols_others],use = &quot;complete.obs&quot;)
+ggcorrplot::ggcorrplot(correl, hc.order = FALSE, type = &quot;lower&quot;,lab=TRUE,lab_size = 2) +
+  ggtitle(&quot;others cor&quot;)</code></pre>
+</div>

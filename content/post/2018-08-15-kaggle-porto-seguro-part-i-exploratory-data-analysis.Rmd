@@ -3,18 +3,16 @@ title: Kaggle Porto Seguro Part I - Exploratory Data Analysis
 author: Amit Agni
 date: '2018-08-15'
 slug: kaggle-porto-seguro-part-i-exploratory-data-analysis
-categories:
-  - kaggle
 tags:
   - kaggle
 robots: index
-draft: true
-description: EDA 
+description: Explores the feature set, normality testing, correlation between different variable types (using Phi Coefficient, ChiSquare Test, etc.)
+draft: false
 output:
   blogdown::html_page:
     toc: yes
-    fig_height: 3
-    fig_width: 4
+    fig_height: 7
+    fig_width: 8
 ---
 
 ```{r setup, include=FALSE}
@@ -22,12 +20,28 @@ knitr::opts_chunk$set(echo = TRUE, fig.align='center',warning=FALSE)
 
 if(!require(cutlery)) { devtools::install_github("amit-agni/cutlery"); library(cutlery)}
 if(!require(pacman)) { install.packages("pacman"); library(pacman)}
-p_load(here,data.table,tidyverse,tictoc,kableExtra,gridExtra,RColorBrewer)
+p_load(here,data.table,tidyverse,tictoc,kableExtra,gridExtra,RColorBrewer,DescTools
+       ,na.tools # For basic NA imputation
+       ,psych # for phi coefficient of correlation
+       ,visdat # Missing value visualisation
+       )
 
 options(scipen=999) 
 
 varPlotCaption <- "© Data Learnings"
 ggplot_color_theme <- "turquoise4"
+
+fn_kable <- function(data,caption=NULL,...){
+  data %>%
+  kable(format.args = list(decimal.mark = '.', big.mark = ",")
+        ,caption = caption) %>%
+    kable_styling(bootstrap_options = "condensed"
+            ,full_width = FALSE
+            ,font_size = 10
+            ,...)
+}
+
+
 
 ```
 
@@ -37,25 +51,33 @@ ggplot_color_theme <- "turquoise4"
 </center>
 <hr>
 
-Porto Seguro is Brazilian insurance company. They hosted a Kaggle competition in Nov 2017 to predict the probability that a driver will initiate an auto insurance claim in the next year. We will conduct an exploratory data analysis in this post. To reproduce this document, please download the datasets from the Kaggle website. The training set has around 600K rows and 59 columns.
+Porto Seguro is Brazilian insurance company. They hosted a [Kaggle competition](https://www.kaggle.com/c/porto-seguro-safe-driver-prediction) in Nov 2017 to predict the probability that a driver will initiate an auto insurance claim in the next year. This was the first Kaggle competition that I participated. In this post, I will do an exploratory analysis of the training data and also try some statistical inference tests. 
 
->In the train and test data, features that belong to similar groupings are tagged as such in the feature names (e.g., ind, reg, car, calc). In addition, feature names include the postfix bin to indicate binary features and cat to indicate categorical features. Features without these designations are either continuous or ordinal. Values of -1 indicate that the feature was missing from the observation. The target columns signifies whether or not a claim was filed for that policy holder.
+### Data description
 
-This was the first Kaggle competition that I participated. In this post, I will do a exploratory analysis of the data. The training set has around 600k observations and 59 features (including the target feature and an id feature)
+The training set has around 600k observations and 59 features (including the target feature and an id feature) and test set has around 900K rows. Below was the given description :
 
 ```{r}
 #train file stored outside the blog files
 root <- '/Mac Backup/R-Large-Items/porto/'
 DT_train <- fread(file=paste(root,'train.csv',sep=''))
-dim(DT_train)
+DT_test <- fread(file=paste(root,'test.csv',sep=''))
+# dim(DT_train)
+# dim(DT_test)
 
 ```
 
-The first thing that I look at in a dataset is whether there are any missing values. The missing value and its imputation is a interesting topic that I am hoping to cover in the future. I have used the `plot_missing` from the excellent `DataExplorer` package to get an idea of the missing values. 
 
-The missing values were coded as -1 which I have converted to NA and I am plotting only the features that had missing values. Majority of the features either don't have missing values or they are within an acceptable range of less than 2%. Except for 4 features that have significant volume is missingness.
+>In the train and test data, features that belong to similar groupings are tagged as such in the feature names (e.g., ind, reg, car, calc). In addition, feature names include the postfix bin to indicate binary features and cat to indicate categorical features. Features without these designations are either continuous or ordinal. Values of -1 indicate that the feature was missing from the observation. The target columns signifies whether or not a claim was filed for that policy holder.
 
-```{r fig.width=7,fig.height=5}
+### Missing values
+* The first thing that I look at in a dataset is whether there are any missing values. 
+* The missing value and its imputation is a interesting topic that I am hoping to cover in the future. I have used the `plot_missing` from the excellent `DataExplorer` package to get an idea of the missing values. 
+* The missing values were coded as -1 that I have converted to NA and I am plotting only the features that had missing values. 
+* There are 13 features with missing values and four of them (`ps_car_14`,`ps_reg_03`,`ps_car_05_cat` and `ps_car_03_cat`) have significant volume of missingness 
+* The distribution of the missing values is shown in the following plot
+
+```{r fig.height=5}
 
 DT_train[DT_train == -1] <- NA
 #lapply(DT_train,function(x) sum(is.na(x))/length(x))
@@ -66,9 +88,45 @@ DataExplorer::plot_missing(DT_train[,..cols_NA]
 
 ```
 
-There are 17 features that are postfixed with 'bin'. These are binary features and as such have values of 0 and 1. 99% of observations have zero values for the features `ps_ind_10, ps_ind_11, ps_ind_12 and ps_ind_13`. For the predictive modeling, these features would not add much values and I would probably look at dropping them.
+```{r fig.height=5}
 
-```{r fig.width = 7, fig.height=10}
+visdat::vis_dat(dplyr::sample_n(DT_train[,..cols_NA],60000),warn_large_data = F)  +
+  theme_darklightmix(color_theme = ggplot_color_theme,legend_position = "right") +
+  labs(title="Missing value distribution (sample size 60K)"
+  ,caption = varPlotCaption) +
+        theme(axis.text.x = element_text(angle =45,hjust=0.2))
+
+```
+
+### Basic imputation
+
+* Missing value imputation is an extensive topic and there are many advanced algorithms and packages like mice, Amelia, expectation maximisation etc. that can be used
+* But for this analysis, I will rely on the simplest methods :
+  + Mode imputation for categorical features
+  + Median imputation for the continuous features. 
+* I could have handcoded the functions but they are available in the `na.tools` package
+
+
+```{r fig.height=7}
+
+DataExplorer::plot_histogram(DT_train[,..cols_NA]
+                           ,theme_config = theme_darklightmix(color_theme = ggplot_color_theme)
+                           ,title = "Distribution of the features with missing values") 
+
+cols_NA_cat <- c("ps_ind_02_cat","ps_ind_04_cat","ps_ind_05_cat","ps_car_01_cat","ps_car_02_cat","ps_car_03_cat","ps_car_05_cat","ps_car_07_cat","ps_car_09_cat","ps_car_11")
+DT_train[,(cols_NA_cat) := lapply(.SD,na.tools::na.most_freq), .SDcols = cols_NA_cat ]
+
+cols_NA_cont <- c("ps_car_14","ps_reg_03","ps_car_12")
+DT_train[,(cols_NA_cont) := lapply(.SD,na.tools::na.median), .SDcols = cols_NA_cont ]
+
+```
+
+### Binary Features
+
+* There are 17 features that are postfixed with 'bin'. These are binary features and as such have values of 0 and 1. 
+* 99% of observations have zero values for the features `ps_ind_10, ps_ind_11, ps_ind_12 and ps_ind_13`. For the predictive modeling, these features would not add much values and I would probably look at dropping them.
+
+```{r fig.height=10}
 cols_bin <- grep("bin",names(DT_train),value = T)
 
 DT_train[,..cols_bin] %>%
@@ -85,14 +143,18 @@ DT_train[,..cols_bin] %>%
   scale_fill_brewer(palette = "Set3") +
   labs(x="value"
   ,y="count"
-  ,subtitle="Distribution of bin variables"
+  ,title="Distribution of bin variables"
   ,caption = varPlotCaption)
 
 ```
 
-There are 14 features that are postfixed with cat. These are categorical features. While majority of them have less than 10 levels, there are some features like `ps_ind_06_cat` and `ps_car_11_cat` that have higher number of levels. As these are column plots, the variability is not clear, so I will include `ps_car_11_cat` in the following histogram plots
+### Categorical features
 
-```{r fig.width = 7, fig.height=10}
+* There are 14 features that are postfixed with cat. These are categorical features. 
+* While majority of them have less than 10 levels, there are some features like `ps_ind_06_cat` and `ps_car_11_cat` that have higher number of levels.
+  + As these are column plots, the variability is not clear, so I will include `ps_car_11_cat` in the following histogram plots
+
+```{r  fig.height=10}
 
 cols_cat <- grep("cat",names(DT_train),value = T)
 
@@ -110,7 +172,7 @@ DT_train[,..cols_cat] %>%
   scale_fill_brewer(palette = "Set3") +
   labs(x="value"
   ,y="count"
-  ,subtitle="Distribution of cat variables"
+  ,title="Distribution of cat variables"
   ,caption = varPlotCaption)
 
 
@@ -119,9 +181,11 @@ DT_train[,..cols_cat] %>%
 
 ```
 
+### Remaining features
+
 Remaining 26 features are either continuous or ordinal are have been plotted below
 
-```{r fig.width = 7, fig.height=12, warning=FALSE}
+```{r  fig.height=12, warning=FALSE, message=F}
 #remove id and target and add one variable from cat
 cols_others <- names(DT_train)[!names(DT_train) %in% c(cols_bin,cols_cat,"id","target")]
 cols_others <- c(cols_others,"ps_car_11_cat")
@@ -140,46 +204,365 @@ DT_train[,..cols_others] %>%
 #  scale_fill_brewer(palette = "Set3") +
   labs(x="value"
   ,y="count"
-  ,subtitle="Distribution of remaining variables"
+  ,title="Distribution of remaining variables"
   ,caption = varPlotCaption)
 
 
 
 ```
 
-This was an quick overview of the feature set. Next step is to see how these features are correlated
 
-```{r eval = F}
 
-table(DT_train$ps_calc_01,DT_train$target)
+### Do the features follow a normal distribution ?
 
-table(DT_train$ps_calc_01,DT_train$ps_calc_02)
+* Some of the prediction algorithms require the continuous features to follow a normal distribution. This can be verified by different ways :
+  + Histogram
+  + QQ Plots
+  + Shapiro-Wilk Test
+  + Kolmogorov-Smirnov Test
+  + Anderson-Darling test
+* We already know that the binary and categorical features do not follow normal distribution. 
+* Let's look at few of the features that looked like normally distributed in the histograms (plotted above)
+  + Only `ps_calc_10`, `ps_calc_14` and to certain extent `ps_calc_11` shows clear normal distribution
+  + `ps_reg_03`, `ps_car_14` and  `ps_car_13` (not shown) is influenced by outliers and will need to be treated
 
-cor(DT_train$ps_calc_01,DT_train$ps_calc_02,method = "spearman")
+  
+```{r }
 
-chisq.test(DT_train$ps_calc_01,DT_train$ps_calc_02)
+cols_others_normal <- c("ps_ind_03", "ps_ind_15", "ps_reg_03","ps_car_14", "ps_car_15", "ps_calc_06", "ps_calc_10", "ps_calc_11", "ps_calc_14")
 
-chisq.test(DT_train$ps_calc_01,DT_train$target)
+DT_train[1:100,..cols_others_normal] %>%
+  melt(measure.vars = 1:ncol(.)) %>%
+  ggplot(aes(sample = value,color = variable)) +
+  stat_qq() + 
+  stat_qq_line() +
+  facet_wrap(~variable, scales = "free", ncol = 3) +
+  theme_darklightmix(color_theme = ggplot_color_theme,legend_position = "none") +
+  scale_color_manual(values = fn_extraPolate(length(cols_others_normal))) +
+  labs(x="value"
+  ,y="count"
+  ,title="QQ Plots - Normality Testing"
+  ,caption = varPlotCaption)
+
+
+```
+
+**How about using statistical tests for normality**
+
+* There are couple of them :Shapiro-Wilk and Kolmogorov-Smirnov Test
+* The null hypothesis for these tests is that the distribution is normal 
+  + Hence a p-value << 0.05 means would reject the null hypothesis
+* From the below table we can see that none of the features are normal
+  + This might not be 100% correct as these tests don't work well for large datasets
+  + And they expect the distribution to be perfectly normal
+
+```{r}
+shap <-  DT_train[,lapply(.SD,function(x) shapiro.test(sample(x,5000))$p.value)
+         ,.SDcols = cols_others_normal] %>% melt(value.name ="Shapiro pValue")
+      
+ks <-  DT_train[,lapply(.SD,function(x) ks.test(x,rnorm,3)$p.value)
+         ,.SDcols = cols_others_normal] %>% melt(value.name ="KS pValue") 
+
+batchtools::ijoin(shap,ks,by="variable")  %>% fn_kable()
+
+```
+
+
+
+### Correlation
+
+* I have used R `cor` function to see if there is correlation among the features and it does not look like there is not much.
+  + Except for `ps_ind_12_bin` and `ps_ind_14` has a high correlation coefficient of `r round(cor(DT_train$ps_ind_12_bin,DT_train$ps_ind_14),2)`
+  + This gives a nice overall picture of the feature space, even though it violates some of the assumptions of Pearson correlation i.e. normality, linearity and homoscedasticity.
+
+
+```{r fig.height=10}
+
+
+
+correl <- cor(DT_train,method="pearson")
+
+ggcorrplot::ggcorrplot(correl, hc.order = FALSE, type = "lower",lab=F,lab_size = 2,outline.color = "black") +
+    labs(title="Pearson correlation of all features"
+    ,caption = varPlotCaption) +
+    theme_darklightmix(color_theme = ggplot_color_theme
+                       ,legend_position = "bottom") +
+      theme(axis.text.x = element_text(angle =90,hjust=1,vjust = 0.5)
+            ,axis.title = element_blank()
+            ,panel.grid.major =element_line(size=0.8)
+            ,panel.grid.major.x  = element_blank())
+
+    
+```
+
+* Can the R `cor` function be used to find the correlation between different variable types i.e binary, continuous, etc ?
+* As per it this [article](https://researchbasics.education.uconn.edu/types_of_correlations/#) it looks like there are other statistical tests available for checking the correlation or the independence of features depending on the type of variable. 
+* I have used the `datapasta` package to create the below table by copy pasting the values from Excel 
+
+```{r }
+
+#datapasta::tribble_paste()
+
+cor_types  <- tibble::tribble(
+                             ~Test, ~Notation,                                            ~`Variable types`,                                                          ~Assumptions,
+                       "Pearson’s",     "r",                                                       "Both continuous",                           "Normality, Linearity and Homoscedasticity",
+                             "Phi",     "f",                                                           "Both binary",                                                                 "TBD",
+                     "Contingency",     "C",                                                      "Both categorical",                                                                 "TBD",
+                  "Point-Biserial", "rpbis",                                                   "Continuous - Binary", "No outliers, Approximately normal, equal variance for each category",
+                        "Biserial",  "rbis",                          "Both continuous but converted to Categorical",                                                                 "TBD",
+                     "Tetrachoric",    "rt",                               "Both continuous but converted to Binary",                                                                 "TBD",
+                             "Eta",     "h", "Both are continuous and are used to detect curvilinear relationships.",                                                                 "TBD",
+                      "Rank Order",     "r",                                               "Both are rank (ordinal)",                                                                 "TBD"
+                  )
+
+cor_types %>% fn_kable
+
+```
+
+### Binary-Binary Correlation (Phi Coefficient)
+
+* As per the above article we can use the `Phi Coefficient` to determine the correlation of binary features
+* Is the Pearson Correlation different from the Phi Coefficient ?
+* I don't think so as I am getting the same results. Does this mean the `cor` function internally takes care of correlation of binary variable. I will need to investigate
+* I have used the `PairApply` function from the `DescTools` package for pair-wise column computations
+
+```{r}
+
+cor <- PairApply(DT_train[,..cols_bin],FUN = cor)
+p1 <- ggcorrplot::ggcorrplot(cor, hc.order = FALSE, type = "lower",lab=T,lab_size = 2,outline.color = "black"
+                       ,legend.title = "p-value"
+                       ,digits = 2) +
+    labs(title="Correlation"
+         ,subtitle =  "High indicates stronger relationship"
+    ,caption = varPlotCaption) +
+    theme_darklightmix(color_theme = ggplot_color_theme
+                       ,legend_position = "bottom") +
+      theme(axis.text.x = element_text(angle =90,hjust=1,vjust = 0.5)
+            ,axis.title = element_blank()
+            ,panel.grid.major =element_line(size=0.8)
+            ,panel.grid.major.x  = element_blank()) 
+
+phi <- PairApply(DT_train[,..cols_bin],FUN = function(x,y) psych::phi(table(x,y)))
+p2 <- ggcorrplot::ggcorrplot(phi, hc.order = FALSE, type = "lower",lab=T,lab_size = 2,outline.color = "black"
+                       ,legend.title = "p-value"
+                       ,digits = 2) +
+    labs(title="Phi Coefficient"
+         ,subtitle =  "Correlation coefficient for binary variables"
+    ,caption = varPlotCaption) +
+    theme_darklightmix(color_theme = ggplot_color_theme
+                       ,legend_position = "bottom") +
+      theme(axis.text.x = element_text(angle =90,hjust=1,vjust = 0.5)
+            ,axis.title = element_blank()
+            ,panel.grid.major =element_line(size=0.8)
+            ,panel.grid.major.x  = element_blank()) 
+
+
+gridExtra::grid.arrange(p1, p2, ncol=2)
+
+```
+
+### Binary-Binary Correlation (Chi-Square test / CramerV)
+
+* Continuing with the assumption that Pearson's correlation cannot be used for Binary features, I thought of checking the results against Chi-Square test
+* Chi-square test is useful in two scenarios :
+  + To check if the sample comes from a population (goodness of fit test)
+  + To check if two categorical variables are independent
+    + Low chi-square implies relationship exists
+    + High chi-square implies no relationship
+* The CramerV gives the strength of the relationship
+* But these results also seem to be inline with what I got from Pearson's correlation
+
+```{r}
+cols_bin <- grep("bin",names(DT_train),value = T)
+
+chiSqPValue <- PairApply(DT_train[,..cols_bin],FUN = function(x,y) chisq.test(x,y)$p.value)
+p1<- ggcorrplot::ggcorrplot(chiSqPValue, hc.order = FALSE, type = "lower",lab=T,lab_size = 2,outline.color = "black"
+                       ,legend.title = "p-value"
+                       ,digits = 2) +
+    labs(title="ChiSq Test p-values"
+         ,subtitle = "Low values indicates relationship exists"
+    ,caption = varPlotCaption) +
+    theme_darklightmix(color_theme = ggplot_color_theme
+                       ,legend_position = "bottom") +
+      theme(axis.text.x = element_text(angle =90,hjust=1,vjust = 0.5)
+            ,axis.title = element_blank()
+            ,panel.grid.major =element_line(size=0.8)
+            ,panel.grid.major.x  = element_blank()) 
+
+crammerV <- PairApply(DT_train[,..cols_bin],FUN = DescTools::CramerV)
+p2 <- ggcorrplot::ggcorrplot(crammerV, hc.order = FALSE, type = "lower",lab=T,lab_size = 2,outline.color = "black"
+                       ,legend.title = "p-value"
+                       ,digits = 2) +
+    labs(title="cramerV"
+         ,subtitle =  "High indicates stronger relationship"
+    ,caption = varPlotCaption) +
+    theme_darklightmix(color_theme = ggplot_color_theme
+                       ,legend_position = "bottom") +
+      theme(axis.text.x = element_text(angle =90,hjust=1,vjust = 0.5)
+            ,axis.title = element_blank()
+            ,panel.grid.major =element_line(size=0.8)
+            ,panel.grid.major.x  = element_blank()) 
+
+gridExtra::grid.arrange(p1, p2, ncol=2)
+
 
 
 ```
 
 
-```{r eval = F}
 
-dimRed_lowVariance(DT_train)
+### Continuous - Binary (Kruskal-Wallis Rank Sum Test)
 
-index <- caret::createDataPartition(DT_train$target
-                             ,p = 0.3
-                             ,list = FALSE
-                             ,times = 1)
+* There are multiple ways in which we can test the dependence of Continuous-Categorical variables
+  + One-way ANOVA
+  + Logistic Regression
+  + Point biserial correlation
+  + Kruskal-Wallis Rank Sum Test
+* The Kruskal-Wallis Rank Sum tests is a non-parametric test and hence can be used for non-normal distributions (unlike ANOVA that expects the continuous variable to be normal)
+  + The Null hypothesis is that the both the variables are dependent
+  + Hence, a p-value of << 0.05 will reject the null hypothesis
+* **There are few combinations that result in high p-value but they have low Pearson's correlation coefficient. Does this mean they are dependent ?**
+  
 
-DT_sample <- DT_train[index]
-DataExplorer::plot_bar(DT_sample
-                       ,ncol=4
-                       ,nrow = 8
-                       ,theme_config = theme_darklightmix(color_theme = ggplot_color_theme)
-                       ,title = "Distribution of bin variables") +
-  scale_fill_manual(values ="cornsilk")
+```{r fig.height=4}
+cols_bin <- grep("bin",names(DT_train),value = T)
+cols_others <- names(DT_train)[!names(DT_train) %in% c(cols_bin,cols_cat,"id","target")]
+grid<- expand.grid(cols_bin,cols_others,stringsAsFactors = F,KEEP.OUT.ATTRS = F)
+out_cor <- 
+map2(.x=grid$Var1,.y=grid$Var2,.f = function(v1,v2){
+  cols <- c(v1,v2)
+  list(v1,v2,cor(DT_train[,..cols],use="pairwise.complete.obs")[1,2])
+  
+}) 
+out_cor <- rbindlist(out_cor) %>% .[order(V3)]
+setnames(out_cor,"V3","Correlation")
+out_kruskal <-map2(.x=grid$Var1,.y=grid$Var2,.f = function(v1,v2){
+  cols <- c(v1,v2)
+  k <- kruskal.test(x=DT_train[[v2]],g=DT_train[[v1]])
+  list(v1,v2,statistic=k$statistic,pvalue=round(k$p.value,10))
+  
+}) 
+out_kruskal <- rbindlist(out_kruskal) %>% .[order(-pvalue)]
+setnames(out_kruskal,"statistic","KW - Statistic")
+out <- batchtools::ijoin(out_cor,out_kruskal,by=c("V1","V2"))
+
+out[order(-pvalue)][1:10] %>% fn_kable(position = "float_left",caption = "Top 10 p-value")
+
+
+
+p1 <- ggplot(out,aes(x=Correlation,y=`KW - Statistic`)) +
+  geom_point() +
+  coord_cartesian(ylim = c(0,11000)) +
+  theme_darklightmix(color_theme = ggplot_color_theme,legend_position = "none") +
+  labs(subtitle="KW Statistics vs Correlation Coefficient"
+  ,caption = varPlotCaption)
+
+p2 <- ggplot(out,aes(x=Correlation,y=pvalue)) +
+  geom_point(position = "jitter") +
+  theme_darklightmix(color_theme = ggplot_color_theme,legend_position = "none") +
+  labs(subtitle="pValue of KW vs Correlation Coefficient"
+  ,caption = varPlotCaption)
+
+gridExtra::grid.arrange(p1, p2, ncol=2)
+
+
 ```
+
+
+This post has already crossed a 10 mins read, so I will stop here and write another post to continue with the EDA. 
+
+### Summary / Key Learnings
+* The features in the dataset were encoded and their meanings were not provided. Hence, I have not attempted to write how the insights relate to the real-world business
+* The objective was to run through the R code and further my understanding of key statistical concepts
+* New packages and functions that I learnt while writing this post 
+  + `na.tools` package for basic missing value imputation
+  + In the histogram plot, I used the special variable `..count..` to show the count of the respective features
+    + As per the documentation, these are special variables computed from the aesthetics
+    + Alternative way of using them is by calling them within the `ggplot2::stat(count)` function
+    + `ggplot(aes(x=value,y=..count../1e3,fill=variable))` 
+  + Ran the Shapiro-Wilk `shapiro.test` and Kolmogorov-Smirnov `ks.test` tests for normality 
+    + Shapiro-Wilk test works for sample size < 5000
+    + Both tests expect the distribution to be perfectly normal
+  + The results of Pearson's correlation `cor` were not different from the results of some other tests 
+    + Phi coefficient is used for binary-binary variables `psych::phi(table(x,y))` 
+    + **Kruskal test is used for categorical-continuous variables, but I was not able to come to conclusion and will need further reading** 
+      
+* References/Further Reading
+  + [Correlation of different variable types](https://researchbasics.education.uconn.edu/types_of_correlations/#)
+  + [SPSS Tutorials](https://libguides.library.kent.edu/SPSS/ChiSquare)
+  + [An overview of correlation measures between categorical and continuous variables](https://medium.com/@outside2SDs/an-overview-of-correlation-measures-between-categorical-and-continuous-variables-4c7f85610365)
+  
+  
+
+```{r fig.width = 8,fig.height=10, eval = F}
+
+
+### Low variance features
+This was an quick overview of the feature set. Next step is to see how these features are correlated.
+
+But before that, I will remove the features that show low variance. For example the `ps_ind_10_bin` has only 0 values and it will not have much predictive value. We can use the `var` function is R to find these features, but it is always a good practice to look at the plots. 
+
+```{r eval=F}
+
+DT_train[,lapply(.SD,var)] %>% melt() %>% .[order(value)] %>% .[1:10] %>%
+  kable(format.args = list(decimal.mark = '.', big.mark = ",")) %>%
+  kable_styling(bootstrap_options = "condensed"
+            ,full_width = FALSE
+            ,position = "left"
+            ,font_size = 10)
+
+lowVarianceFeatures <- c("ps_ind_10_bin","ps_ind_13_bin","ps_ind_11_bin","ps_car_10_cat","ps_ind_12_bin")
+DT_train[,(lowVarianceFeatures) := NULL]
+
+
+#Bin-Bin
+cor(DT_train$ps_ind_18_bin,DT_train$ps_calc_15_bin)
+CramerV(factor(DT_train$ps_ind_18_bin),factor(DT_train$ps_calc_15_bin))
+Phi(DT_train$ps_ind_18_bin,DT_train$ps_calc_15_bin)
+
+#Bin-Continuous
+cor(DT_train$ps_ind_18_bin,DT_train$ps_calc_14)
+summary(aov(ps_calc_14~ps_ind_18_bin,data=DT_train))
+var(DT_train$ps_calc_14)
+aggregate(formula = ps_calc_14~ps_ind_18_bin,data=DT_train, FUN = var)
+kruskal.test(DT_train$ps_calc_14,DT_train$ps_ind_18_bin)
+
+#Cat-Continuous
+cor(DT_train$ps_car_02_cat,DT_train$ps_car_13,use="pairwise.complete.obs")
+summary(aov(ps_car_13~ps_car_02_cat,data=DT_train))
+var(DT_train$ps_car_13)
+aggregate(formula = ps_car_13~ps_car_02_cat,data=DT_train, FUN = var)
+K <- kruskal.test(DT_train$ps_car_13,DT_train$ps_car_02_cat)
+
+
+cols_bin <- grep("bin",names(DT_train),value = T)
+cols_cat <- grep("cat",names(DT_train),value = T)
+cols_others <- names(DT_train)[!names(DT_train) %in% c(cols_bin,cols_cat,"id","target")]
+
+
+
+cols_bin <- grep("bin",names(DT_train),value = T)
+correl <- cor(DT_train[,..cols_bin])
+ggcorrplot::ggcorrplot(correl, hc.order = FALSE, type = "lower",lab=TRUE,lab_size = 2) +
+  ggtitle("bin cor")
+
+cols_cat <- grep("cat",names(DT_train),value = T)
+correl <- cor(DT_train[,..cols_cat] )
+ggcorrplot::ggcorrplot(correl, hc.order = FALSE, type = "lower",lab=TRUE,lab_size = 2) +
+  ggtitle("cat cor")
+
+cols_others <- names(DT_train)[!names(DT_train) %in% c(cols_bin,cols_cat,"id","target")]
+cols_others <- c(cols_others,"ps_car_11_cat")
+correl <- cor(DT_train[,..cols_others],use = "complete.obs")
+ggcorrplot::ggcorrplot(correl, hc.order = FALSE, type = "lower",lab=TRUE,lab_size = 2) +
+  ggtitle("others cor")
+
+
+
+
+
+
+
+```
+
 
