@@ -2,12 +2,13 @@
 title: Kaggle Porto Seguro Part I - Exploratory Data Analysis
 author: Amit Agni
 date: '2018-08-15'
-slug: kaggle-porto-seguro-part-i-exploratory-data-analysis
 tags:
-  - kaggle
+  - all posts
+slug: kaggle-porto-seguro-part-i-exploratory-data-analysis
 robots: index
-description: Explores the feature set, normality testing, correlation between different variable types (using Phi Coefficient, ChiSquare Test, etc.)
-draft: false
+description: Explores the feature set, normality testing, correlation between different
+  variable types (using Phi Coefficient, ChiSquare Test, etc.)
+draft: no
 output:
   blogdown::html_page:
     toc: yes
@@ -47,6 +48,8 @@ fn_kable <- function(data,caption=NULL,...){
 
 <center>
 	<!-- feature image -->
+	![](/post/2018-08-15-kaggle-porto-seguro-part-i-exploratory-data-analysis_files/viraj-rajankar-miBpTBgIaw8-unsplash.jpg)
+	Photo by Viraj Rajankar on Unsplash
 
 </center>
 <hr>
