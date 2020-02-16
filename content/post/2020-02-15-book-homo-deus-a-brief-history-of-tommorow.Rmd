@@ -1,0 +1,244 @@
+---
+title: Book - Homo Deus, A Brief History of Tommorow
+author: Amit Agni
+date: '2020-02-15'
+slug: book-homo-deus-a-brief-history-of-tommorow
+categories: []
+tags:
+  - books
+robots: index
+description: Book review and excerpts for personal reference
+output:
+  blogdown::html_page:
+    toc: yes
+    fig_height: 3
+    fig_width: 4
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.align='center')
+
+if(!require(cutlery)) { devtools::install_github("amit-agni/cutlery"); library(cutlery)}
+if(!require(pacman)) { install.packages("pacman"); library(pacman)}
+p_load(here,data.table,tidyverse,tictoc,kableExtra,gridExtra)
+
+varPlotCaption <- "© Data Learnings"
+ggplot_color_theme <- "turquoise4"
+```
+
+<center>
+	<!-- feature image -->
+	
+	![](/post/2020-02-15-book-homo-deus-a-brief-history-of-tommorow_files/toa-heftiba-C9WnRj-CZEk-unsplash.jpg)
+
+Photo by Toa Heftiba on Unsplash
+
+</center>
+<hr>
+
+Homo Deus : A brief history of tomorrow (2016) is written by Yuval Noah Hariri, an Israeli author. This is his second book, I had read the first one titled Sapiens : A brief history of humankind (2014) and that was an interesting read. Hence, decided to buy this one (paper version). He has also written a third one called 21 Lessons for the 21st century (2018). 
+
+The author takes a very refreshing take on our future. He starts with the human history 70000 years back and chronicles our evolution since then. He looks at our historical past and predicts where might be heading to. The key take-aways for me :
+
+  * Humans will aim for immortality, bliss and divinity
+  * All living organisms are algorithms
+  * Humans are/were able to rule the world because of our abilities to work together and cooperate. 
+  * But even bees cooperate, so why didn't they rule the world. That is because we imagined, we knitted stories, learnt to write them down and made other humans follow it. 
+  * Using that we created gods, religions, countries and corporations
+  * But we no longer believe in gods as our ancestors used to, so what do we have to hold on to ?
+  * The answer is humanism = experiences x sensitivity
+  * The peak-end rule and the example for enhanced helmet
+  * Humans were useful because we had intelligence and consciousness, but this is now getting decoupled and intelligence is taken over by the machines
+  * Data religion
+
+The book has three parts 
+
+* The first part compares humans and animals, and how the humans evolved due to our abilities to think. He says in order to understand the future relationship between humans and superhumans, we need to first look at our relationship with animals. The superhumans will treat the humans the same way, the humans treated the animals
+* Second part talks about the belief of humans in humanity, and how we became the center point of the universe around which everything else revolves.
+* Third part talks about the future of humanity 
+
+
+### Table of contents
+
+1. The New Human Agenda  
+**PART I : Homo Sapiens Conquers the World**
+2. The Anthropocene
+3. The Human Spark  
+**PART II Homo Sapiens Gives Meaning to the World**
+4. The Storytellers
+5. The Odd Couple
+6. The Modern Covenant
+7. The Humanist Revolution  
+**PART III Homo Sapiens Loses Control**
+8. The Time Bomb in the Laboratory
+9. The Great Decoupling
+10. The Ocean of Consciousness
+11. The Data Religion
+
+
+### 1. The New Human Agenda  
+
+* In the 21st century humans will aim for `immortality, bliss and divinity`. This idea run throughout the first part of the book. 
+  + *Having reduced mortality from starvation, disease and violence, we will now aim to `overcome old age` and even death itself*
+  + *Having saved people from abject misery, we will now aim to make them positively `happy`*
+  + *And having raised humanity above the beastly level of survival struggles, we will now aim to `upgrade humans into gods`, and turn Homo sapiens into Homo deus*
+* “What’s the point of making predictions if they cannot change anything?”
+* Paradox of historical knowledge
+  * “Knowledge that does not change behaviour is useless. But knowledge that changes behaviour quickly loses its relevance. The more data we have and the better we understand history, the faster history alters its course, and the faster our knowledge becomes outdated.”
+* Story of lawns 
+  + In the late middle ages, lawns were identified with power and wealth in Europe.
+  + And now having known the history of lawns, we can think of alternative ways of decorating our front-yards
+  + He says `“This is the best reason to learn history: not in order to predict the future, but to free yourself of the past and imagine alternative destinies.”`
+
+**PART I : Homo Sapiens Conquers the World**
+
+### 2. The Anthropocene
+* The timeline of the earth is divided into epochs. And the nomenclature is maintained by [International Commission on Stratigraphy](http://www.stratigraphy.org).  The `anthropocene` is the current epoch that has been proposed due to the significant changes that humans have done to the Earth by means of global warming, loss of animal/plant species, etc. But it has not been officially accepted.
+* “Officially, we live in the Holocene epoch. Yet it may be better to call the last 70,000 years the Anthropocene epoch: the epoch of humanity. For during these millennial Homo sapiens became the single most important agent of change in the global ecology.”
+* The author then goes on to explains changes that humans have done. This is similar to what he had written in his earlier book - Sapiens
+* All living organisms are algorithms
+  + “An algorithm is a methodical set of steps that can be used to make calculations, resolve problems and reach decisions.”
+  + “The algorithms controlling humans work through sensations, emotions and thoughts. And exactly the same kind of algorithms control pigs, baboons, otters and chickens.”
+<center>
+![](/post/2020-02-15-book-homo-deus-a-brief-history-of-tommorow_files/homo-deus-algorithms.jpeg)
+</center>
+  + The author talks about how modern science has enabled us to mass produce pigs, chicken and cows to feed us. “We are suddenly showing unprecedented interest in the fate of so-called lower life forms, perhaps because we are about to become one. ”
+
+  
+### 3. The Human Spark  
+  + “Indeed, what exactly is it about humans that make us so intelligent and powerful in the first place, and how likely is it that non-human entities will ever rival and surpass us?”
+  + “The better we understand the brain, the more redundant the mind seems. If the entire system works by electric signals passing from here to there, why the hell do we also need to feel fear? ”
+  + “If we cannot explain the mind, and if we don’t know what function it fulfills, why not just discard it? ” in the same way scientists had discarded the existence of ether and the idea that light flows through ether
+  + And in the same way why not discard the `soul`, the `consciousness` and the `subjective experiences`
+  + One theory is that the consciousness is some kind of a mental pollution produced by the firing neurons in the brain. "It doesn’t do anything. It is just there.”
+  + The Turing test was invented by British mathematician Alan Turing and it says **“in order to determine whether a computer has a mind, you should communicate simultaneously both with that computer and with a real person, without knowing which is which”**
+  + Do animals have a mind. The author gives some examples of experiments in which rats were injected with anti-depressants, the self-conscious chimpanzee, the clever horse who could add numbers and signaled the answers by tapping his hoofs. 
+  + “because no matter how one defines intelligence, it is quite clear that neither intelligence nor toolmaking by themselves can account for the Sapiens conquest of the world”
+  + **“Humans nowadays completely dominate the planet not because the individual human is far smarter and more nimble-fingered than the individual chimp or wolf, but because Homo sapiens is the only species on earth capable of co-operating flexibly in large numbers.”**
+  + **“Sapiens rule the world because only they can weave an intersubjective web of meaning: a web of laws, forces, entities and places that exist purely in their common imagination. This web allows humans alone to organise crusades, socialist revolutions and human rights movements.”**
+  + The imagination of animals is limited, they cannot imagine Facebook or Google or even India. Only sapiens can use language to create such new realities
+  + “As human fictions are translated into genetic and electronic codes, the intersubjective reality will swallow up the objective reality and biology will merge with history. ”
+
+**PART II Homo Sapiens Gives Meaning to the World**
+
+
+### 4. The Storytellers
+  + This chapter gives numerous examples of how humans created stories. How they evolved first by just imagining things, then forming networks of humans, creating customs, traditions, rules and finally writing these down on paper and creating fictional entities like gods and countries and corporations
+  + The current `Holocene` epoch is believed to have started 70,000 years ago after start of the human cognitive revolution. This is when the humans started talking about things that they were imagining.
+  + Until the agricultural revolution that started 12,000 years back the interaction between the humans were local. “Farming made it possible to feed thousands of people in crowded cities and thousands of soldiers in disciplined armies”
+  + Some 6000 years ago, the farmers of the Sumerian kingdom believed in stories about great gods and they built temples to their favorite god. "The Sumerian gods fulfilled a function analogous to modern brands and corporations. ”
+  + “But the biological pharaoh was of little importance. The real ruler of the Nile Valley was an imagined pharaoh that existed in the stories millions of Egyptians told one another.”
+  + “Like pharaoh, Elvis (Presley) was a story, a myth, a brand – and the brand was far more important than the biological body.”
+  + “Written language may have been conceived as a modest way of describing reality, but it gradually became a powerful way to reshape reality. When official reports collided with objective reality, it was often reality that had to give way. Anyone who has ever dealt with the tax authorities, the educational system or any other complex bureaucracy knows that the truth hardly matters. What’s written on your form is far more important.”
+  + “Fiction isn’t bad. It is vital. Without commonly accepted stories about things like money, states or corporations, no complex human society can function”
+
+### 5. The Odd Couple
+  + Science and Religion
+  + “In theory, both science and religion are interested above all in the truth, and because each upholds a different truth, they are doomed to clash. In fact, neither science nor religion cares that much about the truth, hence they can easily compromise, coexist and even cooperate.”
+  + “Religion is interested above all in order. It aims to create and maintain the social structure. Science is interested above all in power. It aims to acquire the power to cure diseases, fight wars and produce food.”
+
+“We will dedicate the next two chapters to understanding the modern covenant between science and humanism. The third and final part of the book will then explain why this covenant is disintegrating, and what new deal might replace it.”
+
+### 6. The Modern Covenant
+  + Covenant is usually a formal agreement between two or more people to do or not to do something
+  + “Modernity is a deal. All of us sign up to this deal on the day we are born, and it regulates our lives until the day we die.” And the entire deal is summarised in a one line `"humans agree to give up meaning in exchange for power.”`
+  + “The modern world does not believe in purpose, only in cause. If modernity has a motto, it is ‘shit happens’.”
+  + “Evolutionary pressures have accustomed humans to see the world as a static pie. If somebody gets a bigger slice of the pie, somebody else inevitably gets a smaller slice.”
+  + “Yet can the economy actually keep growing for ever? Won’t it eventually run out of resources – and grind to a halt? In order to ensure perpetual growth, we must somehow discover an inexhaustible store of resources.”
+  + “The traditional view of the world as a pie of a fixed size presupposes there are only two kinds of resources in the world: raw materials and energy. But in truth, there are three kinds of resources: raw materials, energy and knowledge. Raw materials and energy are exhaustible – the more you use, the less you have. Knowledge, in contrast, is a growing resource – the more you use, the more you have.”
+  + “For thousands of years priests, rabbis and muftis explained that humans cannot overcome famine, plague and war by their own efforts. Then along came the bankers, investors and industrialists, and within 200 years managed to do exactly that.”
+  + “How did morality, beauty and even compassion survive and flourish in a world devoid of gods, of heaven and of hell?”
+  + The answer is `humanism` 
+
+
+### 7. The Humanist Revolution  
+  + The book now moves to the current times.
+  + “Heaven and hell too ceased to be real places somewhere above the clouds and below the volcanoes, and were instead interpreted as internal mental states.”
+  + “If my inner self tells me to believe in God – then I believe."
+  + "Either way, the real source of authority is my own feelings. So even while saying that I believe in God, the truth is I have a much stronger belief in my own inner voice.”
+  + The formulae of knowledge. What would people do if they needed to answer questions
+    + In Medieval Europe : `Knowledge = Scriptures x Logic`
+    + Scientific Revolution : `Knowledge = Empirical Data x Mathematics`
+    + Humanism : `Knowledge = Experiences x Sensitivity`
+  + The example of drinking tea. “You cannot experience something if you don’t have the necessary sensitivity, and you cannot develop your sensitivity except by undergoing a long string of experiences.”
+  + “Humanism thus sees life as a gradual process of inner change, leading from ignorance to enlightenment by means of experiences. The highest aim of humanist life is to fully develop your knowledge through a large variety of intellectual, emotional and physical experiences. ”
+  + “Travel agents and restaurant chefs do not sell us flight tickets, hotels or fancy dinners – they sell us novel experiences.”
+  + “As of 2016, there is no serious alternative to the liberal package of individualism, human rights, democracy and a free market."
+  + "radical Islam may appeal to people born and raised in its fold, but it has precious little to offer unemployed Spanish youths or anxious Chinese billionaires.”
+  + “That’s why traditional religions offer no real alternative to liberalism. Their scriptures don’t have anything to say about genetic engineering or artificial intelligence, and most priests, rabbis and muftis don’t understand the latest breakthroughs in biology and computer science. ”
+  + `“History is often shaped by small groups of forward-looking innovators rather than by the backward-looking masses.` Ten thousand years ago most people were hunter-gatherers and only a few pioneers in the Middle East were farmers. Yet the future belonged to the farmers.”
+  + `“The main products of the twenty-first century will be bodies, brains and minds, and the gap between those who know how to engineer bodies and brains and those who do not will be far bigger than the gap between Dickens’s Britain and the Mahdi’s Sudan.”`
+  
+“The humanist belief in feelings has enabled us to benefit from the fruits of the modern covenant without paying its price. We don’t need any gods to limit our power and give us meaning – the free choices of customers and voters supply us with all the meaning we require. What, then, will happen once we realise that customers and voters never make free choices, and once we have the technology to calculate, design or outsmart their feelings? If the whole universe is pegged to the human experience, what will happen once the human experience becomes just another designable product, no different in essence from any other item in the supermarket?”
+
+**PART III Homo Sapiens Loses Control**
+
+### 8. The Time Bomb in the Laboratory
+  + “The sacred word ‘freedom’ turns out to be, just like ‘soul’, an empty term that carries no discernible meaning. Free will exists only in the imaginary stories we humans have invented.”
+  + Scientific experiments have shown that **“Neural events in the brain indicating the person’s decision begin from a few hundred milliseconds to a few seconds before the person is aware of this choice.”**
+  + The author writes about the experience of *New Scientist* journalist, Sally Adee at the `Human Effectiveness Directorate, Ohio air force base`. She wore an enhanced helmet fitted with electrodes that manipulate the signals passed to the specific areas of the brain. The signals can stimulate or inhibit certain brain activities, resulting in sharpened attention and focus of the person wearing the helmet.
+  + When such helmets become freely available we will be able to use them to study and work more efficiently, “and be able to focus on what interests us at any particular moment, be it maths or football. **However, if and when such manipulations become routine, the supposedly free will of customers will become just another product we can buy. ”**
+  + “The human brain is composed of two hemispheres, connected to each other through a thick neural cable. Each hemisphere controls the opposite side of the body. ”
+  + “Most cognitive activities involve both hemispheres, but not to the same degree. For example, in most cases the `left hemisphere plays a more important role in speech and in logical reasoning, whereas the right hemisphere is more dominant in processing spatial information.`”
+  + Some experiments were conducted on patients with epilepsy, whose neural cable was cut "so that electrical storms beginning in one hemisphere could not spill over to the other.”
+  + “The cold-water experiment is so simple, yet its implications shake the core of the liberal world view. It exposes the existence of at least two different selves within us: `the experiencing self and the narrating self.` ”
+    + “The experiencing self is our moment-to-moment consciousness. ”
+    + “However, the experiencing self remembers nothing. It tells no stories, and is seldom consulted when it comes to big decisions. Retrieving memories, telling stories and making big decisions are all the monopoly of a very different entity inside us: the narrating self.”
+  + “Just as in the cold-water experiment, the overall pain level neglected duration and instead reflected only `the peak-end rule.`”. 
+  + “The narrating self doesn’t aggregate experiences – it averages them.”
+  + The Pediatricians use the `peak-end rule` to trick the kids. "Many keep in their clinics jars full of treats, and hand a few to the kids (or dogs) after giving them a painful injection or an unpleasant medical examination. When the narrating self remembers the visit to the doctor, ten seconds of pleasure at the end of the visit will erase many minutes of anxiety and pain.”
+  + “Truth be told, the experiencing self and the narrating self are not completely separate entities but are closely intertwined. The narrating self uses our experiences as important (but not exclusive) raw materials for its stories. These stories, in turn, shape what the experiencing self actually feels. We experience hunger differently when we fast on Ramadan, when we fast in preparation for a medical examination, and when we don’t eat because we have no money. The different meanings ascribed to our hunger by the narrating self create very different actual experiences.”
+  + “Some people live a tragedy, others inhabit a never-ending religious drama, some approach life as if it were an action film, and not a few act as if in a comedy. But in the end, they are all just stories.”
+  + Meaning of life
+    + “These momentary experiences do not add up to any enduring essence. The narrating self tries to impose order on this chaos by spinning a never-ending story, in which every such experience has its place, and hence every experience has some lasting meaning. But, as convincing and tempting as it may be, this story is a fiction”
+  + "At the beginning of the third millennium, liberalism is threatened not by the philosophical idea that ‘there are no free individuals’ but rather by concrete technologies. `We are about to face a flood of extremely useful devices, tools and structures that make no allowance for the free will of individual humans.` Can democracy, the free market and human rights survive this flood?”
+
+### 9. The Great Decoupling
+  + `“Humans are in danger of losing their value, because intelligence is decoupling from consciousness.”`. The intelligence is being taken over by the machines. 
+  + The author gives several examples of how machines are doing tasks that were once performed by `conscious and intelligent` human beings like “playing chess, driving cars, diagnosing diseases or identifying terrorists”. 
+  + “This raises a novel question: which of the two is really important, intelligence or consciousness? ”
+  + “And it is sobering to realise that, at least for armies and corporations, the answer is straightforward: intelligence is mandatory but consciousness is optional.”
+  + “Some economists predict that sooner or later, unenhanced humans will be completely useless. While robots and 3D printers replace workers in manual jobs such as manufacturing shirts, highly intelligent algorithms will do the same to white-collar occupations. ”
+  + “Companies such as `Mindojo` are developing interactive algorithms that not only teach me maths, physics and history, but also simultaneously study me and get to know exactly who I am." and then customise the teaching for me.
+  + “Though Toyota or Argentina has neither a body nor a mind, they are subject to international laws, they can own land and money, and they can sue and be sued in court. We might soon grant similar status to algorithms. An algorithm could then own a venture-capital fund without having to obey the wishes of any human master.”
+  + “ Indeed, 5,000 years ago much of Sumer was owned by imaginary gods such as Enki and Inanna. `If gods can possess land and employ people, why not algorithms?`”
+  + `"The only way for the humans to stay in the game would be keep learning throughtout their lives"`
+  + The author talks about three practical threats to liberalism: 
+    + "humans will lose their value completely"
+    + "humans will still be valuable collectively, but they will lose their individual authority, and will instead be managed by external algorithms"
+    + `some people will remain both indispensable and undecipherable, but they will constitute a small and privileged elite of upgraded humans.`
+
+“What new religions or ideologies might fill the resulting vacuum and guide the subsequent evolution of our godlike descendants?”
+
+
+### 10. The Ocean of Consciousness
+  + “The new religions are unlikely to emerge from the caves of Afghanistan or from the madrasas of the Middle East.”
+  + “These new techno-religions can be divided into two main types: techno-humanism and data religion.”
+  + “Did the decline in our capacity to smell, to pay attention and to dream make our lives poorer and greyer? Maybe. But even if it did, for the economic and political system it was worth it. Mathematical skills are more important to the economy than smelling flowers or dreaming about fairies. For similar reasons, it is likely that future upgrades to the human mind will reflect political needs and market forces.”
+
+
+
+
+### 11. The Data Religion
+  + “Dataism says that the universe consists of data flows, and the value of any phenomenon or entity is determined by its contribution to data processing.”
+  + “Dataism was born from the explosive confluence of two scientific tidal waves. 
+    + In the 150 years since Charles Darwin published On the Origin of Species, the life sciences have come to see organisms as biochemical algorithms. 
+    + Simultaneously, in the eight decades since Alan Turing formulated the idea of a Turing Machine, computer scientists have learned to engineer increasingly sophisticated electronic algorithms. 
+    + Dataism puts the two together, pointing out that exactly the same mathematical laws apply to both biochemical and electronic algorithms. Dataism thereby collapses the barrier between animals and machines, and expects electronic algorithms to eventually decipher and outperform biochemical algorithms.”
+  + “Why did the USA grow faster than the USSR? Because information flowed more freely in the USA. Why are Americans healthier, wealthier and happier than Iranians or Nigerians? Thanks to the freedom of information. So if we want to create a better world, the key is to set the data free.”
+  + Take a video, click a picture, upload it to the internet and share
+    + “Hence all of the wolf’s experiences – as deep and complex as they may be – are worthless. No wonder we are so busy converting our experiences into data. It isn’t a question of trendiness. It is a question of survival. We must prove to ourselves and to the system that we still have value. `And value lies not in having experiences, but in turning these experiences into free-flowing data.`”
+  + “The Google and Facebook algorithms not only know exactly how you feel, they also know a million other things about you that you hardly suspect. Consequently you should now stop listening to your feelings, and start listening to these external algorithms instead.”
+  + “Whereas humanism commanded: ‘Listen to your feelings!’ Dataism now commands: ‘Listen to the algorithms! They know how you feel.”
+  + “In the past, censorship worked by blocking the flow of information. In the twenty-first century, censorship works by flooding people with irrelevant information. People just don’t know what to pay attention to, and they often spend their time investigating and debating side issues. In ancient times having power meant having access to data. `Today having power means knowing what to ignore.` So of everything that happens in our chaotic world, what should we focus on?”
+  + "If we take the really grand view of life, all other problems and developments are overshadowed by three interlinked processes:
+    1. Science is converging on an all-encompassing dogma, which says that organisms are algorithms, and life is data processing.
+    2. Intelligence is decoupling from consciousness.
+    3. Non-conscious but highly intelligent algorithms may soon know us better than we know ourselves.
+  + These three processes raise three key questions, which I hope will stick in your mind long after you have finished this book:  
+    1. Are organisms really just algorithms, and is life really just data processing?
+    2. What’s more valuable – intelligence or consciousness?
+    3. What will happen to society, politics and daily life when non-conscious but highly intelligent algorithms know us better than we know ourselves?”
+
+
+Excerpts From: Yuval Noah Harari. “Homo Deus: A Brief History of Tomorrow.” 
