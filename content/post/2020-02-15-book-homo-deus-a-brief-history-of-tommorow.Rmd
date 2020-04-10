@@ -18,9 +18,10 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, fig.align='center')
 
-if(!require(cutlery)) { devtools::install_github("amit-agni/cutlery"); library(cutlery)}
 if(!require(pacman)) { install.packages("pacman"); library(pacman)}
-p_load(here,data.table,tidyverse,tictoc,kableExtra,gridExtra)
+p_load(here,data.table,tidyverse,tictoc,kableExtra,gridExtra,devtools,blogdown)
+
+if(!require(cutlery)) { devtools::install_github("amit-agni/cutlery"); library(cutlery)}
 
 varPlotCaption <- "© Data Learnings"
 ggplot_color_theme <- "turquoise4"

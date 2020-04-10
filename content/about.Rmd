@@ -19,7 +19,7 @@ My day job is at Virgin Australia, Brisbane as a Data Specialist. I analyse âœˆï
 
 I have been in the tech industry for over 20 years and worked across India, Dubai and USA. My professional career has seen me teaching programming, assembling PCs, installing networks, managing data-center servers and designing information systems. Now, I apply mathematical and statistical methods to pull out patterns and meaning from data.
 
-A firm believer of the new data religion that says `"Listen to the algorithms! They know how you feel"`, my passion is building data-driven products that can extract knowledge and derive actionable insights.  
+A firm believer of the "data religion" that says `"Listen to the algorithms! They know how you feel"`, my passion is building data-driven products that can extract knowledge and derive actionable insights.  
 
 ### Data Learnings 
 
