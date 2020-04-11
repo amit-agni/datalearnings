@@ -1,0 +1,282 @@
+---
+title: FiMATS
+author: Amit Agni
+date: '2020-04-15'
+slug: fimats
+categories: []
+tags: []
+description: 'An R Shiny project for tracking and analysing the financial markets'
+repo: ''
+weight: 0
+draft: false
+output:
+  blogdown::html_page:
+    toc: yes
+    fig_height: 3
+    fig_width: 4
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#background">Background</a></li>
+<li><a href="#reactive-programming">Reactive Programming</a></li>
+<li><a href="#shiny-dev-con---joe-cheng">Shiny Dev Con - Joe Cheng</a></li>
+<li><a href="#reactive-log-visualizer">Reactive Log Visualizer</a></li>
+<li><a href="#invalidation-isolate-to-get-real-time-data">Invalidation, isolate to get real time data</a></li>
+<li><a href="#dynamic-box-heights">Dynamic Box heights</a></li>
+<li><a href="#summary">Summary</a></li>
+</ul>
+</div>
+
+<center>
+<!-- feature image -->
+<p><img src="/project/2020-04-10-fimats_files/markus-spiske-2VMcpbUR6w8-unsplash.jpg" /></p>
+<p>Photo by Markus Spiske on Unsplash</p>
+</center>
+<hr>
+<div id="background" class="section level3">
+<h3>Background</h3>
+<p><strong>FiMATS</strong> stands for Financial Markets Analysis and Tracking System. It is R Shiny application that I developed during the Covid19 pandemic as I was stood-down (furloughed) in Apr-May 2020.</p>
+<p>The objective of the app is to use statistics and machine learning to analyse the Financial markets. The data source for the prices is the Yahoo! Finance website. And I have used the <code>tidyquant</code> and <code>quantmod</code> packages to access the Yahoo! API.</p>
+<p>The app is hosted on <a href="https://amitagni.shinyapps.io/FiMATS/">shinyapps.io/FiMATS</a> and the entire source code is available in this <a href="https://github.com/amit-agni/FiMATS">github repo</a></p>
+<p><strong>Project Plan</strong></p>
+<ul>
+<li>The first phase of the project was to build a MVP with some basic functionality. As such, following features are currently implemented :
+<ul>
+<li>An overall market view, a view for the investments made by the user and a page for in-depth analysis</li>
+<li>The app also features live realtime stock prices that can be enabled/disabled as required</li>
+<li>The user can load a CSV file with the Yahoo! Finance stock codes that he wants to track/analyse</li>
+<li>If the user has made any investments, the details of these can also be uploaded to the app</li>
+</ul></li>
+<li>In the following phases, I intend to implement the following
+<ul>
+<li>Cloud integration, so that the user’s can save/read the data in a platform like Dropbox</li>
+<li>Stock price forecasting</li>
+<li>Identifying opportunities to invest</li>
+</ul></li>
+</ul>
+<p>This blog post is meant to document some of the things that I learnt in the process of developing this app.</p>
+</div>
+<div id="reactive-programming" class="section level3">
+<h3>Reactive Programming</h3>
+<p>In any software application that has a user interface, the user has to take certain actions and follow certain steps to get the desired output. In a traditional programming language, this is coded synchronously ie every input and its corresponding output has to be explicitly coded. But in a reactive programming language, all the inner workings of connecting the inputs to their outputs and their interdependencies are handled by the programming library. This not only results in a simpler application code but also greatly enhances the user experience.</p>
+<ul>
+<li><p>In Shiny, there are three types of reactives that can be loosely based on input-process-output (img source : RStudio)
+<img src="/project/2020-04-10-fimats_files/shiny-reactives.png" /></p></li>
+<li><p><strong>Reactive Source</strong></p>
+<ul>
+<li>The <code>input</code> objects are the examples of reactive source</li>
+<li>They can also be created using <code>reactiveVal</code> and <code>reactiveValues</code> functions</li>
+<li>In the FiMATS app, I have used them for data storage</li>
+</ul></li>
+</ul>
+<pre class="r"><code>DT_stats &lt;- reactiveVal(readRDS(file=here::here(&quot;100_data_raw-input&quot;,&quot;DT_stats.Rds&quot;)))
+DT_hist &lt;- reactiveVal(readRDS(file=here::here(&quot;100_data_raw-input&quot;,&quot;DT_hist.Rds&quot;)))
+DT_myShares &lt;- reactiveVal(readRDS(file=here::here(&quot;100_data_raw-input&quot;,&quot;DT_myShares.Rds&quot;)))
+DT_realTime &lt;- reactiveVal(data.frame())</code></pre>
+<ul>
+<li><strong>Reactive Endpoints</strong>
+<ul>
+<li>The <code>output</code> objects are the examples of reactive endpoints</li>
+<li>As per the Rstudio documentation <em>Observers are an implementation of Reactive endpoints. They can access reactive sources and reactive expressions, and they don’t return a value; they are used for their side effects</em></li>
+<li>In my app, I have used them extensively to perform on-click events like loading of data using the <code>observeEvent</code> function</li>
+</ul></li>
+</ul>
+<pre class="r"><code>observeEvent(input$ab_loadFreshData,{ 
+      fnHelper_shinyBusy(T,text = &quot;Data Loading in Progress&quot;)
+      #Get symbols from the CSV file
+      infile &lt;- input$file_yahooCodes
+      DT_yahooCodes &lt;- fread(file=infile$datapath) 
+      
+      DT_stats_temp &lt;- fn_getData_DTStats(DT_yahooCodes)
+      DT_stats(DT_stats_temp) #assign value to the reactiveVal
+      fnHelper_shinyBusy(F,session=session) # remove it when done
+  })</code></pre>
+<ul>
+<li>And also using the <code>observe</code> function for rendering the output ie when the side effect was desired</li>
+</ul>
+<pre class="r"><code>observe({
+  output$boxEagle_additionalParameters &lt;- renderUI({
+    validate(need(DT_stats()$category,&quot;Data is not loaded, please load data using the Data Processing Page&quot;))
+    box(collapsible = T,solidHeader = T,width = NULL,status = &quot;info&quot;,title = &quot;Additional Parameters&quot;
+        ,radioButtons(&quot;radioEagle_selectCategory&quot;,label = &quot;Category&quot;,choices = unique(DT_stats()$category))
+        ,selectInput(&quot;lovEagle_selectCountry&quot;,label = &quot;Country&quot;,choices = c(&#39;ALL&#39;,unique(DT_stats()$country)))
+        ,selectInput(&quot;lovEagle_selectSector&quot;,label = &quot;Sector&quot;,choices = c(&#39;ALL&#39;,unique(DT_stats()$sector)))
+        ,radioButtons(&quot;radioEagle_displayPerPage&quot;,label=&quot;Display per page&quot;
+                      ,choices = c(5,10,20,&quot;ALL&quot;),inline = T,selected= &quot;10&quot;)
+      )
+    })
+  })</code></pre>
+<ul>
+<li><strong>Reactive Conductors</strong>
+<ul>
+<li>The reactive expressions created using the functions <code>reactive</code> or <code>reactiveEvent</code> are the examples of Reactive conductors</li>
+<li>As per the RStudio documentation, they are useful for caching the results of any procedure that happens in response to the user input like database or file access or for performing slow and expensive operations</li>
+<li>I have not used them in my app, but I could have used them for the data loading tasks</li>
+<li>I have managed to achieve the same result by using <code>observeEvent/reactiveVal</code>
+<ul>
+<li><code>DT_stats(DT_stats_temp) #DT_stats being the reactiveVal object</code></li>
+<li>As per the help file the reactiveVal returns a function and <em>Call the function with no arguments to (reactively) read the value; call the function with a single argument to set the value</em></li>
+</ul></li>
+<li>Maybe at a later stage, I will refactor the code and separate the <code>action</code> of loading the data from the <code>side effect</code> of displaying the user notification popup</li>
+</ul></li>
+</ul>
+</div>
+<div id="shiny-dev-con---joe-cheng" class="section level3">
+<h3>Shiny Dev Con - Joe Cheng</h3>
+<ul>
+<li><p>I learnt a lot from <a href="https://resources.rstudio.com/shiny-developer-conference/shinydevcon-reactivity-joecheng-part-1-1080p">this tutorial</a> conducted by Joe Cheng. Below are some of key points directly from his video</p></li>
+<li><p>Most notably the difference between</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left"><code>reactive()</code></th>
+<th align="left"><code>observe()</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Callable</td>
+<td align="left">Not callable</td>
+</tr>
+<tr class="even">
+<td align="left">Returns a value</td>
+<td align="left">No return value</td>
+</tr>
+<tr class="odd">
+<td align="left">Lazy</td>
+<td align="left">Eager</td>
+</tr>
+<tr class="even">
+<td align="left">Cached</td>
+<td align="left"><em>N/A</em></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right"><code>reactive()</code></th>
+<th align="right"><code>observe()</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Purpose</strong></td>
+<td align="right">Calculations</td>
+<td align="right">Actions</td>
+</tr>
+<tr class="even">
+<td><strong>Side effects?</strong></td>
+<td align="right">Forbidden</td>
+<td align="right">Allowed</td>
+</tr>
+</tbody>
+</table></li>
+<li><p><code>reactive()</code> is for <em>calculating values, without side effects</em></p>
+<ul>
+<li>A <strong>calculation</strong> is a block of code where you don’t care about whether the code actually executes—you just want the answer</li>
+<li>Safe for caching</li>
+</ul></li>
+<li><p><code>observe()</code> is for <em>performing actions, with side effects</em></p>
+<ul>
+<li>An <strong>action</strong> is where you care very much that the code executes, and there is no answer (return value), only side effects</li>
+</ul></li>
+<li><p><strong>What if you want both an answer AND you want the code to execute? Refactor into two code chunks–separate the calculation from the action</strong></p></li>
+</ul>
+<blockquote>
+<ul>
+<li>We’ve identified a number of cases where we should use a reactive expression instead of an <code>observe(Event)</code>/<code>reactiveValues</code> pairing. But there are cases where you simply must use the latter.</li>
+<li>There are essentially cases where inputs, outputs, and reactive expressions aren’t powerful enough to natively express the computations you want to perform.</li>
+<li>So you have the “escape hatch” of <code>observe</code>/<code>reactiveValues</code>; you can do things that would otherwise be impossible, at the price of your code being harder to reason about and harder for the reactive framework to help you with :</li>
+</ul>
+</blockquote>
+<ul>
+<li>Accumulating values over time, not just reacting to the latest one</li>
+<li>Aggregating multiple reactive values/expressions into a single expression</li>
+<li>Adding artificial latency into reactive values/expressions</li>
+</ul>
+<blockquote>
+<ul>
+<li>In general, we want to stick to reactive expressions whenever possible. And when we really need to, break out the big guns of <code>observe(Event)</code>/<code>reactiveValues</code>.</li>
+</ul>
+</blockquote>
+</div>
+<div id="reactive-log-visualizer" class="section level3">
+<h3>Reactive Log Visualizer</h3>
+<ul>
+<li>If you want to see what is going on behind the scene of a Shiny app, then this is a cool option</li>
+<li>The lifecycle of the app is visualised using graphs that show the reactive inputs, outputs and expressions.</li>
+<li>I have not explored it much but I think it will be very useful in debugging performance issues in large complex apps</li>
+<li>It can be enabled by setting this option in the console
+<code>options(shiny.reactlog=TRUE)</code></li>
+<li>And then run the app and press CTRL/CMD + F3<br />
+</li>
+<li>On my Windows 10 machine I also had to set this option
+<code>options(useFancyQuotes = FALSE)</code></li>
+<li>More details are available <a href="https://rstudio.github.io/reactlog/articles/reactlog.html">in this article</a></li>
+</ul>
+<p><img src="/project/2020-04-10-fimats_files/shiny-reactlog.PNG" /></p>
+</div>
+<div id="invalidation-isolate-to-get-real-time-data" class="section level3">
+<h3>Invalidation, isolate to get real time data</h3>
+<ul>
+<li>The reactive expressions and observers can get invalidated and when that happens their associated code needs to get re-executed</li>
+<li>One example is when the user clicks out of a tab, the output objects on that tab go out of focus and then Shiny invalidates the objects</li>
+<li>We can force shiny to invalidate an object after a certain interval by placing the <code>invalidateLater</code> function inside it</li>
+<li>We also need to <code>isolate</code> the DT_realTime reactiveVal, otherwise shiny will keep invalidating it
+<ul>
+<li>If we do not then the code keeps getting executed again and again</li>
+<li>What <code>isolate</code> does it that it <em>executes the given expression in a scope where reactive values or expression can be read, but they cannot cause the reactive scope of the caller to be re-evaluated when they change</em></li>
+</ul></li>
+<li>I have used this functionailty to get live prices from Yahoo!</li>
+</ul>
+<pre class="r"><code>observe({
+    if(input$radio_realTimeYN==&quot;Yes&quot;){
+      # Re-execute this observer after n milliseconds
+      invalidateLater(input$slider_realTimeDelay*1000)
+      # The isolate() makes this observer _not_ get invalidated and re-executed when DT_realTime() changes
+      isolate({
+        DT_realTime(rbind(DT_realTime(),fn_getData_DTrealTime(DT_stats())))
+      })
+    }
+  })</code></pre>
+</div>
+<div id="dynamic-box-heights" class="section level3">
+<h3>Dynamic Box heights</h3>
+<ul>
+<li>I have enclosed the plots inside <code>shinydashboard::box</code> and I wanted to dynamically resize the heights of these boxes based on the heights of the plots that it contained</li>
+<li>The <code>gg_facet_nrow</code> function that I copied from <a href="https://stackoverflow.com/questions/50914398/increase-plot-size-in-shiny-when-using-ggplot-facets">Stackoverflow</a> helped me in achieving that</li>
+</ul>
+<pre class="r"><code>#Dynamic height plot inside a box
+var_plot &lt;- reactive({
+    fn_plotRealTime(DT_realTime=DT_realTime()
+                    ,varSymbols=NULL
+                    ,DT_myShares=DT_myShares()) 
+})
+
+var_dynamicHeight &lt;- reactive(gg_facet_nrow(var_plot()))
+
+output$box_mySharesPlot &lt;- renderUI({
+  req(DT_myShares()$symbol)
+  box(collapsible = T,solidHeader = T,width = NULL,status = &quot;info&quot;,title =&quot;My Shares&quot;
+      ,renderPlot({ var_plot() },height = function(){var_dynamicHeight()*FACET_ROW_HEIGHT}))
+  })
+
+gg_facet_nrow &lt;- function(p){
+    assertive.types::assert_is_any_of(p, &#39;ggplot&#39;)
+    p %&gt;%
+        ggplot2::ggplot_build() %&gt;%
+        magrittr::extract2(&#39;layout&#39;) %&gt;% 
+        magrittr::extract2(&#39;layout&#39;) %&gt;%
+        magrittr::extract2(&#39;ROW&#39;) %&gt;%
+        unique() %&gt;%
+        length()
+}</code></pre>
+</div>
+<div id="summary" class="section level3">
+<h3>Summary</h3>
+<p>I am still working on this project and I will continue to update this blog as and when I make significant changes. If you have any questions/comments or would like to collaborate on the project please do reach out to me</p>
+</div>
