@@ -5,7 +5,7 @@ date: '2020-04-11'
 slug: fimats
 categories: []
 tags: []
-description: 'An R Shiny project for tracking and analysing the financial markets'
+description: 'R Shiny project for tracking and analysing the financial markets'
 repo: ''
 weight: 0
 output:
@@ -36,16 +36,16 @@ output:
 <hr>
 <div id="background" class="section level3">
 <h3>Background</h3>
-<p><strong>FiMATS</strong> stands for Financial Markets Analysis and Tracking System. It is R Shiny application that I developed during the Covid19 pandemic as I was stood-down (furloughed) in Apr-May 2020.</p>
+<p><strong>FiMATS</strong> stands for Financial Markets Analysis and Tracking System. It is a R Shiny application that I developed during the Covid19 pandemic as I was stood-down (furloughed) in Apr-May 2020.</p>
 <p>The objective of the app is to use statistics and machine learning to analyse the Financial markets. The data source for the prices is the Yahoo! Finance website. And I have used the <code>tidyquant</code> and <code>quantmod</code> packages to access the Yahoo! API.</p>
 <p>The app is hosted on <a href="https://amitagni.shinyapps.io/FiMATS/">shinyapps.io/FiMATS</a> and the entire source code is available in this <a href="https://github.com/amit-agni/FiMATS">github repo</a></p>
 <p><strong>Project Plan</strong></p>
 <ul>
-<li>The first phase of the project was to build a MVP with some basic functionality. As such, following features are currently implemented :
+<li>The first phase of the project was to build a MVP with some basic functionality. Following features are currently implemented :
 <ul>
 <li>An overall market view, a view for the investments made by the user and a page for in-depth analysis</li>
-<li>The app also features live realtime stock prices that can be enabled/disabled as required</li>
-<li>The user can load a CSV file with the Yahoo! Finance stock codes that he wants to track/analyse</li>
+<li>The app also features live real-time stock prices that can be enabled/disabled as required</li>
+<li>The user can load a CSV file with the Yahoo! Finance stock codes he wants to track/analyse</li>
 <li>If the user has made any investments, the details of these can also be uploaded to the app</li>
 </ul></li>
 <li>In the following phases, I intend to implement the following
@@ -55,11 +55,11 @@ output:
 <li>Identifying opportunities to invest</li>
 </ul></li>
 </ul>
-<p>This blog post is meant to document some of the things that I learnt in the process of developing this app.</p>
+<p>This blog post is meant to document some of the things I learnt in the process of developing this app.</p>
 </div>
 <div id="reactive-programming" class="section level3">
 <h3>Reactive Programming</h3>
-<p>In any software application that has a user interface, the user has to take certain actions and follow certain steps to get the desired output. In a traditional programming language, this is coded synchronously ie every input and its corresponding output has to be explicitly coded. But in a reactive programming language, all the inner workings of connecting the inputs to their outputs and their interdependencies are handled by the programming library. This not only results in a simpler application code but also greatly enhances the user experience.</p>
+<p>In any software application that has a user interface, the user has to take certain actions and follow certain steps to get the desired output. In a traditional programming language, this is coded synchronously ie every input and its corresponding output has to be explicitly coded. But in a reactive programming language, all the inner workings of connecting the inputs to their outputs and their interdependencies are handled by the programming library. This not only results in a simpler application code but also enhances the user experience.</p>
 <ul>
 <li><p>In Shiny, there are three types of reactives that can be loosely based on input-process-output (img source : RStudio)
 <img src="/project/2020-04-10-fimats_files/shiny-reactives.png" /></p></li>
@@ -113,7 +113,7 @@ DT_realTime &lt;- reactiveVal(data.frame())</code></pre>
 <li>The reactive expressions created using the functions <code>reactive</code> or <code>reactiveEvent</code> are the examples of Reactive conductors</li>
 <li>As per the RStudio documentation, they are useful for caching the results of any procedure that happens in response to the user input like database or file access or for performing slow and expensive operations</li>
 <li>I have not used them in my app, but I could have used them for the data loading tasks</li>
-<li>I have managed to achieve the same result by using <code>observeEvent/reactiveVal</code>
+<li>I have achieve the same result by using <code>observeEvent/reactiveVal</code>
 <ul>
 <li><code>DT_stats(DT_stats_temp) #DT_stats being the reactiveVal object</code></li>
 <li>As per the help file the reactiveVal returns a function and <em>Call the function with no arguments to (reactively) read the value; call the function with a single argument to set the value</em></li>
@@ -187,7 +187,7 @@ DT_realTime &lt;- reactiveVal(data.frame())</code></pre>
 </ul>
 <blockquote>
 <ul>
-<li>We’ve identified a number of cases where we should use a reactive expression instead of an <code>observe(Event)</code>/<code>reactiveValues</code> pairing. But there are cases where you simply must use the latter.</li>
+<li>We’ve identified several cases where we should use a reactive expression instead of an <code>observe(Event)</code>/<code>reactiveValues</code> pairing. But there are cases where you simply must use the latter.</li>
 <li>There are essentially cases where inputs, outputs, and reactive expressions aren’t powerful enough to natively express the computations you want to perform.</li>
 <li>So you have the “escape hatch” of <code>observe</code>/<code>reactiveValues</code>; you can do things that would otherwise be impossible, at the price of your code being harder to reason about and harder for the reactive framework to help you with :</li>
 </ul>
@@ -217,7 +217,9 @@ DT_realTime &lt;- reactiveVal(data.frame())</code></pre>
 <code>options(useFancyQuotes = FALSE)</code></li>
 <li>More details are available <a href="https://rstudio.github.io/reactlog/articles/reactlog.html">in this article</a></li>
 </ul>
-<p><img src="/project/2020-04-10-fimats_files/shiny-reactlog.PNG" /></p>
+<center>
+<img src="/project/2020-04-10-fimats_files/shiny-reactlog.PNG" style="width:80.0%;height:80.0%" />
+</center>
 </div>
 <div id="invalidation-isolate-to-get-real-time-data" class="section level3">
 <h3>Invalidation, isolate to get real time data</h3>
@@ -277,5 +279,5 @@ gg_facet_nrow &lt;- function(p){
 </div>
 <div id="summary" class="section level3">
 <h3>Summary</h3>
-<p>I am still working on this project and I will continue to update this blog as and when I make significant changes. If you have any questions/comments or would like to collaborate on the project please do reach out to me</p>
+<p>I am still working on this project and I will continue to update this blog as and when I make significant changes. For any questions/comments or collaboration on the project please reach out to me</p>
 </div>

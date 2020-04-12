@@ -5,7 +5,7 @@ date: '2020-04-11'
 slug: fimats
 categories: []
 tags: []
-description: 'An R Shiny project for tracking and analysing the financial markets'
+description: 'R Shiny project for tracking and analysing the financial markets'
 repo: ''
 weight: 0
 output:
@@ -39,7 +39,7 @@ Photo by Markus Spiske on Unsplash
 
 ### Background
 
-**FiMATS** stands for Financial Markets Analysis and Tracking System. It is R Shiny application that I developed during the Covid19 pandemic as I was stood-down (furloughed) in Apr-May 2020. 
+**FiMATS** stands for Financial Markets Analysis and Tracking System. It is a R Shiny application that I developed during the Covid19 pandemic as I was stood-down (furloughed) in Apr-May 2020. 
 
 The objective of the app is to use statistics and machine learning to analyse the Financial markets. The data source for the prices is the Yahoo! Finance website. And I have used the `tidyquant` and `quantmod` packages to access the Yahoo! API.
 
@@ -47,10 +47,10 @@ The app is hosted on [shinyapps.io/FiMATS](https://amitagni.shinyapps.io/FiMATS/
 
 **Project Plan**  
 
-* The first phase of the project was to build a MVP with some basic functionality. As such, following features are currently implemented : 
+* The first phase of the project was to build a MVP with some basic functionality. Following features are currently implemented : 
     + An overall market view, a view for the investments made by the user and a page for in-depth analysis
-    + The app also features live realtime stock prices that can be enabled/disabled as required
-    + The user can load a CSV file with the Yahoo! Finance stock codes that he wants to track/analyse
+    + The app also features live real-time stock prices that can be enabled/disabled as required
+    + The user can load a CSV file with the Yahoo! Finance stock codes he wants to track/analyse
     + If the user has made any investments, the details of these can also be uploaded to the app
     
 * In the following phases, I intend to implement the following
@@ -58,11 +58,11 @@ The app is hosted on [shinyapps.io/FiMATS](https://amitagni.shinyapps.io/FiMATS/
     + Stock price forecasting
     + Identifying opportunities to invest
     
-This blog post is meant to document some of the things that I learnt in the process of developing this app.
+This blog post is meant to document some of the things I learnt in the process of developing this app.
 
 ### Reactive Programming
 
-In any software application that has a user interface, the user has to take certain actions and follow certain steps to get the desired output. In a traditional programming language, this is coded synchronously ie every input and its corresponding output has to be explicitly coded. But in a reactive programming language, all the inner workings of connecting the inputs to their outputs and their interdependencies are handled by the programming library. This not only results in a simpler application code but also greatly enhances the user experience.
+In any software application that has a user interface, the user has to take certain actions and follow certain steps to get the desired output. In a traditional programming language, this is coded synchronously ie every input and its corresponding output has to be explicitly coded. But in a reactive programming language, all the inner workings of connecting the inputs to their outputs and their interdependencies are handled by the programming library. This not only results in a simpler application code but also enhances the user experience.
 
 * In Shiny, there are three types of reactives that can be loosely based on input-process-output (img source : RStudio)
 ![](/project/2020-04-10-fimats_files/shiny-reactives.png)
@@ -123,7 +123,7 @@ observe({
   + The reactive expressions created using the functions `reactive` or `reactiveEvent` are the examples of Reactive conductors
   + As per the RStudio documentation, they are useful for caching the results of any procedure that happens in response to the user input like database or file access or for performing slow and expensive operations 
   + I have not used them in my app, but I could have used them for the data loading tasks 
-  + I have managed to achieve the same result by using `observeEvent/reactiveVal`
+  + I have achieve the same result by using `observeEvent/reactiveVal`
     + `DT_stats(DT_stats_temp) #DT_stats being the reactiveVal object`
     + As per the help file the reactiveVal returns a function and *Call the function with no arguments to (reactively) read the value; call the function with a single argument to set the value*
   + Maybe at a later stage, I will refactor the code and separate the `action` of loading the data from the `side effect` of displaying the user notification popup  
@@ -156,7 +156,7 @@ observe({
   
 * **What if you want both an answer AND you want the code to execute? Refactor into two code chunks--separate the calculation from the action**
 
-> * We've identified a number of cases where we should use a reactive expression instead of an `observe(Event)`/`reactiveValues` pairing. But there are cases where you simply must use the latter.
+> * We've identified several cases where we should use a reactive expression instead of an `observe(Event)`/`reactiveValues` pairing. But there are cases where you simply must use the latter.
 * There are essentially cases where inputs, outputs, and reactive expressions aren't powerful enough to natively express the computations you want to perform. 
 * So you have the "escape hatch" of `observe`/`reactiveValues`; you can do things that would otherwise be impossible, at the price of your code being harder to reason about and harder for the reactive framework to help you with :
 
@@ -179,8 +179,9 @@ observe({
   `options(useFancyQuotes = FALSE)`
 * More details are available [in this article](https://rstudio.github.io/reactlog/articles/reactlog.html)  
 
-![](/project/2020-04-10-fimats_files/shiny-reactlog.PNG)
-
+<center>
+![](/project/2020-04-10-fimats_files/shiny-reactlog.PNG){width=80% height=80%}
+</center>
 
 ### Invalidation, isolate to get real time data
 * The reactive expressions and observers can get invalidated and when that happens their associated code needs to get re-executed
@@ -245,4 +246,4 @@ gg_facet_nrow <- function(p){
 
 ### Summary
 
-I am still working on this project and I will continue to update this blog as and when I make significant changes. If you have any questions/comments or would like to collaborate on the project please do reach out to me
+I am still working on this project and I will continue to update this blog as and when I make significant changes. For any questions/comments or collaboration on the project please reach out to me
