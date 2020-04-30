@@ -1,0 +1,59 @@
+---
+title: Data Bookmarks
+author: Amit Agni
+date: '2020-04-29'
+slug: data-bookmarks
+categories: []
+tags:
+  - all posts
+robots: index
+draft: yes
+description: write in quotes
+output:
+  blogdown::html_page:
+    toc: yes
+    fig_height: 3
+    fig_width: 4
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.align='center')
+
+if(!require(cutlery)) { devtools::install_github("amit-agni/cutlery"); library(cutlery)}
+if(!require(pacman)) { install.packages("pacman"); library(pacman)}
+p_load(here,data.table,tidyverse,tictoc,kableExtra,gridExtra)
+
+varPlotCaption <- "© Data Learnings"
+ggplot_color_theme <- "turquoise4"
+```
+
+Collection of websites that I frequently refer to. I was finding it difficult to manage the bookmarks on different browsers on multiple PCs, hence thought of collating them here.
+
+<div class = "row">
+  
+<div class = "col-md-6">
+
+**General**
+
+[Shiny Search Icons | fontawesome.com](https://fontawesome.com/start)
+
+
+</div>
+<div class = "col-md-6">
+**ggplot**
+
+
+
+</div>
+  
+</div>
+
+<div class = "row">
+
+<div class = "col-md-6">
+**Time Series Forecasting**
+
+[tsibble fable feasts | tidyverts.com](https://tidyverts.org/)
+[imputeTS - Time Series | PDF](https://cran.r-project.org/web/packages/imputeTS/imputeTS.pdf)
+</div>
+</div>
