@@ -298,6 +298,11 @@ This was a quick post for getting started with geospatial data in R. I will cont
   + tmap
   + ggmap
   + and many others
-* References
-  [Visualising Spatial data in R](https://cran.r-project.org/doc/contrib/intro-spatial-rl.pdf)
+* References/Resources
+  + [CRAN Task View](https://cran.r-project.org/web/views/Spatial.html)
+  + [Visualising Spatial data in R](https://cran.r-project.org/doc/contrib/intro-spatial-rl.pdf)
+  + [sp or sf](https://www.r-bloggers.com/should-i-learn-sf-or-sp-for-spatial-r-programming/)
+  + [leaflet](https://rstudio.github.io/leaflet/)
+  + [tmap](https://cran.r-project.org/web/packages/tmap/vignettes/tmap-getstarted.html)
+  + [ggmap](https://journal.r-project.org/archive/2013-1/kahle-wickham.pdf)
   
