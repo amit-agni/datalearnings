@@ -42,7 +42,7 @@ ggplot_color_theme <- "turquoise4"
 </center>
 <hr>
 
-Humans have a very curious nature. We like to travel and explore new areas. For ages, maps have been our best freinds on that journey. The earliest maps of the world are considered to be those created on clay tablets during the Babylonia era (600 BCE). Now, we have GIS systems that allows us to interact with them. We can visualise them with statistical data and draw inferences.
+Humans have a very curious nature. We like to travel and explore new areas. For ages, maps have been our best friends on that journey. The earliest maps of the world are considered to be those created on clay tablets during the Babylonia era (600 BCE). Now, we have GIS systems that allows us to interact with them. We can visualise them with statistical data and draw inferences.
 
 Some of the popular GIS systems are :
 
@@ -76,7 +76,7 @@ At the lowest level there is the NAMF. It is the framework is used for verificat
   + SA3 has population of 20000+ and consist of regional towns, cities and suburbs around major urban areas
   + SA4 have population of 100000+
 
-* ABS releases different statistics at each of these level. For example the Labour Force Survey data is released at SA3 leve. Although, most of statistics are released at SA2 level.
+* ABS releases different statistics at each of these level. For example the Labour Force Survey data is released at SA3 level. Although, most of statistics are released at SA2 level.
 
 * Correspondences
     + Indexes that can be used for mapping one statistical area to another.
@@ -152,7 +152,7 @@ kable_styling(bootstrap_options = "condensed"
 
 Alternatively, data can also be loaded using the `st_read` function in the `sf` package.
 
-sf objects are just data-frames that are collections of spatial objects. Each row is a spatial object (e.g. a polgyon), that may have data associated with it (e.g. its area) and a special geo variable that contains the coordinates.
+sf objects are just data-frames that are collections of spatial objects. Each row is a spatial object (e.g. a polygon), that may have data associated with it (e.g. its area) and a special geo variable that contains the coordinates.
 
 The readOGR function drops NULL geometries, I will do the same for the obj_sf so that the visualisations in the next sections are consistent.
 

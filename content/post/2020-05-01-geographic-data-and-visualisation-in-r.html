@@ -45,7 +45,7 @@ output:
 <!-- feature image -->
 </center>
 <hr>
-<p>Humans have a very curious nature. We like to travel and explore new areas. For ages, maps have been our best freinds on that journey. The earliest maps of the world are considered to be those created on clay tablets during the Babylonia era (600 BCE). Now, we have GIS systems that allows us to interact with them. We can visualise them with statistical data and draw inferences.</p>
+<p>Humans have a very curious nature. We like to travel and explore new areas. For ages, maps have been our best friends on that journey. The earliest maps of the world are considered to be those created on clay tablets during the Babylonia era (600 BCE). Now, we have GIS systems that allows us to interact with them. We can visualise them with statistical data and draw inferences.</p>
 <p>Some of the popular GIS systems are :</p>
 <ul>
 <li>ESGI ArcGIS : Developed by Environmental Systems Research Institute, based in California</li>
@@ -75,7 +75,7 @@ output:
 <li>SA3 has population of 20000+ and consist of regional towns, cities and suburbs around major urban areas</li>
 <li>SA4 have population of 100000+</li>
 </ul></li>
-<li><p>ABS releases different statistics at each of these level. For example the Labour Force Survey data is released at SA3 leve. Although, most of statistics are released at SA2 level.</p></li>
+<li><p>ABS releases different statistics at each of these level. For example the Labour Force Survey data is released at SA3 level. Although, most of statistics are released at SA2 level.</p></li>
 <li><p>Correspondences</p>
 <ul>
 <li>Indexes that can be used for mapping one statistical area to another.</li>
@@ -443,7 +443,7 @@ New South Wales
 </tbody>
 </table>
 <p>Alternatively, data can also be loaded using the <code>st_read</code> function in the <code>sf</code> package.</p>
-<p>sf objects are just data-frames that are collections of spatial objects. Each row is a spatial object (e.g. a polgyon), that may have data associated with it (e.g. its area) and a special geo variable that contains the coordinates.</p>
+<p>sf objects are just data-frames that are collections of spatial objects. Each row is a spatial object (e.g. a polygon), that may have data associated with it (e.g. its area) and a special geo variable that contains the coordinates.</p>
 <p>The readOGR function drops NULL geometries, I will do the same for the obj_sf so that the visualisations in the next sections are consistent.</p>
 <pre class="r"><code>obj_sf &lt;- sf::st_read(dsn=here::here(&#39;content&#39;,&#39;post&#39;,&#39;data&#39;,&#39;2020-05-01-geographic-data-and-visualisation-in-r&#39;,
                                            &#39;ESRI-Shape-files-1270055001_sa2_2016_aust_shape&#39;),layer=&quot;SA2_2016_AUST&quot;)</code></pre>
