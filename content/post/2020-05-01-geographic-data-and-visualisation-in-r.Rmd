@@ -38,7 +38,8 @@ ggplot_color_theme <- "turquoise4"
 
 <center>
 	<!-- feature image -->
-
+![](/post/2020-05-01-geographic-data-and-visualisation-in-r_files/chris-lawton-duQ1ulzTJbM-unsplash.jpg)
+*Photo by Chris Lawton on Unsplash*
 </center>
 <hr>
 
