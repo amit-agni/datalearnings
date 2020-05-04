@@ -139,12 +139,13 @@ obj_rgdal <- rgdal::readOGR(dsn=here::here('content','post','data','2020-05-01-g
 
 class(obj_rgdal)
 
-head(obj_rgdal@data) %>%
-kable(format.args = list(decimal.mark = '.', big.mark = ",")) %>%
-kable_styling(bootstrap_options = "condensed"
-            ,full_width = FALSE
-            ,position = "left"
-            ,font_size = 10)
+# Commented as it is not responsive on a Mobile
+# head(obj_rgdal@data) %>%
+# kable(format.args = list(decimal.mark = '.', big.mark = ",")) %>%
+# kable_styling(bootstrap_options = "condensed"
+#             ,full_width = FALSE
+#             ,position = "left"
+#             ,font_size = 10)
 
             
 
