@@ -3,7 +3,7 @@ title: Geographic Data and Visualisation in R
 author: Amit Agni
 date: '2020-04-30'
 slug: geographic-data-and-visualisation-in-r
-categories: []
+categories: [inst]
 tags:
   - all posts
 robots: index

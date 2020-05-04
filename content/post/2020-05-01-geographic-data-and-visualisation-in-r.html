@@ -3,7 +3,7 @@ title: Geographic Data and Visualisation in R
 author: Amit Agni
 date: '2020-04-30'
 slug: geographic-data-and-visualisation-in-r
-categories: []
+categories: [inst]
 tags:
   - all posts
 robots: index
@@ -43,6 +43,8 @@ output:
 
 <center>
 <!-- feature image -->
+<img src="/post/2020-05-01-geographic-data-and-visualisation-in-r_files/chris-lawton-duQ1ulzTJbM-unsplash.jpg" />
+<em>Photo by Chris Lawton on Unsplash</em>
 </center>
 <hr>
 <p>Humans have a very curious nature. We like to travel and explore new areas. For ages, maps have been our best friends on that journey. The earliest maps of the world are considered to be those created on clay tablets during the Babylonia era (600 BCE). Now, we have GIS systems that allows us to interact with them. We can visualise them with statistical data and draw inferences.</p>
@@ -62,13 +64,13 @@ output:
 <p>At the lowest level there is the NAMF. It is the framework is used for verification and management of physically addresses with the aim of <strong>one address = one location</strong>. Rest of the levels are shown below <a href="https://www.abs.gov.au/websitedbs/D3310114.nsf/home/Australian+Statistical+Geography+Standard+(ASGS)">Source</a>:</p>
 <p><img src="/post/2020-05-01-geographic-data-and-visualisation-in-r_files/abs%20structures.jpg" style="width:50.0%;height:50.0%" /></p>
 <ul>
-<li><p>The next level is the ASGS Mesh blocks.</p>
+<li>The next level is the ASGS Mesh blocks.
 <ul>
 <li>They are the smallest geographical areas and form the basis for the larger higher level regions.</li>
 <li>The 2016 ASGS contains 358,122 Mesh blocks covering the whole of Australia.</li>
 <li>Each Mesh Block is uniquely identified by a 11 digit id consisting of State and Territory identifier (1 digit) and a Mesh block identifier (10 digits).</li>
 </ul></li>
-<li><p>On top of the Mesh Block, there are four statistical area levels as shown below.</p>
+<li>On top of the Mesh Block, there are four statistical area levels as shown below.
 <ul>
 <li>SA1 has a population ranging from 200-800 and are the aggregation of the Mesh Blocks</li>
 <li>SA2 has between 3000-25000 persons and consider the suburb and locality boundaries</li>
@@ -76,13 +78,13 @@ output:
 <li>SA4 have population of 100000+</li>
 </ul></li>
 <li><p>ABS releases different statistics at each of these level. For example the Labour Force Survey data is released at SA3 level. Although, most of statistics are released at SA2 level.</p></li>
-<li><p>Correspondences</p>
+<li>Correspondences
 <ul>
 <li>Indexes that can be used for mapping one statistical area to another.</li>
 <li>These can be downloaded from <a href="https://data.gov.au/dataset/ds-dga-4b208cc1-f5de-405d-af96-0777645dfc87/distribution/dist-dga-24b6c091-aca6-4257-8a71-dfb0ce47bb3e/details?q=">here</a>
 <img src="/post/2020-05-01-geographic-data-and-visualisation-in-r_files/correspondences%20example.PNG" style="width:80.0%;height:80.0%" /></li>
 </ul></li>
-<li><p>The Geospatial data is provided in three formats :</p>
+<li>The Geospatial data is provided in three formats :
 <ul>
 <li>ESRI Shapefiles : <em>The shapefile format is a geospatial vector data format for geographic information system software. It is developed and regulated by Esri as a mostly open specification for data interoperability among Esri and other GIS software products</em></li>
 <li>MapInfo Tab format : <em>The MapInfo TAB format is a geospatial vector data format for geographic information systems software</em></li>
@@ -137,7 +139,7 @@ required.</li>
 <pre class="r"><code>obj_rgdal &lt;- rgdal::readOGR(dsn=here::here(&#39;content&#39;,&#39;post&#39;,&#39;data&#39;,&#39;2020-05-01-geographic-data-and-visualisation-in-r&#39;,
                                            &#39;ESRI-Shape-files-1270055001_sa2_2016_aust_shape&#39;),layer=&quot;SA2_2016_AUST&quot; )</code></pre>
 <pre><code>## OGR data source with driver: ESRI Shapefile 
-## Source: &quot;C:\Amit\OneDrive\R\Blogs\datablog\content\post\data\2020-05-01-geographic-data-and-visualisation-in-r\ESRI-Shape-files-1270055001_sa2_2016_aust_shape&quot;, layer: &quot;SA2_2016_AUST&quot;
+## Source: &quot;/Mac Backup/OneDrive/R/Blogs/datablog/content/post/data/2020-05-01-geographic-data-and-visualisation-in-r/ESRI-Shape-files-1270055001_sa2_2016_aust_shape&quot;, layer: &quot;SA2_2016_AUST&quot;
 ## with 2310 features
 ## It has 12 fields</code></pre>
 <pre class="r"><code>class(obj_rgdal)</code></pre>
@@ -447,7 +449,7 @@ New South Wales
 <p>The readOGR function drops NULL geometries, I will do the same for the obj_sf so that the visualisations in the next sections are consistent.</p>
 <pre class="r"><code>obj_sf &lt;- sf::st_read(dsn=here::here(&#39;content&#39;,&#39;post&#39;,&#39;data&#39;,&#39;2020-05-01-geographic-data-and-visualisation-in-r&#39;,
                                            &#39;ESRI-Shape-files-1270055001_sa2_2016_aust_shape&#39;),layer=&quot;SA2_2016_AUST&quot;)</code></pre>
-<pre><code>## Reading layer `SA2_2016_AUST&#39; from data source `C:\Amit\OneDrive\R\Blogs\datablog\content\post\data\2020-05-01-geographic-data-and-visualisation-in-r\ESRI-Shape-files-1270055001_sa2_2016_aust_shape&#39; using driver `ESRI Shapefile&#39;
+<pre><code>## Reading layer `SA2_2016_AUST&#39; from data source `/Mac Backup/OneDrive/R/Blogs/datablog/content/post/data/2020-05-01-geographic-data-and-visualisation-in-r/ESRI-Shape-files-1270055001_sa2_2016_aust_shape&#39; using driver `ESRI Shapefile&#39;
 ## Simple feature collection with 2310 features and 12 fields (with 18 geometries empty)
 ## geometry type:  MULTIPOLYGON
 ## dimension:      XY
@@ -519,7 +521,7 @@ leaflet(obj_sf[kms_city_center &lt; 10,]) %&gt;%
 <li>Based on the principles of Grammer of graphics, tmap is a thematic maps package</li>
 <li>Similar to ggplot, can create facets, easier to customize</li>
 <li>Personally, I feel the plots tmap plots look beautiful</li>
-<li>Can be made interactive using <code>tmap_mode("view")</code></li>
+<li>Can be made interactive using <code>tmap_mode(&quot;view&quot;)</code></li>
 <li><a href="https://geocompr.robinlovelace.net/adv-map.html">Resource</a></li>
 </ul>
 <pre class="r"><code>#Simple quick map

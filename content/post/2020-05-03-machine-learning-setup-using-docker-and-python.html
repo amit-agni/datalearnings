@@ -1,0 +1,272 @@
+---
+title: 'Machine Learning setup using Docker and Python'
+author: Amit Agni
+date: '2020-05-03'
+slug: machine-learning-setup-using-docker-and-python
+categories: []
+tags:
+  - all posts
+robots: index
+description: Creating a light-weight portable machine learning development environment
+output:
+  blogdown::html_page:
+    toc: yes
+    fig_height: 3
+    fig_width: 4
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#background">Background</a></li>
+<li><a href="#key-docker-concepts">Key Docker concepts</a></li>
+<li><a href="#build-attempts">Build attempts</a></li>
+<li><a href="#dockerfile">Dockerfile</a></li>
+<li><a href="#build-the-image">Build the image</a></li>
+<li><a href="#create-the-container-and-run-jupyter">Create the container and run jupyter</a></li>
+<li><a href="#housekeeping">Housekeeping</a></li>
+<li><a href="#random-notes">Random notes</a></li>
+<li><a href="#summary">Summary</a></li>
+</ul>
+</div>
+
+<center>
+<!-- feature image -->
+<p><img src="/post/2020-05-03-machine-learning-setup-using-docker-and-python_files/natalie-scott-nHSoXrmM5Zs-unsplash.jpg" />
+Photo by Natalie Scott on Unsplash</p>
+</center>
+<hr>
+<div id="background" class="section level3">
+<h3>Background</h3>
+<p>I have Anaconda distribution of Python on my Macbook Air. I had installed it when I had started learning Python. Recently, I bought a Desktop PC and I have Windows/Ubuntu dual boot on it. So, I was looking for a development environment that I could seemlessly move across these three platforms. I have been reading about containerisation using Docker and thought of giving it a try. This is what I am trying to achieve on the Macbook Air :</p>
+<ul>
+<li>Create a Docker image that I can share across my Mac/Windows/Ubuntu platforms</li>
+<li>Use light-weight unix base</li>
+<li>Create a project based environment so that I can streamline the installation of Python packages and their dependencies.</li>
+<li>Install Jupyter and maybe other IDE’s like Pycharm/VS Code for development</li>
+<li>Get rid of the Anaconda installation on my Mac</li>
+</ul>
+</div>
+<div id="key-docker-concepts" class="section level3">
+<h3>Key Docker concepts</h3>
+<p>There are many online resources explaining what is Docker. The ones that I used for reference are listed in the Summary section of this post. Some basic concepts are here :</p>
+<ul>
+<li>As per the <a href="https://docs.docker.com/get-started/overview/">official docker docs</a>, Docker is a platform for developers and sysadmins to build, run, and share applications with containers. The use of containers to deploy applications is called containerization.</li>
+<li>A container runs on Linux operating system (OS)</li>
+<li>It is similar to a VM as it lets you run another OS inside your host machine OS (which can be MacOS, Windows or another Linux). But instead of hypervisor, a Docker container shares the kernel of the host OS making it light-weight</li>
+<li>An <strong>image</strong> is a read-only template with instructions for creating a Docker container. Often, an image is based on another image, with some additional customization.</li>
+<li>A <strong>container</strong> is a runnable instance of an image. You can create, start, stop, move, or delete a container using the Docker API or CLI. Similar to Object Oriented programming, it is like an object that is instantiated from a class.</li>
+<li>The image and the container both have names</li>
+<li>A <strong>Dockerfile</strong> is a simple text file that has instructions on how to build your customised image FROM a base image</li>
+</ul>
+</div>
+<div id="build-attempts" class="section level3">
+<h3>Build attempts</h3>
+<p>The first step was to choose a base image. As I needed to run Jupyter, below were some options that I tried.</p>
+<ol style="list-style-type: decimal">
+<li><strong>continuumio/miniconda3</strong></li>
+</ol>
+<ul>
+<li>Provided by <a href="https://hub.docker.com/r/continuumio/miniconda3">continuumio</a></li>
+<li>Runs debian and python version 3.5</li>
+<li>Then I used conda to install jupyter</li>
+<li>Image size : 2GB / Build time : 4.5mins</li>
+<li>Verdict : Not chosen as miniconda installs several packages that I may not need.</li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li><strong>python:3.8.2-slim-buster</strong></li>
+</ol>
+<ul>
+<li>Official python image provided by <a href="https://hub.docker.com/_/python">Docker</a></li>
+<li>Manually installed miniconda (<a href="https://stackoverflow.com/questions/58269375/how-to-install-packages-with-miniconda-in-dockerfile">with help from Stackoverflow</a>) and then used it to install jupyter (<a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-jupyter-notebook-with-python-3-on-debian-9">with help from this article</a>)</li>
+<li>Image size : 2GB / Build time : 10mins</li>
+<li>Verdict : Better control over the OS/python version but installing conda made the image heavy</li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li><strong>jupyter/base-notebook</strong></li>
+</ol>
+<ul>
+<li>Provided by <a href="https://hub.docker.com/u/jupyter">jupyter</a></li>
+<li>Runs Ubuntu and python version 3.7</li>
+<li>Image size : 650MB / Build time : 1min</li>
+<li>Verdict : No control over the OS or the version of Python</li>
+</ul>
+</div>
+<div id="dockerfile" class="section level3">
+<h3>Dockerfile</h3>
+<p>After trying all of the above I decided to use the official debian-python image provided by Docker and then used pip3 to install jupyter. My final Dockerfile looked like this.</p>
+<pre><code>FROM python:3.8.2-slim-buster
+RUN apt-get update &amp;&amp; \
+      apt-get install -y &amp;&amp; \
+    pip3  --no-cache-dir install jupyter numpy
+EXPOSE 8888
+WORKDIR /project-home 
+VOLUME /project-home
+CMD [&quot;jupyter&quot;, &quot;notebook&quot;, &quot;--ip=&#39;*&#39;&quot;, &quot;--port=8888&quot;, &quot;--no-browser&quot;, &quot;--allow-root&quot;]</code></pre>
+<ul>
+<li><strong>FROM python:3.8.2-slim-buster</strong>
+<ul>
+<li>The base image that will be used</li>
+<li><code>python</code> is the repository and <code>3.8.2-alpine3.11</code> is called the tag that I copied from <a href="https://hub.docker.com/_/python">dockerhub</a></li>
+</ul></li>
+<li><strong>RUN</strong>
+<ul>
+<li>Updates/Installs packages</li>
+<li><code>&amp;&amp;</code> is for chaining the layers and <code>\</code> is for continuing on new line</li>
+</ul></li>
+<li><strong>EXPOSE 8888</strong>
+<ul>
+<li>Opens the port within the container that will listen to external connections</li>
+</ul></li>
+<li><strong>WORKDIR /project-home</strong>
+<ul>
+<li>Creates the folder inside the container</li>
+<li>The jupyter notebook will start in this folder instead of root.</li>
+</ul></li>
+<li><strong>VOLUME /project-home</strong>
+<ul>
+<li>Optional but it is the mount point on which the host folder will be mounted to the container</li>
+</ul></li>
+<li><strong>CMD [“jupyter”, “notebook”, &quot;–ip=’*’“,”–port=8888“,”–no-browser“,”–allow-root&quot;]</strong>
+<ul>
+<li>Command to run the jupyter notebook</li>
+</ul></li>
+</ul>
+</div>
+<div id="build-the-image" class="section level3">
+<h3>Build the image</h3>
+<ul>
+<li>Save the Dockerfile in the project folder and then at the terminal run</li>
+<li><strong>docker build -t debian-pip-jupyter:latest .</strong>
+<ul>
+<li>Builds the image</li>
+<li><code>debian-pip-jupyter</code> is the repository name for the image and <code>latest</code> is the tag. If this is not specified, then docker will use the name:tag from FROM line in the Dockerfile</li>
+<li><code>.</code> (current directory) is the location of the Dockerfile</li>
+</ul></li>
+<li><strong>`docker images</strong> or <strong>docker image ls</strong>
+<ul>
+<li>Lists the images</li>
+</ul></li>
+</ul>
+</div>
+<div id="create-the-container-and-run-jupyter" class="section level3">
+<h3>Create the container and run jupyter</h3>
+<ul>
+<li><p>A image has a name, so also a container has a name. We can either specify it using –name option or docker will give on its own</p></li>
+<li><strong>docker run [OPTIONS] image-name [COMMAND]</strong>
+<ul>
+<li>-d Detached (runs in background)</li>
+<li>-a Attach to STDOUT/STDERR</li>
+<li>-i Attach STDIN</li>
+<li>-t Allocates pseudo-TTY</li>
+<li>–name [NAME] Set the container name</li>
+</ul></li>
+<li><strong>docker run -p 8888:8888 -v “/Mac Backup/OneDrive/Docker/images/ml-project”:/project-home debian-pip-jupyter</strong>
+<ul>
+<li>-p maps the local host port to : container port that was EXPOSEd in the Dockerfile</li>
+<li>-v maps the local directory to : project-home directory in the container
+<ul>
+<li>This is needed so that I can continue to have my source code/data outside of the container on my local host machine</li>
+<li>On my Mac I got this error :The path /Mac Backup/OneDrive/Docker/images/ml-project is not shared from OS X and is not known to Docker. You can configure shared paths from Docker -&gt; Preferences… -&gt; File Sharing.So I added the Docker folder in the Mac Preferences</li>
+</ul></li>
+<li>Running this commands gives the url to open jupyter
+<code>http://127.0.0.1:8888/?token=afee17bc6a9d95e581aa1a269718f993ae3a61a07e308290</code></li>
+</ul></li>
+<li><strong>docker ps -a</strong>
+<ul>
+<li>Gives the list of all containers (including stopped)</li>
+<li>The <code>NAMES</code> given here can also be used to start the container at later stage</li>
+</ul></li>
+<li><strong>docker start tender_goldwasser</strong>
+<ul>
+<li>Restart the stopped container instance</li>
+</ul></li>
+</ul>
+</div>
+<div id="housekeeping" class="section level3">
+<h3>Housekeeping</h3>
+<ul>
+<li><strong>docker container prune</strong>
+<ul>
+<li>Remove all stopped containers</li>
+</ul></li>
+<li><strong>docker stop $(docker ps -a -q) &amp;&amp; docker rm $(docker ps -a -q)</strong>
+<ul>
+<li>Stop and remove all containers</li>
+</ul></li>
+<li><strong>docker stop sleepy_diffie</strong>
+<ul>
+<li>Stop a unresponsive/mistakenly created container</li>
+</ul></li>
+<li><strong>docker rmi $(docker images -a -q)</strong>
+<ul>
+<li>Removes all images</li>
+<li>All the Docker images on a system can be listed by adding -a to the docker images command. Once you’re sure you want to delete them all, you can add the -q flag to pass the Image ID to docker rmi:</li>
+<li>Dangling images are not referenced by other images and are safe to delete.</li>
+</ul></li>
+<li><strong>docker system prune -a</strong>
+<ul>
+<li>will delete ALL dangling data (i.e. In order: containers stopped, volumes without containers and images with no containers). Even unused data, with -a option.</li>
+</ul></li>
+<li>Not tried
+<ul>
+<li>docker rmi $(docker images –filter “dangling=true” -q –no-trunc)</li>
+<li>docker images | grep “none”</li>
+<li>docker rmi $(docker images | grep “none” | awk ‘/ / { print $3 }’)</li>
+</ul></li>
+</ul>
+</div>
+<div id="random-notes" class="section level3">
+<h3>Random notes</h3>
+<ul>
+<li>–rm : In docker run, removes the container after you exit</li>
+<li>CTRL + P + Q : Release terminal but the container will keep running</li>
+<li>We can also specify the CMD in the docker run command</li>
+<li><strong>docker run -it image-name “/bin/sh”</strong>
+<ul>
+<li>Create an instance, assign a TTY and keep STDIN open (interactive mode)</li>
+<li>Since “bin/sh” command is available in linux, this will let us enter the shell of the container.</li>
+</ul></li>
+<li>The docker building time can be done using <code>time docker build -t debian-pip-jupyter:latest .</code></li>
+<li>The –no-cache-dir option in pip install is to remove the downloaded package file</li>
+<li>Start a Jupyter Notebook server and interact with Miniconda via your browser:
+<ul>
+<li><code>docker run -i -t -p 8888:8888 continuumio/miniconda3 /bin/bash -c &quot;/opt/conda/bin/conda install jupyter -y --quiet &amp;&amp; mkdir /opt/notebooks &amp;&amp; /opt/conda/bin/jupyter notebook --notebook-dir=/opt/notebooks --ip='*' --port=8888 --no-browser&quot;</code></li>
+<li>View the Jupyter Notebook by opening <a href="http://localhost:8888" class="uri">http://localhost:8888</a></li>
+</ul></li>
+<li>conda vs pip / virtualenv
+<ul>
+<li>If you have used pip and virtualenv in the past, you can use conda to perform all of the same operations.</li>
+<li>Pip is a package manager, and virtualenv is an environment manager; and conda is both.</li>
+<li>pip installs all Python package dependencies required, whether or not those conflict with other packages previously installed. So a working installation of, for example, Google TensorFlow can suddenly stop working when a user pip-installs a new package that needs a different version of the NumPy library.</li>
+<li>More insidiously, everything might still appear to work, but the user gets different results, or is unable to reproduce the same results elsewhere because the user did not pip-install in the same order.</li>
+<li>Conda analyzes the user’s current environment, everything that have been installed, any version limitations that the user specifies (e.g. if the user only wants tensorflow &gt;= 2.0) and figures out how to install compatible dependencies.</li>
+<li>Otherwise, it will tell the user that what he or she wants can’t be done. pip, by contrast, will just install the package the user specified and any dependencies, even if that breaks other packages.</li>
+<li><a href="https://en.wikipedia.org/wiki/Conda_(package_manager)">Source : Wiki</a></li>
+</ul></li>
+</ul>
+</div>
+<div id="summary" class="section level3">
+<h3>Summary</h3>
+<ul>
+<li><p>A basic setup to run Python Jupyter notebooks using Docker</p></li>
+<li>References
+<ul>
+<li><a href="https://www.youtube.com/watch?v=Se-IUjRQe2c">Get started with Docker | Youtube</a></li>
+<li><a href="https://www.youtube.com/watch?v=oO8n3y23b6M">Awesome tutorial by Aly Sivji | Youtube</a> and the <a href="https://docs.google.com/presentation/d/1LkeJc-O5k0LQvzcFokj3yKjcEDns10JGX9uHK0igU8M/edit#slide=id.g739fc59034b0e576_59">presentation slides</a></li>
+<li><a href="https://docs.docker.com/get-started/overview/">Docker overview</a></li>
+<li><a href="https://docs.docker.com/develop/develop-images/dockerfile_best-practices/">Docker file best practices</a></li>
+<li><a href="https://pythonspeed.com/articles/base-image-python-docker-images/">which base image to use</a></li>
+<li><a href="https://towardsdatascience.com/docker-jupyter-for-machine-learning-in-1-minute-30e1df969d09">Intersting Dockerfile - Docker + Jupyter for ML</a></li>
+<li><a href="https://stackoverflow.com/questions/48706548/how-to-free-disk-space-taken-up-by-anaconda">cleanup anaconda from my mac</a></li>
+<li><a href="https://stackoverflow.com/questions/30034840/what-are-the-differences-between-conda-and-anaconda">conda vs anaconda</a></li>
+</ul></li>
+<li>Some other links for future reference
+<ul>
+<li><a href="https://jcristharif.com/conda-docker-tips.html">Smaller Docker images with Conda</a></li>
+<li><a href="https://pythonspeed.com/articles/base-image-python-docker-images/">https://jcristharif.com/conda-docker-tips.html</a></li>
+<li><a href="https://pythonspeed.com/products/productionchecklist/">Docker packaging is complicated, and you can’t afford to screw up production</a></li>
+<li><a href="https://pythonspeed.com/products/pythoncontainer/">Hit the ground running! From zero to production-ready Docker image in just 3 hours</a></li>
+</ul></li>
+</ul>
+</div>
