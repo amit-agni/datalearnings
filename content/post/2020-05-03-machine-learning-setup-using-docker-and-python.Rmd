@@ -35,7 +35,7 @@ Photo by Natalie Scott on Unsplash
 <hr>
 
 ### Background
-I have Anaconda distribution of Python on my Macbook Air. I had installed it when I had started learning Python. Recently, I bought a Desktop PC and I have Windows/Ubuntu dual boot on it. So, I was looking for a development environment that I could seemlessly move across these three platforms. I have been reading about containerisation using Docker and thought of giving it a try. This is what I am trying to achieve on the Macbook Air :
+I have Anaconda distribution of Python on my Macbook Air. I had installed it when I had started learning Python. Recently, I bought a Desktop PC and I have Windows/Ubuntu dual boot on it. So, I was looking for a development environment that I could seemlessly move across these three platforms. I have been reading about containerisation using Docker and thought of giving it a try. This is what I am trying to achieve on my Macbook Air :
 
 * Create a Docker image that I can share across my Mac/Windows/Ubuntu platforms
 * Use light-weight unix base 
@@ -171,6 +171,12 @@ CMD ["jupyter", "notebook", "--ip='*'", "--port=8888", "--no-browser", "--allow-
 * **docker system prune -a**
   + will delete ALL dangling data (i.e. In order: containers stopped, volumes without containers and images with no containers). Even unused data, with -a option.
 
+* **<none>:<none> Images**
+  + The `docker images -a` will list many images with <none>:<none> 
+  + These are the intermediate images that Docker create but they don't occupy space
+  + But if such images are listed when `docker images` command then such images are called Dangling images and will need to be pruned
+  + **Docker stores the layers in a graph database and are available here /var/lib/docker/graph**
+  
 * Not tried
   + docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
   + docker images | grep "none"
@@ -211,13 +217,19 @@ CMD ["jupyter", "notebook", "--ip='*'", "--port=8888", "--no-browser", "--allow-
   + [Awesome tutorial by Aly Sivji | Youtube](https://www.youtube.com/watch?v=oO8n3y23b6M) and the [presentation slides](https://docs.google.com/presentation/d/1LkeJc-O5k0LQvzcFokj3yKjcEDns10JGX9uHK0igU8M/edit#slide=id.g739fc59034b0e576_59)
   + [Docker overview](https://docs.docker.com/get-started/overview/)
   + [Docker file best practices](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
+  + [Several Examples](https://www.aaron-powell.com/posts/2020-04-06-getting-started-learning-docker/)
   + [which base image to use](https://pythonspeed.com/articles/base-image-python-docker-images/)
   + [Intersting Dockerfile - Docker + Jupyter for ML](https://towardsdatascience.com/docker-jupyter-for-machine-learning-in-1-minute-30e1df969d09)
   + [cleanup anaconda from my mac](https://stackoverflow.com/questions/48706548/how-to-free-disk-space-taken-up-by-anaconda)
   + [conda vs anaconda](https://stackoverflow.com/questions/30034840/what-are-the-differences-between-conda-and-anaconda)
 
 * Some other links for future reference
+  + [A Simple Docker Tutorial for Machine-Learning Developers](http://neohsu.com/2018/01/05/a-simple-docker-tutorial-for-machine-learning-developers/)
+    + Use the docker container as the Python interpreter in the Pycharm
+    + Docker container cannot use your GPU directly. Fortunately, Nvidia-Docker has been created for solving this problem
+  + [A Guide to Docker for Machine Learning Written for Clever Beginners](https://medium.com/@lippoldt331/a-guide-to-docker-for-machine-learning-written-for-clever-beginners-e06d191722cb)
   + [Smaller Docker images with Conda](https://jcristharif.com/conda-docker-tips.html)
-  + [https://jcristharif.com/conda-docker-tips.html](https://pythonspeed.com/articles/base-image-python-docker-images/)
-  + [Docker packaging is complicated, and you can’t afford to screw up production](https://pythonspeed.com/products/productionchecklist/)
-  + [Hit the ground running! From zero to production-ready Docker image in just 3 hours](https://pythonspeed.com/products/pythoncontainer/)
+  + pythonspeed.com
+    + [The best Docker base image for your Python application (April 2020)](https://pythonspeed.com/articles/base-image-python-docker-images/)
+    + [Docker packaging is complicated, and you can’t afford to screw up production](https://pythonspeed.com/products/productionchecklist/)
+    + [Hit the ground running! From zero to production-ready Docker image in just 3 hours](https://pythonspeed.com/products/pythoncontainer/)

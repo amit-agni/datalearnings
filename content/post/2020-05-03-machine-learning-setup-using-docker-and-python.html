@@ -38,7 +38,7 @@ Photo by Natalie Scott on Unsplash</p>
 <hr>
 <div id="background" class="section level3">
 <h3>Background</h3>
-<p>I have Anaconda distribution of Python on my Macbook Air. I had installed it when I had started learning Python. Recently, I bought a Desktop PC and I have Windows/Ubuntu dual boot on it. So, I was looking for a development environment that I could seemlessly move across these three platforms. I have been reading about containerisation using Docker and thought of giving it a try. This is what I am trying to achieve on the Macbook Air :</p>
+<p>I have Anaconda distribution of Python on my Macbook Air. I had installed it when I had started learning Python. Recently, I bought a Desktop PC and I have Windows/Ubuntu dual boot on it. So, I was looking for a development environment that I could seemlessly move across these three platforms. I have been reading about containerisation using Docker and thought of giving it a try. This is what I am trying to achieve on my Macbook Air :</p>
 <ul>
 <li>Create a Docker image that I can share across my Mac/Windows/Ubuntu platforms</li>
 <li>Use light-weight unix base</li>
@@ -208,6 +208,13 @@ CMD [&quot;jupyter&quot;, &quot;notebook&quot;, &quot;--ip=&#39;*&#39;&quot;, &q
 <ul>
 <li>will delete ALL dangling data (i.e. In order: containers stopped, volumes without containers and images with no containers). Even unused data, with -a option.</li>
 </ul></li>
+<li><strong><none>:<none> Images</strong>
+<ul>
+<li>The <code>docker images -a</code> will list many images with <none>:<none></li>
+<li>These are the intermediate images that Docker create but they don’t occupy space</li>
+<li>But if such images are listed when <code>docker images</code> command then such images are called Dangling images and will need to be pruned</li>
+<li><strong>Docker stores the layers in a graph database and are available here /var/lib/docker/graph</strong></li>
+</ul></li>
 <li>Not tried
 <ul>
 <li>docker rmi $(docker images –filter “dangling=true” -q –no-trunc)</li>
@@ -256,6 +263,7 @@ CMD [&quot;jupyter&quot;, &quot;notebook&quot;, &quot;--ip=&#39;*&#39;&quot;, &q
 <li><a href="https://www.youtube.com/watch?v=oO8n3y23b6M">Awesome tutorial by Aly Sivji | Youtube</a> and the <a href="https://docs.google.com/presentation/d/1LkeJc-O5k0LQvzcFokj3yKjcEDns10JGX9uHK0igU8M/edit#slide=id.g739fc59034b0e576_59">presentation slides</a></li>
 <li><a href="https://docs.docker.com/get-started/overview/">Docker overview</a></li>
 <li><a href="https://docs.docker.com/develop/develop-images/dockerfile_best-practices/">Docker file best practices</a></li>
+<li><a href="https://www.aaron-powell.com/posts/2020-04-06-getting-started-learning-docker/">Several Examples</a></li>
 <li><a href="https://pythonspeed.com/articles/base-image-python-docker-images/">which base image to use</a></li>
 <li><a href="https://towardsdatascience.com/docker-jupyter-for-machine-learning-in-1-minute-30e1df969d09">Intersting Dockerfile - Docker + Jupyter for ML</a></li>
 <li><a href="https://stackoverflow.com/questions/48706548/how-to-free-disk-space-taken-up-by-anaconda">cleanup anaconda from my mac</a></li>
@@ -263,10 +271,19 @@ CMD [&quot;jupyter&quot;, &quot;notebook&quot;, &quot;--ip=&#39;*&#39;&quot;, &q
 </ul></li>
 <li>Some other links for future reference
 <ul>
+<li><a href="http://neohsu.com/2018/01/05/a-simple-docker-tutorial-for-machine-learning-developers/">A Simple Docker Tutorial for Machine-Learning Developers</a>
+<ul>
+<li>Use the docker container as the Python interpreter in the Pycharm</li>
+<li>Docker container cannot use your GPU directly. Fortunately, Nvidia-Docker has been created for solving this problem</li>
+</ul></li>
+<li><a href="https://medium.com/@lippoldt331/a-guide-to-docker-for-machine-learning-written-for-clever-beginners-e06d191722cb">A Guide to Docker for Machine Learning Written for Clever Beginners</a></li>
 <li><a href="https://jcristharif.com/conda-docker-tips.html">Smaller Docker images with Conda</a></li>
-<li><a href="https://pythonspeed.com/articles/base-image-python-docker-images/">https://jcristharif.com/conda-docker-tips.html</a></li>
+<li>pythonspeed.com
+<ul>
+<li><a href="https://pythonspeed.com/articles/base-image-python-docker-images/">The best Docker base image for your Python application (April 2020)</a></li>
 <li><a href="https://pythonspeed.com/products/productionchecklist/">Docker packaging is complicated, and you can’t afford to screw up production</a></li>
 <li><a href="https://pythonspeed.com/products/pythoncontainer/">Hit the ground running! From zero to production-ready Docker image in just 3 hours</a></li>
+</ul></li>
 </ul></li>
 </ul>
 </div>
