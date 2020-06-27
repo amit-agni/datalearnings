@@ -1,6 +1,6 @@
 baseURL = "http://datalearnings.com/"
 languageCode = "en-us"
-title = "data"
+title = "data learnings"
 theme = "minimal"
 disqusShortname = "www-datalearnings-com" # delete this to disable disqus comments
 googleAnalytics = "UA-28526370-4"
@@ -8,7 +8,7 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
 [params]
     author = "Amit Agni"
-    description = "learnings around Data Analytics, Data Science, Data Visualisation, Statistics, Machine Learning, AI, etc. "
+    description = "How to learn from data : using visualisations, applying statistical techniques, Machine Learning, Deep Learning, etc. "
     githubUsername = "amit-agni"
     accent = "grey"
     showBorder = true
