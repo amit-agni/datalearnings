@@ -38,30 +38,28 @@ There were few options :
 
 * Install Python and tensorflow directly on Windows [The setup seems quite complicated and I prefer the containerised approach for development]
 * Dual boot into Ubuntu and setup tensorflow [Best and recommended. But this would mean I would be switching back forth between Ubuntu and Windows]
-* Use the Docker Desktop for Windows to create docker containers with tensorflow [Currently GPU is not supported, hence the next option]
+* Use the Docker Desktop for Windows and create tensorflow containers [Currently GPU is not supported, hence the next option]
 * Use Windows Subsystem for Linux (WSL)
 
-I decided to go with the last option. And it was a good timing as Microsoft had recently announced the support for GPU acceleration in WSL 2. So, the plan is as follows :
+I decided to go with the last option. And it was a good timing as Microsoft and NVIDIA had recently announced the support for GPU acceleration in WSL 2. So, the plan is as follows :
 
 1. Enable WSL on Windows
 2. Install Ubuntu inside WSL
 3. Install Docker and NVIDIA toolkit in Ubuntu and create tensorflow containers (with GPU support)
 4. Use the VS Code IDE for development
 
-There are many online resources that explain how to do this and that I took help from. I have listed them at the end of the post.
+Please note that as of 26th Jun 20, most of these features are still in development. They worked for me and you may try them at your own risk, as they did end up messing some parts of my system. You will need to sign up for :
 
-Please note that as of 26th Jun 20, most of these features are still in development phase. They worked for me and you may try them at your own risk, as they did end up messing some parts of my system. You will need to sign up for below two programs :
-
-* [Windows Insider](https://insider.windows.com/en-us/)
+* [Windows Insider Program](https://insider.windows.com/en-us/)
 * [NVIDIA Developer Program](https://developer.nvidia.com/developer-program)
 
-Also, at each stage I have mentioned some `CHECKS` that would help in making sure you are on the right track.
+Also, under each section I have mentioned some `CHECKS` that would help in making sure you are on the right track.
 
 ### Windows Insider Preview Build 20150
 
-First and foremost the GPU support on WSL is not available in the Retail Build of Windows 10. I had to get the latest [Windows 10 Insider Preview Build 20150](https://blogs.windows.com/windowsexperience/2020/06/17/announcing-windows-10-insider-preview-build-20150/). The details of all the builds are available in the [Flight Hub](https://docs.microsoft.com/en-us/windows-insider/flight-hub/). The process took about an hour. _Later on, I realised that my Ubuntu Dual boot went missing, and I suspect it must have happened at this stage_
+First and foremost the GPU support on WSL is not available in the Retail Build of Windows 10. I had to get the latest [Windows 10 Insider Preview Build 20150](https://blogs.windows.com/windowsexperience/2020/06/17/announcing-windows-10-insider-preview-build-20150/). The details of all the builds are available in the [Flight Hub](https://docs.microsoft.com/en-us/windows-insider/flight-hub/). The installation process took an hour.
 
-**CHECK : Windows Version** in Power Shell (PS) or CMD. Type `winver`
+**CHECK : Windows Version**. In Power Shell (PS) or CMD, type `winver`
 
 ### Install WSL
 
@@ -85,7 +83,7 @@ Output : `Linux version 4.19.121-microsoft-standard (oe-user@oe-host) (gcc versi
 If you dont have latest kernel, then go to `Windows Settings \ Update & Security \ Windows Update \ Check for updates`. Ensure that "Receive Updates" is turned on.
 
 
-*As per my understanding, in the future releases both the installation of WSL and Linux Kernel will be handled by these two commands :  `wsl --install` and `wsl --update`*
+*As per my understanding, in the future releases both the installation/update of WSL Linux Kernel will be handled by these two commands :  `wsl --install` and `wsl --update`*
 
 As per [Microsoft](https://devblogs.microsoft.com/commandline/wsl2-will-be-generally-available-in-windows-10-version-2004/) : 
 
@@ -111,17 +109,17 @@ The CUDA drivers for WSL - Public Preview can be installed from [here](https://d
 
 ### Install Docker 
 
-* Enter the WSL by typing `wsl` on PS/CMD 
+* Enter the WSL by typing `wsl` on PS/CMD. This will activate Ubuntu. 
 * Install docker using `curl https://get.docker.com | sh`
     + As far as I understand, the NVIDIA container toolkit does not work with Docker Desktop for Windows so I ignored this `WSL DETECTED: We recommend using Docker Desktop for Windows. You may press Ctrl+C now to abort this script.` 
 
 
-**CHECK : Docker version** can be found using `docker -v`
+**CHECK : Docker version**. At the Ubuntu prompt, type `docker -v`
 
 
 ### Install NVIDIA Container Toolkit
 
-Below commands will do the installation. [Source : CUDA on WSL](https://docs.nvidia.com/cuda/wsl-user-guide/index.html#setting-containers)
+Below commands will do the installation of the toolkit. [Source : CUDA on WSL](https://docs.nvidia.com/cuda/wsl-user-guide/index.html#setting-containers)
 ```
 $ distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
 $ curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
@@ -143,8 +141,9 @@ If it doesnt work you could try `sudo systemctl restart docker`
 
 **CHECK**
 
-* This will create docker container to test whether the installation was sucessful
+* To check whether whether the installation was sucessful :
     + `$ docker run --gpus all nvcr.io/nvidia/k8s/cuda-sample:nbody nbody -gpu -benchmark`
+    + This creates a docker container and will give details about your GPU
 * Some additional test examples are also [available](https://docs.nvidia.com/cuda/wsl-user-guide/index.html#setting-containers)
 
 
@@ -155,7 +154,8 @@ One of the challenges I faced was to connect VS Code to the container that was r
 With some help from the [VS Code community](https://github.com/microsoft/vscode-remote-release/issues/3254) and the docker documentation [here](https://docs.docker.com/engine/install/linux-postinstall/) and [here](https://docs.docker.com/engine/reference/commandline/dockerd/), I managed to get it working in below 2 steps :
 
 * In WSL/Ubuntu, I started the docker daemon using the -H flag 
-`sudo dockerd -H unix:///var/run/docker.sock -H tcp://0.0.0.0:2375`
+  + `sudo dockerd -H unix:///var/run/docker.sock -H tcp://0.0.0.0:2375`
+  + This opens the 2375 port for the docker to listen (this is a non-secured way)
 * And in VS Code settings.json, I added this line :
 `"docker.host":"tcp://localhost:2375"`
 
@@ -164,7 +164,7 @@ And then in VS Code, I could use the `Remote Containers:Attach to running contai
 
 ### Issues faced
 * The boot loader menu for my Ubuntu - Windows 10 dual boot disappeared (Most likely after the installation of the Insider Build 20150)
-* The CUDA toolkit doesn't seem to work on Debian distro
+* The CUDA toolkit doesn't seem to work on Debian distro (I might have to give it another try )
 * The Docker Desktop for Windows should not be running as it interferes with the docker daemon in Ubuntu
   + Stop the Docker Desktop
   + If your `wsl -l -v` command shows `docker-desktop` and `docker-desktop-data`, then the same can be deregistered using `wslconfig /u docker-desktop`
@@ -188,7 +188,7 @@ And then in VS Code, I could use the `Remote Containers:Attach to running contai
 
 ### Summary
 
-This was just a start and I could run into issues as I continue using tensorflow. But in summary, it was a good learning experience even though I ended up spending couple of days in setting it up.  I am not an expert in Docker neither in CUDA, so if you find any issues in the blog please leave a comment. You can also reach out to the NVIDIA team, they are highly engaged and promptly reply to queries on their forums. Cheers !
+This was just a start and I could run into issues as I continue using tensorflow. But in summary, it was a good learning experience even though I ended up spending couple of days in setting it up.  I am not an expert in Docker neither in CUDA, so if you see any issues with the blog please leave a comment and I will rectify. You can also reach out to the NVIDIA team, they are highly engaged and promptly reply to queries on their forums. Cheers !
 
 
 
