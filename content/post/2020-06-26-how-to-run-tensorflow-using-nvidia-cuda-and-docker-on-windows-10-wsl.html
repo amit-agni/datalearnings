@@ -18,14 +18,14 @@ output:
 <div id="TOC">
 <ul>
 <li><a href="#background">Background</a></li>
-<li><a href="#windows-insider-preview-build-20150">Windows Insider Preview Build 20150</a></li>
-<li><a href="#install-wsl">Install WSL</a></li>
-<li><a href="#linux-kernel">Linux Kernel</a></li>
-<li><a href="#install-ubuntu-18.04">Install Ubuntu 18.04</a></li>
-<li><a href="#install-cuda-drivers-on-win-10-host">Install CUDA drivers on Win 10 (host)</a></li>
-<li><a href="#install-docker">Install Docker</a></li>
-<li><a href="#install-nvidia-container-toolkit">Install NVIDIA Container Toolkit</a></li>
-<li><a href="#use-vs-code-for-development">Use VS Code for development</a></li>
+<li><a href="#windows-insider-preview-build-20150">1. Windows Insider Preview Build 20150</a></li>
+<li><a href="#install-wsl">2. Install WSL</a></li>
+<li><a href="#linux-kernel">3. Linux Kernel</a></li>
+<li><a href="#install-ubuntu-18.04">4. Install Ubuntu 18.04</a></li>
+<li><a href="#install-cuda-drivers-on-win-10-host">5. Install CUDA drivers on Win 10 (host)</a></li>
+<li><a href="#install-docker">6. Install Docker</a></li>
+<li><a href="#install-nvidia-container-toolkit">7. Install NVIDIA Container Toolkit</a></li>
+<li><a href="#use-vs-code-for-development">8. Use VS Code for development</a></li>
 <li><a href="#issues-faced">Issues faced</a></li>
 <li><a href="#references">References</a></li>
 <li><a href="#summary">Summary</a></li>
@@ -58,15 +58,15 @@ output:
 <li><a href="https://insider.windows.com/en-us/">Windows Insider Program</a></li>
 <li><a href="https://developer.nvidia.com/developer-program">NVIDIA Developer Program</a></li>
 </ul>
-<p>Also, under each section I have mentioned some <code>CHECKS</code> that would help in making sure you are on the right track.</p>
+<p>Also, under each step I have mentioned some <code>CHECKS</code> that would help in making sure you are on the right track.</p>
 </div>
 <div id="windows-insider-preview-build-20150" class="section level3">
-<h3>Windows Insider Preview Build 20150</h3>
+<h3>1. Windows Insider Preview Build 20150</h3>
 <p>First and foremost the GPU support on WSL is not available in the Retail Build of Windows 10. I had to get the latest <a href="https://blogs.windows.com/windowsexperience/2020/06/17/announcing-windows-10-insider-preview-build-20150/">Windows 10 Insider Preview Build 20150</a>. The details of all the builds are available in the <a href="https://docs.microsoft.com/en-us/windows-insider/flight-hub/">Flight Hub</a>. The installation process took an hour.</p>
 <p><strong>CHECK : Windows Version</strong>. In Power Shell (PS) or CMD, type <code>winver</code></p>
 </div>
 <div id="install-wsl" class="section level3">
-<h3>Install WSL</h3>
+<h3>2. Install WSL</h3>
 <p>Steps to be done in PS/CMD:</p>
 <ol style="list-style-type: decimal">
 <li>Enable WSL1 : <code>dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart</code></li>
@@ -76,7 +76,7 @@ output:
 </ol>
 </div>
 <div id="linux-kernel" class="section level3">
-<h3>Linux Kernel</h3>
+<h3>3. Linux Kernel</h3>
 <p>After running the above command, I got this message : <code>WSL 2 requires an update to its kernel component. For information please visit https://aka.ms/wsl2kernel.</code></p>
 <p>The page has instructions for installing the WSL2 Linux Kernel MSI. After installing it in Win10, this command worked : <code>wsl.exe --set-default-version 2</code></p>
 <p><strong>CHECK : Linux Kernel version should be 4.19.121 or higher</strong>. On PS/CMD type <code>wsl cat /proc/version</code><br />
@@ -89,7 +89,7 @@ Output : <code>Linux version 4.19.121-microsoft-standard (oe-user@oe-host) (gcc 
 </blockquote>
 </div>
 <div id="install-ubuntu-18.04" class="section level3">
-<h3>Install Ubuntu 18.04</h3>
+<h3>4. Install Ubuntu 18.04</h3>
 <ul>
 <li>You can get the distro from the Microsoft store, to be installed on WSL</li>
 <li>I prefer the Debian distribution as it is lighter than Ubuntu, so I spent quite some time in setting it up. But it did not work.</li>
@@ -101,12 +101,12 @@ Output :<br />
 <code>* Ubuntu-18.04    Stopped         2</code></p>
 </div>
 <div id="install-cuda-drivers-on-win-10-host" class="section level3">
-<h3>Install CUDA drivers on Win 10 (host)</h3>
+<h3>5. Install CUDA drivers on Win 10 (host)</h3>
 <p>The CUDA drivers for WSL - Public Preview can be installed from <a href="https://developer.nvidia.com/cuda/wsl">here</a></p>
 <p><strong>CHECK : The CUDA driver version should be 455.41 or higher</strong>. On PS/CMD type <code>nvidia-smi</code></p>
 </div>
 <div id="install-docker" class="section level3">
-<h3>Install Docker</h3>
+<h3>6. Install Docker</h3>
 <ul>
 <li>Enter the WSL by typing <code>wsl</code> on PS/CMD. This will activate Ubuntu.</li>
 <li>Install docker using <code>curl https://get.docker.com | sh</code>
@@ -117,7 +117,7 @@ Output :<br />
 <p><strong>CHECK : Docker version</strong>. At the Ubuntu prompt, type <code>docker -v</code></p>
 </div>
 <div id="install-nvidia-container-toolkit" class="section level3">
-<h3>Install NVIDIA Container Toolkit</h3>
+<h3>7. Install NVIDIA Container Toolkit</h3>
 <p>Below commands will do the installation of the toolkit. <a href="https://docs.nvidia.com/cuda/wsl-user-guide/index.html#setting-containers">Source : CUDA on WSL</a></p>
 <pre><code>$ distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
 $ curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
@@ -141,7 +141,7 @@ $ sudo service docker start</code></pre>
 </ul>
 </div>
 <div id="use-vs-code-for-development" class="section level3">
-<h3>Use VS Code for development</h3>
+<h3>8. Use VS Code for development</h3>
 <p>One of the challenges I faced was to connect VS Code to the container that was running on Ubuntu which was inturn running inside WSL. The <code>Remote-Containers</code> extension was unable to reach the container. And <code>Remote-WSL</code> extension only reached the Ubuntu.</p>
 <p>With some help from the <a href="https://github.com/microsoft/vscode-remote-release/issues/3254">VS Code community</a> and the docker documentation <a href="https://docs.docker.com/engine/install/linux-postinstall/">here</a> and <a href="https://docs.docker.com/engine/reference/commandline/dockerd/">here</a>, I managed to get it working in below 2 steps :</p>
 <ul>

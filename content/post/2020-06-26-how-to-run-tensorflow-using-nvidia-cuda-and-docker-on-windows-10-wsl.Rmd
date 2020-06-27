@@ -53,15 +53,15 @@ Please note that as of 26th Jun 20, most of these features are still in developm
 * [Windows Insider Program](https://insider.windows.com/en-us/)
 * [NVIDIA Developer Program](https://developer.nvidia.com/developer-program)
 
-Also, under each section I have mentioned some `CHECKS` that would help in making sure you are on the right track.
+Also, under each step I have mentioned some `CHECKS` that would help in making sure you are on the right track.
 
-### Windows Insider Preview Build 20150
+### 1. Windows Insider Preview Build 20150
 
 First and foremost the GPU support on WSL is not available in the Retail Build of Windows 10. I had to get the latest [Windows 10 Insider Preview Build 20150](https://blogs.windows.com/windowsexperience/2020/06/17/announcing-windows-10-insider-preview-build-20150/). The details of all the builds are available in the [Flight Hub](https://docs.microsoft.com/en-us/windows-insider/flight-hub/). The installation process took an hour.
 
 **CHECK : Windows Version**. In Power Shell (PS) or CMD, type `winver`
 
-### Install WSL
+### 2. Install WSL
 
 Steps to be done in PS/CMD:
 
@@ -71,7 +71,7 @@ Steps to be done in PS/CMD:
 4. Default to version 2 : `wsl.exe --set-default-version 2`
 
 
-### Linux Kernel
+### 3. Linux Kernel
 
 After running the above command, I got this message : `WSL 2 requires an update to its kernel component. For information please visit https://aka.ms/wsl2kernel.` 
 
@@ -90,7 +90,7 @@ As per [Microsoft](https://devblogs.microsoft.com/commandline/wsl2-will-be-gener
 > We’ve removed the Linux kernel from the Windows OS image and instead will be delivering it to your machine via Windows Update, the same way that 3rd party drivers (like graphics, or touchpad drivers) are installed and updated on your machine today. When automatic install and update of the Linux kernel is added you’ll start getting automatic updates to your kernel right away.
 
 
-### Install Ubuntu 18.04 
+### 4. Install Ubuntu 18.04 
 
 * You can get the distro from the Microsoft store, to be installed on WSL
 * I prefer the Debian distribution as it is lighter than Ubuntu, so I spent quite some time in setting it up. But it did not work.
@@ -101,13 +101,13 @@ Output :
 `  NAME            STATE           VERSION`  
 `* Ubuntu-18.04    Stopped         2`
 
-### Install CUDA drivers on Win 10 (host)
+### 5. Install CUDA drivers on Win 10 (host)
 
 The CUDA drivers for WSL - Public Preview can be installed from [here](https://developer.nvidia.com/cuda/wsl)
 
 **CHECK : The CUDA driver version should be 455.41 or higher**. On PS/CMD type `nvidia-smi` 
 
-### Install Docker 
+### 6. Install Docker 
 
 * Enter the WSL by typing `wsl` on PS/CMD. This will activate Ubuntu. 
 * Install docker using `curl https://get.docker.com | sh`
@@ -117,7 +117,7 @@ The CUDA drivers for WSL - Public Preview can be installed from [here](https://d
 **CHECK : Docker version**. At the Ubuntu prompt, type `docker -v`
 
 
-### Install NVIDIA Container Toolkit
+### 7. Install NVIDIA Container Toolkit
 
 Below commands will do the installation of the toolkit. [Source : CUDA on WSL](https://docs.nvidia.com/cuda/wsl-user-guide/index.html#setting-containers)
 ```
@@ -147,7 +147,7 @@ If it doesnt work you could try `sudo systemctl restart docker`
 * Some additional test examples are also [available](https://docs.nvidia.com/cuda/wsl-user-guide/index.html#setting-containers)
 
 
-### Use VS Code for development
+### 8. Use VS Code for development
 
 One of the challenges I faced was to connect VS Code to the container that was running on Ubuntu which was inturn running inside WSL. The `Remote-Containers` extension was unable to reach the container. And `Remote-WSL` extension only reached the Ubuntu. 
 
