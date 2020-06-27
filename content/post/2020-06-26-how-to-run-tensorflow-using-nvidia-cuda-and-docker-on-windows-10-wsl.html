@@ -58,11 +58,11 @@ output:
 <li><a href="https://insider.windows.com/en-us/">Windows Insider Program</a></li>
 <li><a href="https://developer.nvidia.com/developer-program">NVIDIA Developer Program</a></li>
 </ul>
-<p>Also, under each step I have mentioned some <code>CHECKS</code> that would help in making sure you are on the right track.</p>
+<p>Also, under each step I have mentioned some <code>CHECKS</code>. Hope they help in making sure you are on the right track.</p>
 </div>
 <div id="windows-insider-preview-build-20150" class="section level3">
 <h3>1. Windows Insider Preview Build 20150</h3>
-<p>First and foremost the GPU support on WSL is not available in the Retail Build of Windows 10. I had to get the latest <a href="https://blogs.windows.com/windowsexperience/2020/06/17/announcing-windows-10-insider-preview-build-20150/">Windows 10 Insider Preview Build 20150</a>. The details of all the builds are available in the <a href="https://docs.microsoft.com/en-us/windows-insider/flight-hub/">Flight Hub</a>. The installation process took an hour.</p>
+<p>First and foremost, the GPU support on WSL is not available in the Retail Build of Windows 10. I had to get the latest <a href="https://blogs.windows.com/windowsexperience/2020/06/17/announcing-windows-10-insider-preview-build-20150/">Windows 10 Insider Preview Build 20150</a>. The details of all the builds are available in the <a href="https://docs.microsoft.com/en-us/windows-insider/flight-hub/">Flight Hub</a>. The installation process took an hour.</p>
 <p><strong>CHECK : Windows Version</strong>. In Power Shell (PS) or CMD, type <code>winver</code></p>
 </div>
 <div id="install-wsl" class="section level3">
@@ -93,7 +93,7 @@ Output : <code>Linux version 4.19.121-microsoft-standard (oe-user@oe-host) (gcc 
 <ul>
 <li>You can get the distro from the Microsoft store, to be installed on WSL</li>
 <li>I prefer the Debian distribution as it is lighter than Ubuntu, so I spent quite some time in setting it up. But it did not work.</li>
-<li>In the end, I went ahead with Ubuntu 18.04 (I might be wrong but I have read somewhere that tensorflow has issues with Ubuntu 20.04)</li>
+<li>In the end, I went ahead with Ubuntu 18.04 (I didn’t choose 20.04 as I have read somewhere that tensorflow has issues with that version. I might be wrong)</li>
 </ul>
 <p><strong>CHECK : Version of Ubuntu</strong>. On PS/CMD type <code>wsl -l -v</code><br />
 Output :<br />
@@ -119,25 +119,25 @@ Output :<br />
 <div id="install-nvidia-container-toolkit" class="section level3">
 <h3>7. Install NVIDIA Container Toolkit</h3>
 <p>Below commands will do the installation of the toolkit. <a href="https://docs.nvidia.com/cuda/wsl-user-guide/index.html#setting-containers">Source : CUDA on WSL</a></p>
-<pre><code>$ distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
-$ curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
-$ curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
-$ curl -s -L https://nvidia.github.io/libnvidia-container/experimental/$distribution/libnvidia-container-experimental.list | sudo tee /etc/apt/sources.list.d/libnvidia-container-experimental.list
-$ sudo apt-get update
-$ sudo apt-get install -y nvidia-docker2</code></pre>
-<p>The documentation gives the below steps to start the docker daemon but on my machine it was giving this error “docker: unrecognized service”</p>
+<pre><code>distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
+curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+curl -s -L https://nvidia.github.io/libnvidia-container/experimental/$distribution/libnvidia-container-experimental.list | sudo tee /etc/apt/sources.list.d/libnvidia-container-experimental.list
+sudo apt-get update
+sudo apt-get install -y nvidia-docker2</code></pre>
+<p>The documentation gives the below steps to start the docker daemon but on my machine it was giving this error <code>docker: unrecognized service</code></p>
 <pre><code>$ sudo service docker stop
 $ sudo service docker start</code></pre>
 <p>This started the docker for me <code>sudo dockerd</code>.</p>
-<p>If it doesnt work you could try <code>sudo systemctl restart docker</code></p>
+<p>If it doesnt work you could try <code>sudo systemctl start docker</code></p>
 <p><strong>CHECK</strong></p>
 <ul>
 <li>To check whether whether the installation was sucessful :
 <ul>
 <li><code>$ docker run --gpus all nvcr.io/nvidia/k8s/cuda-sample:nbody nbody -gpu -benchmark</code></li>
-<li>This creates a docker container and will give details about your GPU</li>
+<li>This creates a docker container and will show some details about your GPU</li>
 </ul></li>
-<li>Some additional test examples are also <a href="https://docs.nvidia.com/cuda/wsl-user-guide/index.html#setting-containers">available</a></li>
+<li>Some additional test examples are also <a href="https://docs.nvidia.com/cuda/wsl-user-guide/index.html#setting-containers">available here</a></li>
 </ul>
 </div>
 <div id="use-vs-code-for-development" class="section level3">

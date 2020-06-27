@@ -53,11 +53,11 @@ Please note that as of 26th Jun 20, most of these features are still in developm
 * [Windows Insider Program](https://insider.windows.com/en-us/)
 * [NVIDIA Developer Program](https://developer.nvidia.com/developer-program)
 
-Also, under each step I have mentioned some `CHECKS` that would help in making sure you are on the right track.
+Also, under each step I have mentioned some `CHECKS`. Hope they help in making sure you are on the right track.
 
 ### 1. Windows Insider Preview Build 20150
 
-First and foremost the GPU support on WSL is not available in the Retail Build of Windows 10. I had to get the latest [Windows 10 Insider Preview Build 20150](https://blogs.windows.com/windowsexperience/2020/06/17/announcing-windows-10-insider-preview-build-20150/). The details of all the builds are available in the [Flight Hub](https://docs.microsoft.com/en-us/windows-insider/flight-hub/). The installation process took an hour.
+First and foremost, the GPU support on WSL is not available in the Retail Build of Windows 10. I had to get the latest [Windows 10 Insider Preview Build 20150](https://blogs.windows.com/windowsexperience/2020/06/17/announcing-windows-10-insider-preview-build-20150/). The details of all the builds are available in the [Flight Hub](https://docs.microsoft.com/en-us/windows-insider/flight-hub/). The installation process took an hour.
 
 **CHECK : Windows Version**. In Power Shell (PS) or CMD, type `winver`
 
@@ -94,7 +94,7 @@ As per [Microsoft](https://devblogs.microsoft.com/commandline/wsl2-will-be-gener
 
 * You can get the distro from the Microsoft store, to be installed on WSL
 * I prefer the Debian distribution as it is lighter than Ubuntu, so I spent quite some time in setting it up. But it did not work.
-* In the end, I went ahead with Ubuntu 18.04 (I might be wrong but I have read somewhere that tensorflow has issues with Ubuntu 20.04)
+* In the end, I went ahead with Ubuntu 18.04 (I didn't choose 20.04 as I have read somewhere that tensorflow has issues with that version. I might be wrong)
 
 **CHECK : Version of Ubuntu**. On PS/CMD type `wsl -l -v`  
 Output :  
@@ -121,30 +121,30 @@ The CUDA drivers for WSL - Public Preview can be installed from [here](https://d
 
 Below commands will do the installation of the toolkit. [Source : CUDA on WSL](https://docs.nvidia.com/cuda/wsl-user-guide/index.html#setting-containers)
 ```
-$ distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
-$ curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
-$ curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
-$ curl -s -L https://nvidia.github.io/libnvidia-container/experimental/$distribution/libnvidia-container-experimental.list | sudo tee /etc/apt/sources.list.d/libnvidia-container-experimental.list
-$ sudo apt-get update
-$ sudo apt-get install -y nvidia-docker2
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
+curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+curl -s -L https://nvidia.github.io/libnvidia-container/experimental/$distribution/libnvidia-container-experimental.list | sudo tee /etc/apt/sources.list.d/libnvidia-container-experimental.list
+sudo apt-get update
+sudo apt-get install -y nvidia-docker2
 ```
 
-The documentation gives the below steps to start the docker daemon but on my machine it was giving this error "docker: unrecognized service"
+The documentation gives the below steps to start the docker daemon but on my machine it was giving this error `docker: unrecognized service`
 ```
 $ sudo service docker stop
 $ sudo service docker start
 ```
 This started the docker for me `sudo dockerd`. 
 
-If it doesnt work you could try `sudo systemctl restart docker`
+If it doesnt work you could try `sudo systemctl start docker`
 
 
 **CHECK**
 
 * To check whether whether the installation was sucessful :
     + `$ docker run --gpus all nvcr.io/nvidia/k8s/cuda-sample:nbody nbody -gpu -benchmark`
-    + This creates a docker container and will give details about your GPU
-* Some additional test examples are also [available](https://docs.nvidia.com/cuda/wsl-user-guide/index.html#setting-containers)
+    + This creates a docker container and will show some details about your GPU
+* Some additional test examples are also [available here](https://docs.nvidia.com/cuda/wsl-user-guide/index.html#setting-containers)
 
 
 ### 8. Use VS Code for development
