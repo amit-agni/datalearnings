@@ -5,7 +5,7 @@ date: '2018-04-10'
 categories:
   - regression
 tags:
-  - all posts
+  - R
   - regression
 slug: linear-regression-part-i-simple
 robots: noindex
@@ -51,6 +51,7 @@ Photo by Antoine Beauvillain on Unsplash
   ,caption = varPlotCaption) +
   theme_darklightmix(color_theme = ggplot_color_theme) +
   scale_color_brewer(palette = &quot;Set3&quot;)</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
 <p><img src="/post/2018-04-10-linear-regression-part-i-simple_files/figure-html/unnamed-chunk-1-1.png" width="384" style="display: block; margin: auto;" /></p>
 <p>The Pearsons correlation coefficient using the cor() for mpg and wt is r = -0.867. Negative indicates inverse relationship. If we square r, we get the coefficient of determination or the proportion of variance accounted for.</p>
 <pre class="r"><code>cor(mtcars$mpg,mtcars$wt)</code></pre>
@@ -131,6 +132,7 @@ labs (x = &quot;wt&quot;
       ,caption = varPlotCaption) +
   theme_darklightmix(color_theme = ggplot_color_theme) +
   scale_color_brewer(palette = &quot;Set3&quot;)</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
 <p><img src="/post/2018-04-10-linear-regression-part-i-simple_files/figure-html/unnamed-chunk-5-1.png" width="384" style="display: block; margin: auto;" /></p>
 <p>The residuals section of our model gives us a quick distribution of our residuals. It should be roughly symmetrical about mean, the median should be close to 0, the 1Q and 3Q values should ideally be roughly similar values.</p>
 </div>

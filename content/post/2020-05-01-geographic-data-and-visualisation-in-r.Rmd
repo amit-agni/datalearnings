@@ -5,7 +5,8 @@ date: '2020-04-30'
 slug: geographic-data-and-visualisation-in-r
 categories: [inst]
 tags:
-  - all posts
+  - R
+  - spatial
 robots: index
 description: Manipulating geospatial data and visualisation using Australian Data
 output:

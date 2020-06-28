@@ -4,7 +4,9 @@ author: Amit Agni
 date: '2020-06-26'
 slug: how-to-run-tensorflow-using-nvidia-cuda-and-docker-on-windows-wsl
 categories: []
-tags: []
+tags:
+  - tensorflow
+  - docker
 robots: index
 description: Setting up a Tensorflow development workflow on Windows 10
 output:
@@ -117,6 +119,22 @@ The CUDA drivers for WSL - Public Preview can be installed from [here](https://d
 **CHECK : Docker version**. At the Ubuntu prompt, type `docker -v`
 
 
+### Docker Desktop for Windows confusion
+
+* The Docker Desktop for Windows is different from the docker that I installed in Step 6
+* Prior to the release of WSL2, it would use Hyper-V virtualisation for creating the Linux VMs in Windows
+* After I installed WSL2, I enabled the WSL2 integration in Docker Desktop and let it use the WSL backend
+* But this started interfering with the docker that I had installed in WSL/Ubuntu
+  + In particular, it would create its own Linux distros : `docker-desktop` and `docker-desktop-data`
+  + And the images/containers that I created using the WSL/Ubuntu dockerd went missing
+* I found these solutions to work:
+  + Disable the Docker Desktop integration with WSL2 (so that it continues to use Hyper-V backend). And then restart computer
+  + Quit Docker Desktop and degister `docker-desktop` and `docker-desktop-data` using
+    + `wslconfig /u docker-desktop` and  `wslconfig /u docker-desktop-data`
+    + Check  `wsl -l -v` 
+  + Setting default distro to Ubuntu `wsl --set-default Ubuntu 18.04` did not help
+
+
 ### 7. Install NVIDIA Container Toolkit
 
 Below commands will do the installation of the toolkit. [Source : CUDA on WSL](https://docs.nvidia.com/cuda/wsl-user-guide/index.html#setting-containers)
@@ -165,10 +183,8 @@ And then in VS Code, I could use the `Remote Containers:Attach to running contai
 ### Issues faced
 * The boot loader menu for my Ubuntu - Windows 10 dual boot disappeared (Most likely after the installation of the Insider Build 20150)
 * The CUDA toolkit doesn't seem to work on Debian distro (I might have to give it another try )
-* The Docker Desktop for Windows should not be running as it interferes with the docker daemon in Ubuntu
-  + Stop the Docker Desktop
-  + If your `wsl -l -v` command shows `docker-desktop` and `docker-desktop-data`, then the same can be deregistered using `wslconfig /u docker-desktop`
-* Some other useful `wsl` options
+* The Docker Desktop for Windows (with WSL2 backend) should not be running as it interferes with the docker daemon in Ubuntu
+* Some useful `wsl` options
   + `wsl --set-default Ubuntu 18.04`  to change default distro
   + `wsl --shutdown` to shutdown the Linux Kernel
 * I also had another non-CUDA display adapter on my machine GeForce GT710. And I realised tensorflow was crashing at this command `tf.test.gpu_device_name()`, so I disabled it and it seemed to work well. 

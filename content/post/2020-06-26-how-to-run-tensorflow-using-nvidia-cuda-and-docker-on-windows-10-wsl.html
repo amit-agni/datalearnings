@@ -4,7 +4,9 @@ author: Amit Agni
 date: '2020-06-26'
 slug: how-to-run-tensorflow-using-nvidia-cuda-and-docker-on-windows-wsl
 categories: []
-tags: []
+tags:
+  - tensorflow
+  - docker
 robots: index
 description: Setting up a Tensorflow development workflow on Windows 10
 output:
@@ -24,6 +26,7 @@ output:
 <li><a href="#install-ubuntu-18.04">4. Install Ubuntu 18.04</a></li>
 <li><a href="#install-cuda-drivers-on-win-10-host">5. Install CUDA drivers on Win 10 (host)</a></li>
 <li><a href="#install-docker">6. Install Docker</a></li>
+<li><a href="#docker-desktop-for-windows-confusion">Docker Desktop for Windows confusion</a></li>
 <li><a href="#install-nvidia-container-toolkit">7. Install NVIDIA Container Toolkit</a></li>
 <li><a href="#use-vs-code-for-development">8. Use VS Code for development</a></li>
 <li><a href="#issues-faced">Issues faced</a></li>
@@ -116,6 +119,29 @@ Output :<br />
 </ul>
 <p><strong>CHECK : Docker version</strong>. At the Ubuntu prompt, type <code>docker -v</code></p>
 </div>
+<div id="docker-desktop-for-windows-confusion" class="section level3">
+<h3>Docker Desktop for Windows confusion</h3>
+<ul>
+<li>The Docker Desktop for Windows is different from the docker that I installed in Step 6</li>
+<li>Prior to the release of WSL2, it would use Hyper-V virtualisation for creating the Linux VMs in Windows</li>
+<li>After I installed WSL2, I enabled the WSL2 integration in Docker Desktop and let it use the WSL backend</li>
+<li>But this started interfering with the docker that I had installed in WSL/Ubuntu
+<ul>
+<li>In particular, it would create its own Linux distros : <code>docker-desktop</code> and <code>docker-desktop-data</code></li>
+<li>And the images/containers that I created using the WSL/Ubuntu dockerd went missing</li>
+</ul></li>
+<li>I found these solutions to work:
+<ul>
+<li>Disable the Docker Desktop integration with WSL2 (so that it continues to use Hyper-V backend). And then restart computer</li>
+<li>Quit Docker Desktop and degister <code>docker-desktop</code> and <code>docker-desktop-data</code> using
+<ul>
+<li><code>wslconfig /u docker-desktop</code> and <code>wslconfig /u docker-desktop-data</code></li>
+<li>Check <code>wsl -l -v</code></li>
+</ul></li>
+<li>Setting default distro to Ubuntu <code>wsl --set-default Ubuntu 18.04</code> did not help</li>
+</ul></li>
+</ul>
+</div>
 <div id="install-nvidia-container-toolkit" class="section level3">
 <h3>7. Install NVIDIA Container Toolkit</h3>
 <p>Below commands will do the installation of the toolkit. <a href="https://docs.nvidia.com/cuda/wsl-user-guide/index.html#setting-containers">Source : CUDA on WSL</a></p>
@@ -160,12 +186,8 @@ $ sudo service docker start</code></pre>
 <ul>
 <li>The boot loader menu for my Ubuntu - Windows 10 dual boot disappeared (Most likely after the installation of the Insider Build 20150)</li>
 <li>The CUDA toolkit doesn’t seem to work on Debian distro (I might have to give it another try )</li>
-<li>The Docker Desktop for Windows should not be running as it interferes with the docker daemon in Ubuntu
-<ul>
-<li>Stop the Docker Desktop</li>
-<li>If your <code>wsl -l -v</code> command shows <code>docker-desktop</code> and <code>docker-desktop-data</code>, then the same can be deregistered using <code>wslconfig /u docker-desktop</code></li>
-</ul></li>
-<li>Some other useful <code>wsl</code> options
+<li>The Docker Desktop for Windows (with WSL2 backend) should not be running as it interferes with the docker daemon in Ubuntu</li>
+<li>Some useful <code>wsl</code> options
 <ul>
 <li><code>wsl --set-default Ubuntu 18.04</code> to change default distro</li>
 <li><code>wsl --shutdown</code> to shutdown the Linux Kernel</li>

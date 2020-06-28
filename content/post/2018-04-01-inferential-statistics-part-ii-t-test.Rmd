@@ -3,10 +3,9 @@ title: Inferential Statistics Part II – T test
 author: Amit Agni
 date: '2018-04-01'
 slug: inferential-statistics-part-ii-t-test
-categories:
-  - statistics
+categories: []
 tags:
-  - all posts
+  - R
   - statistics
 robots: index
 description: "Types of T-tests : One-Sample, Unpaired and Paired t-tests"

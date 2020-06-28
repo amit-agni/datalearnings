@@ -3,10 +3,9 @@ title: Inferential Statisics Part I - Basics
 author: Amit Agni
 date: '2018-03-21'
 slug: inferential-statisics-part-i-basics
-categories:
-  - statistics
+categories: []
 tags:
-  - all posts
+  - R
   - statistics
 robots: "noindex"
 description: General statistical concepts like central limit theorem, confidence intervals, Pprobability distributions, critical values, p-values, etc
