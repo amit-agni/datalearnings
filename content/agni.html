@@ -33,3 +33,8 @@ robots: index
   const formattedDate = today.toLocaleDateString('en-GB', options).replace(/ /g, '-');
   document.getElementById("current-date").textContent = formattedDate;
 </script>
+
+<script>
+fetch("/.netlify/functions/log-visit-to-agni-meter-readings");
+</script>
+
