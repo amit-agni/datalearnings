@@ -3,8 +3,8 @@ title:
 description: 
 slug: agni
 robots: index
-
 ---
+
 <center>
   <h1 style="font-size: 3vw; font-weight: bold; line-height: 1.2;">
     Amit Agni
@@ -12,6 +12,9 @@ robots: index
   <h1 style="font-size: 6vw; font-weight: bold; line-height: 1.2;">
     ELECTRICITY METER READING
   </h1>
+
+  <h2 id="current-date" style="font-size: 4vw; font-weight: normal; margin-top: 0.5em;"></h2>
+
   <br><br>
   <h1 style="font-size: 10vw; font-weight: bold; line-height: 1.2;">
     Meter No. 14010081
@@ -24,3 +27,9 @@ robots: index
   </h1>
 </center>
 
+<script>
+  const today = new Date();
+  const options = { day: '2-digit', month: 'short', year: '2-digit' };
+  const formattedDate = today.toLocaleDateString('en-GB', options).replace(/ /g, '-');
+  document.getElementById("current-date").textContent = formattedDate;
+</script>
