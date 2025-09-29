@@ -3,7 +3,7 @@ exports.handler = async (event, context) => {
   const ua = event.headers["user-agent"] || "unknown browser";
 
   // Send visit to Google Sheet
-  await fetch("YOUR_GOOGLE_SCRIPT_WEBAPP_URL", {
+  await fetch("https://script.google.com/macros/s/AKfycbxMOAcIdVPI-YBG2dY96UvOBshmSio7o4MF_jkEr4Emhls-1fyNx8JOcte5Jpc6TILP/exec", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ip, ua })
